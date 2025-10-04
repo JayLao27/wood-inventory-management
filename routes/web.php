@@ -7,9 +7,9 @@ Route::get('/', function () {
     return view('Auth.Login');
 });
 
-Route::get('/dashboard', function () {
-    return view('Systems\dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/sales', function () {
+    return view('Systems\sales');
+})->middleware(['auth', 'verified'])->name('sales');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

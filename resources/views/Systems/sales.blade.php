@@ -16,7 +16,7 @@
             <div class="sidebar-content">
                 <div class="logo-section">
                     <div class="logo">
-                        <img src="../assets/logo.png" alt="RM Woodworks Logo" />
+                        <img src="../public/images/logo.png" alt="RM Woodworks Logo" />
                     </div>
                     <div class="logo-text">
                         <h2>RM Wood Works</h2>
