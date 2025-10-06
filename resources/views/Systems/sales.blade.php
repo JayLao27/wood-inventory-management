@@ -2,330 +2,304 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sales and Order Management System</title>
-    <link rel="stylesheet" href="../css/sales.css" />
-    <script src="https://kit.fontawesome.com/57ad728d01.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales and Order Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#1f2a38",
+            hover:"#fff1da",
+            accent: "#f28c28",
+            bg: "#f2e9d8",
+            card: "#0f3a3d",
+            beige: "#faedcd",
+            retail: "#6f65ff",
+            wholesale: "#5eb8ff",
+            contractor: "#d27fd6",
+          },
+          fontFamily: {
+            poppins: ["Poppins", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://kit.fontawesome.com/57ad728d01.js" crossorigin="anonymous"></script>
 </head>
 
-<body>
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-content">
-                <div class="logo-section">
-                    <div class="logo">
-                        <img src="../public/images/logo.png" alt="RM Woodworks Logo" />
-                    </div>
-                    <div class="logo-text">
-                        <h2>RM Wood Works</h2>
-                        <p>Management System</p>
-                    </div>
-                </div>
+<body class="bg-bg text-primary font-poppins min-h-screen p-8">
 
-                <hr class="sidebar-divider" />
-                <div class="menu">
-                    <ul>
-                        <li><i class="fa-solid fa-house"></i> Dashboard</li>
-                        <li><i class="fa-solid fa-box"></i> Inventory</li>
-                        <li><i class="fa-solid fa-hammer"></i> Production</li>
-                        <li class="active"><i class="fa-solid fa-cart-shopping"></i> Sales & Orders</li>
-                        <li><i class="fa-solid fa-file-lines"></i> Procurement</li>
-                        <li><i class="fa-solid fa-coins"></i> Accounting</li>
-                        <li><i class="fa-solid fa-chart-column"></i> Reports</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="sidebar-divider" />
-            <div class="footer">© 2024 RM Woodworks</div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <div class="Sales-text">
-                    <h1>Sales & Orders</h1>
-                    <p>Manage customer orders, sales, and deliveries</p>
-                </div>
-
-                <div class="options">
-                    <button class="export"><i class="fa-solid fa-download"></i> Export</button>
-                    <button class="new"><i class="fa-solid fa-plus"></i> New Order</button>
-                </div>
-            </div>
-
-            <!-- Dashboard Cards -->
-            <section class="dashboard-cards">
-                <div class="card">
-                    <h3>Total Revenue</h3>
-                    <p class="value">$6,949.84</p>
-                    <span class="note">All time sales</span>
-                </div>
-                <div class="card">
-                    <h3>Payments Received</h3>
-                    <p class="value success">$3,899.91</p>
-                    <span class="note">Items requiring attention</span>
-                </div>
-                <div class="card">
-                    <h3>Pending Payments</h3>
-                    <p class="value warning">$3,049.93</p>
-                    <span class="note">Outstanding amount</span>
-                </div>
-                <div class="card">
-                    <h3>Active Orders</h3>
-                    <p class="value">4</p>
-                    <span class="note">Orders in progress</span>
-                </div>
-            </section>
-
-            <!-- Table Section -->
-            <section class="sales-management">
-                <header class="section-header">
-                    <h2>Sales Management</h2>
-                    <p>Manage customer orders and track sales performance</p>
-                </header>
-
-                <div class="toolbar">
-                    <input type="search" placeholder="Search order or customers..." />
-                    <div class="filters">
-                        <select>
-                            <option>All Status</option>
-                        </select>
-                        <select>
-                            <option>All Priority</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-filters">
-                    <button class="tab active"><i class="fa-solid fa-cart-shopping"></i> Sales Orders</button>
-                    <button class="tab"><i class="fa-solid fa-users"></i> Customers</button>
-                </div>
-
-                <!-- Sales Orders Table -->
-                <table id="sales-orders-table" class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Order #</th>
-                            <th>Customer</th>
-                            <th>Order Date</th>
-                            <th>Delivery Date</th>
-                            <th>Status</th>
-                            <th>Total Amount</th>
-                            <th>Payment Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>WO-2025-001</td>
-                            <td>Home Design Studio <span class="tag">Wholesale</span></td>
-                            <td>1/15/2025</td>
-                            <td>1/30/2025</td>
-                            <td><span class="badge in-progress">In Production</span></td>
-                            <td>$1,199.96</td>
-                            <td><span class="badge partial">Partial</span></td>
-                            <td>
-                                <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
-                                <button class="action-btn edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Customers Table -->
-                <table id="customers-table" class="data-table" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th>Customer Name</th>
-                            <th>Type</th>
-                            <th>Contact</th>
-                            <th>Email</th>
-                            <th>Total Orders</th>
-                            <th>Total Spent</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Oclarit Family</td>
-                            <td><span class="badge">Retail</span></td>
-                            <td>+1-555-0202</td>
-                            <td>mary.johnson@email.com</td>
-                            <td>2</td>
-                            <td>$899.99</td>
-                            <td>
-                                <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
-                                <button class="action-btn edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Modals -->
-                <div id="viewModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2><i class="fa-solid fa-eye"></i> View Details</h2>
-                        <div class="modal-body">
-                            <p><strong>Order #:</strong> WO-2025-001</p>
-                            <p><strong>Customer:</strong> Home Design Studio</p>
-                            <p><strong>Status:</strong> In Production</p>
-                            <p><strong>Total Amount:</strong> $1,199.96</p>
-                            <p><strong>Payment:</strong> Partial</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Update Order -->
-                <div id="editModal" class="modal">
-                    <div class="modal-content update-order">
-                        <span class="close">&times;</span>
-                        <h2><i class="fa-solid fa-pen-to-square"></i> Update Order</h2>
-                        <p class="subtext">Edit order details and update status.</p>
-                        <form>
-                            <label>Customer Name</label>
-                            <input type="text" value="Home Design Studio">
-                            <label>Status</label>
-                            <select>
-                                <option>Confirmed</option>
-                                <option>In Production</option>
-                                <option>Delivered</option>
-                                <option>Cancelled</option>
-                            </select>
-                            <label>Total Amount ($)</label>
-                            <input type="number" value="1199.96">
-                            <div class="modal-actions">
-                                <button type="button" class="cancel-btn">Cancel</button>
-                                <button type="submit" class="save-btn">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Cancel Order -->
-                <div id="cancelModal" class="modal">
-                    <div class="modal-content cancel-order">
-                        <span class="close">&times;</span>
-                        <h2>Cancel Order</h2>
-                        <p class="subtext">Are you sure you want to cancel order SO-2024-002?</p>
-                        <div class="order-info">
-                            <div class="customer"><strong>Oclarit Family</strong>
-                                <p>Total: $899.99</p>
-                            </div>
-                            <div class="delivery">
-                                <p><strong>Delivery Date</strong><br>1/25/2024</p>
-                            </div>
-                        </div>
-                        <label><strong>Cancellation Reason</strong></label>
-                        <div class="reason-select" id="reasonSelect">Select Reason ▾</div>
-                        <label><strong>Additional Notes</strong></label>
-                        <textarea placeholder="Optional notes..."></textarea>
-                        <div class="modal-actions">
-                            <button class="keep-btn">Keep Order</button>
-                            <button class="cancel-btn">Cancel Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reason Modal -->
-                <div id="reasonModal" class="modal">
-                    <div class="modal-content small">
-                        <ul class="reason-list">
-                            <li>Customer Request</li>
-                            <li>Material Shortage</li>
-                            <li>Production Delay</li>
-                            <li>Payment Issue</li>
-                            <li>Other</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- New Sales Order -->
-                <div id="newOrderModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>Create New Sales Order</h2>
-                        <p class="modal-subtitle">Create a new sales order for a customer.</p>
-                        <div class="modal-body">
-                            <label>Customer</label>
-                            <div class="select-box" id="customerSelect">
-                                <span>Select Customer</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </div>
-
-                            <label>Delivery Date</label>
-                            <input type="date">
-
-                            <label>Product</label>
-                            <div class="product-row">
-                                <div class="select-box" id="productSelect">
-                                    <span>Select Product</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <input type="number" placeholder="Qty" min="1" class="qty-input">
-                            </div>
-
-                            <label>Notes</label>
-                            <textarea placeholder="Optional notes..."></textarea>
-                            <button class="create-btn">Create Work Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Success -->
-                <div id="successModal" class="modal">
-                    <div class="modal-content small">
-                        <span class="close">&times;</span>
-                        <h2><i class="fa-solid fa-circle-check" style="color:#2e8b57;"></i> Order Created!</h2>
-                        <p>Your new sales order has been successfully created.</p>
-                        <button class="ok-btn">OK</button>
-                    </div>
-                </div>
-
-                <!-- Select Customer -->
-                <div id="customerSelectModal" class="modal">
-                    <div class="modal-content small">
-                        <span class="close">&times;</span>
-                        <h2><i class="fa-solid fa-users"></i> Select Customer</h2>
-                        <div class="modal-body">
-                            <ul class="select-list">
-                                <li>Home Design Studio</li>
-                                <li>Oclarit Family</li>
-                                <li>Lao Tressure Co.</li>
-                                <li>Neil Idol</li>
-                                <li>JV Family</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Select Product -->
-                <div id="productSelectModal" class="modal">
-                    <div class="modal-content small">
-                        <span class="close">&times;</span>
-                        <h2><i class="fa-solid fa-cube"></i> Select Product</h2>
-                        <div class="modal-body">
-                            <ul class="select-list">
-                                <li>Classic Oak Dining Chair</li>
-                                <li>Pine Coffee Table</li>
-                                <li>Oak Kitchen Cabinet</li>
-                                <li>Pine Bookshelf</li>
-                                <li>Oak Dining Table</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-        </div>
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-semibold">Sales & Orders</h1>
+      <p class="text-gray-600">Manage customer orders, sales, and deliveries</p>
     </div>
-    <script src="script.js"></script>
+    <div>
+      <button id="newOrderBtn"
+        class="bg-gray-700 text-white px-4 py-2 rounded-md ml-2 hover:bg-accent transition"><i
+          class="fa-solid fa-plus mr-1"></i> New Order</button>
+    </div>
+  </div>
 
+  <!-- Sales Management Section -->
+  <section class="bg-card text-white p-6 rounded-2xl">
+    <header class="mb-4">
+      <h2 class="text-xl font-semibold">Sales Management</h2>
+      <p class="text-gray-300">Manage customer orders and track sales performance</p>
+    </header>
+
+    <div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
+      <input type="search" placeholder="Search order or customers..."
+        class="w-full md:w-3/4 rounded-full px-4 py-2 text-primary focus:outline-none" />
+      <div class="flex gap-2">
+        <select class="bg-bg text-primary rounded-md px-3 py-2">
+          <option>All Status</option>
+        </select>
+        <select class="bg-bg text-primary rounded-md px-3 py-2">
+          <option>All Priority</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Toggle Buttons -->
+    <div class="flex justify-center gap-2 mb-6">
+      <button id="salesTab"
+        class="bg-primary text-white px-72 py-2 rounded-md border border-gray-600 hover:bg-hover hover:text-black transition flex items-center gap-2""><i
+          class="fa-solid fa-cart-shopping"></i> Sales Orders</button>
+      <button id="customersTab"
+        class="bg-primary text-white px-72 py-2 rounded-md border border-gray-600 hover:bg-hover hover:text-black transition flex items-center gap-2"><i
+          class="fa-solid fa-users"></i> Customers</button>
+    </div>
+
+    <!-- Sales Table -->
+    <div id="salesTable" class="overflow-x-auto">
+      <table class="min-w-full border-collapse text-left text-sm">
+        <thead class="bg-primary text-gray-300">
+          <tr>
+            <th class="px-4 py-2">Order #</th>
+            <th class="px-4 py-2">Customer</th>
+            <th class="px-4 py-2">Order Date</th>
+            <th class="px-4 py-2">Delivery Date</th>
+            <th class="px-4 py-2">Status</th>
+            <th class="px-4 py-2">Total Amount</th>
+            <th class="px-4 py-2">Payment Status</th>
+            <th class="px-4 py-2">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-[#14494c] even:bg-[#155c5f]">
+            <td class="px-4 py-2">WO-2025-001</td>
+            <td class="px-4 py-2">Home Design Studio</td>
+            <td class="px-4 py-2">1/15/2025</td>
+            <td class="px-4 py-2">1/30/2025</td>
+            <td class="px-4 py-2"><span class="bg-yellow-600 px-2 py-1 rounded text-white text-xs">In Production</span>
+            </td>
+            <td class="px-4 py-2">$1,199.96</td>
+            <td class="px-4 py-2"><span class="bg-indigo-500 px-2 py-1 rounded text-white text-xs">Partial</span></td>
+            <td class="px-4 py-2 flex gap-2">
+              <button class="bg-green-600 hover:scale-110 transition rounded px-2 py-1"><i
+                  class="fa-solid fa-eye"></i></button>
+              <button class="bg-yellow-500 hover:scale-110 transition rounded px-2 py-1"><i
+                  class="fa-solid fa-pen-to-square"></i></button>
+              <button class="bg-red-600 hover:scale-110 transition rounded px-2 py-1"><i
+                  class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Customer Table -->
+    <div id="customerTable" class="hidden overflow-x-auto">
+      <table class="min-w-full border-collapse text-left text-sm">
+        <thead class="bg-primary text-gray-300">
+          <tr>
+            <th class="px-4 py-2">Name</th>
+            <th class="px-4 py-2">Type</th>
+            <th class="px-4 py-2">Contact</th>
+            <th class="px-4 py-2">Total Orders</th>
+            <th class="px-4 py-2">Total Spent</th>
+            <th class="px-4 py-2">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-[#14494c] even:bg-[#155c5f]">
+            <td class="px-4 py-2">Home Design Studio</td>
+            <td class="px-4 py-2"><span class="bg-wholesale text-white px-3 py-1 rounded-full text-xs">Wholesale</span></td>
+            <td class="px-4 py-2">
+              +63-951-042-2303<br>
+              <span class="text-gray-300 text-xs">orders@homedesign.com</span>
+            </td>
+            <td class="px-4 py-2">3</td>
+            <td class="px-4 py-2">$4,599.88</td>
+            <td class="px-4 py-2 flex gap-2">
+              <button class="bg-green-600 hover:scale-110 transition rounded px-2 py-1"><i
+                  class="fa-solid fa-eye"></i></button>
+              <button class="bg-yellow-500 hover:scale-110 transition rounded px-2 py-1"><i
+                  class="fa-solid fa-pen-to-square"></i></button>
+              <button class="bg-red-600 hover:scale-110 transition rounded px-2 py-1"><i
+                  class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- New Order / Customer Modal -->
+  <div id="modal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity">
+    <div class="bg-beige p-6 rounded-lg w-[90%] max-w-md shadow-xl">
+      <h2 id="modalTitle" class="text-xl font-semibold mb-1">Create New Sales Order</h2>
+      <p id="modalSubtitle" class="text-gray-600 mb-4 text-sm">Create a new sales order for a customer.</p>
+
+      <!-- Sales Order Form -->
+      <form id="orderForm" class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium mb-1">Customer</label>
+          <input type="text" placeholder="Enter customer name"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Delivery Date</label>
+          <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Product</label>
+          <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+            <option>Select Product</option>
+            <option>Classic Oak Dining Chair</option>
+            <option>Pine Coffee Table</option>
+            <option>Oak Kitchen Cabinet</option>
+            <option>Pine Bookshelf</option>
+            <option>Oak Dining Table</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Notes</label>
+          <textarea rows="3"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none"></textarea>
+        </div>
+      </form>
+
+      <!-- Customer Form -->
+      <form id="customerForm" class="hidden space-y-3">
+        <div>
+          <label class="block text-sm font-medium mb-1">Name</label>
+          <input type="text" placeholder="Customer name"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Type</label>
+          <div class="flex gap-2">
+            <button type="button"
+              class="type-btn bg-retail text-white px-3 py-1 rounded-full text-xs focus:ring-2 focus:ring-offset-2"
+              data-type="Retail">Retail</button>
+            <button type="button"
+              class="type-btn bg-wholesale text-white px-3 py-1 rounded-full text-xs focus:ring-2 focus:ring-offset-2"
+              data-type="Wholesale">Wholesale</button>
+            <button type="button"
+              class="type-btn bg-contractor text-white px-3 py-1 rounded-full text-xs focus:ring-2 focus:ring-offset-2"
+              data-type="Contractor">Contractor</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Contact Number</label>
+          <input type="text" placeholder="+1 555-1234"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Email</label>
+          <input type="email" placeholder="email@example.com"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Total Orders</label>
+          <input type="number" min="0"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Total Spent</label>
+          <input type="number" min="0" step="0.01"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+        </div>
+      </form>
+
+      <div class="flex justify-end mt-4">
+        <button id="closeModalBtn"
+          class="px-4 py-2 rounded-md bg-gray-300 text-primary mr-2 hover:bg-gray-400">Cancel</button>
+        <button id="submitBtn"
+          class="px-4 py-2 rounded-md bg-primary text-white hover:bg-accent">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    const salesTab = document.getElementById("salesTab");
+    const customersTab = document.getElementById("customersTab");
+    const salesTable = document.getElementById("salesTable");
+    const customerTable = document.getElementById("customerTable");
+    const newOrderBtn = document.getElementById("newOrderBtn");
+    const modal = document.getElementById("modal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSubtitle = document.getElementById("modalSubtitle");
+    const orderForm = document.getElementById("orderForm");
+    const customerForm = document.getElementById("customerForm");
+
+    // Toggle Views
+    customersTab.addEventListener("click", () => {
+      salesTable.classList.add("hidden");
+      customerTable.classList.remove("hidden");
+      customersTab.classList.add("bg-accent", "text-primary");
+      salesTab.classList.remove("bg-accent", "text-primary");
+      salesTab.classList.add("bg-primary", "text-white");
+      newOrderBtn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> New Customer';
+    });
+
+    salesTab.addEventListener("click", () => {
+      customerTable.classList.add("hidden");
+      salesTable.classList.remove("hidden");
+      salesTab.classList.add("bg-accent", "text-primary");
+      customersTab.classList.remove("bg-accent", "text-primary");
+      customersTab.classList.add("bg-primary", "text-white");
+      newOrderBtn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> New Order';
+    });
+
+    // Modal Logic
+    newOrderBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+      if (newOrderBtn.textContent.includes("Customer")) {
+        modalTitle.textContent = "Create New Customer";
+        modalSubtitle.textContent = "Add a new customer record.";
+        customerForm.classList.remove("hidden");
+        orderForm.classList.add("hidden");
+      } else {
+        modalTitle.textContent = "Create New Sales Order";
+        modalSubtitle.textContent = "Create a new sales order for a customer.";
+        orderForm.classList.remove("hidden");
+        customerForm.classList.add("hidden");
+      }
+    });
+
+    closeModalBtn.addEventListener("click", () => modal.classList.add("hidden"));
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.add("hidden");
+    });
+  </script>
 </body>
-
 </html>
