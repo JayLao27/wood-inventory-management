@@ -7,13 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('customers', function (Blueprint $table) {
-            $table->id('customer_id'); // matches sales_orders.customer_id
-            $table->string('customer_name'); // full name or company
-            $table->string('contact_person')->nullable(); // optional contact name
+            $table->id('customer_id');
+            $table->string('customer_name');
+            $table->string('contact_person')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->text('address')->nullable();
-            $table->string('customer_type')->default('Retail'); // Retail or Wholesale
+            $table->enum('customer_type', ['Retail', 'Wholesale', 'Contractor'])->default('Retail');
+            $table->integer('total_orders')->default(0);
+            $table->decimal('total_spent', 10, 2)->default(0);
             $table->timestamps();
         });
     }

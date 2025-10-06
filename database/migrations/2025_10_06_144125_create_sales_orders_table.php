@@ -11,12 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_orders', function (Blueprint $table) {
+   Schema::create('sales_orders', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-        });
-    }
+                $table->string('order_number')->unique();
+                $table->unsignedBigInteger('customer_id'); // references customers.id
+                $table->date('order_date');
+                $table->date('delivery_date');
+                $table->string('product');
+                $table->decimal('total_amount', 10, 2)->default(0);
+                $table->enum('status', ['Pending', 'In Production', 'Ready', 'Delivered', 'Cancelled'])->default('Pending');
+                $table->enum('payment_status', ['Unpaid', 'Partial', 'Paid'])->default('Unpaid');
+                $table->text('notes')->nullable();
+                $table->timestamps();
 
+                
+
+
+
+                $table->engine = 'InnoDB';
+        });
+
+        }
     /**
      * Reverse the migrations.
      */
