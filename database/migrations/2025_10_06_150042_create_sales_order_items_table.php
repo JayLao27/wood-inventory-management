@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_orders', function (Blueprint $table) {
-            $table->id(); // simple auto-increment primary key
+        Schema::create('sales_order_items', function (Blueprint $table) {
+            $table->id(); // simple auto-increment ID
             $table->timestamps(); // created_at and updated_at only
         });
     }
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales_orders');
+        Schema::dropIfExists('sales_order_items');
     }
 };

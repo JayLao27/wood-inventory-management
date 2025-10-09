@@ -159,12 +159,18 @@
       <p id="modalSubtitle" class="text-gray-600 mb-4 text-sm">Create a new sales order for a customer.</p>
 
       <!-- Sales Order Form -->
-      <form id="orderForm" class="space-y-3">
-        <div>
-          <label class="block text-sm font-medium mb-1">Customer</label>
-          <input type="text" placeholder="Enter customer name"
-            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none" />
-        </div>
+     <div>
+  <label class="block text-sm font-medium mb-1">Customer</label>
+  <select id="customerDropdown"
+    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
+    <option value="">Select Customer</option>
+    <option value="Home Design Studio">Home Design Studio</option>
+    <option value="Bright Interiors">Bright Interiors</option>
+    <option value="Modern Concepts">Modern Concepts</option>
+    <option value="Elite Contractors">Elite Contractors</option>
+  </select>
+</div>
+
 
         <div>
           <label class="block text-sm font-medium mb-1">Delivery Date</label>

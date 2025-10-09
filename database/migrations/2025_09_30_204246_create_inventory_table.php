@@ -12,20 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('inventory', function (Blueprint $table) {
-            $table->id('raw_material_id');
-            $table->unsignedBigInteger('finished_product_id');
-            $table->unsignedBigInteger('reference_id');
-            $table->string('item_id');
-            $table->string('item_type');
-            $table->string('movement_type');
-            $table->decimal('quantity', 10, 2);
-            $table->string('reference_type');
-            $table->text('notes')->nullable();
-            $table->timestamps();
-            
-            // Add indexes if needed
-            $table->index(['item_id', 'item_type']);
-            $table->index('reference_id');
+            $table->id();
+            $table->timestamps(); 
         });
     }
 
