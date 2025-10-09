@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Sales and Order Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -101,7 +100,7 @@
         </thead>
         <tbody id="salesTableBody">
           <tr>
-            <td colspan="9" class="text-center py-4">Loading...</td>
+            <td colspan="9" class="text-center py-4">No orders yet. Click "New Order" to create one.</td>
           </tr>
         </tbody>
       </table>
@@ -122,7 +121,7 @@
         </thead>
         <tbody id="customerTableBody">
           <tr>
-            <td colspan="6" class="text-center py-4">Loading...</td>
+            <td colspan="6" class="text-center py-4">No customers yet. Click "New Customer" to add one.</td>
           </tr>
         </tbody>
       </table>
@@ -243,15 +242,16 @@
 
   <!-- Scripts -->
   <script>
-    // CSRF Token Setup
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    // In-Memory Data Storage
+    let allOrders = [];
+    let allCustomers = [];
+    let orderIdCounter = 1;
+    let customerIdCounter = 1;
 
     // State
     let currentView = 'sales';
     let currentEditId = null;
     let currentEditType = null;
-    let allOrders = [];
-    let allCustomers = [];
 
     // DOM Elements
     const salesTab = document.getElementById("salesTab");
@@ -297,190 +297,139 @@
       });
     });
 
-    // API Functions
-    async function fetchOrders() {
-      try {
-        const response = await fetch('/api/sales-orders', {
-          headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-          }
-        });
-        allOrders = await response.json();
+    // Helper Functions
+    function generateOrderNumber() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `ORD-${year}${month}${day}-${String(orderIdCounter).padStart(4, '0')}`;
+    }
+
+    function createOrder(data) {
+      const customer = allCustomers.find(c => c.customer_id === parseInt(data.customer_id));
+      const order = {
+        id: orderIdCounter++,
+        order_number: generateOrderNumber(),
+        customer_id: parseInt(data.customer_id),
+        customer: customer,
+        product: data.product,
+        order_date: new Date().toISOString().split('T')[0],
+        delivery_date: data.delivery_date,
+        status: data.status,
+        total_amount: parseFloat(data.total_amount) || 0,
+        payment_status: data.payment_status,
+        notes: data.notes || ''
+      };
+      allOrders.push(order);
+      updateCustomerStats();
+      showNotification('Order created successfully!', 'success');
+      renderOrders();
+      closeModal();
+    }
+
+    function updateOrder(id, data) {
+      const index = allOrders.findIndex(o => o.id === id);
+      if (index !== -1) {
+        const customer = allCustomers.find(c => c.customer_id === parseInt(data.customer_id));
+        allOrders[index] = {
+          ...allOrders[index],
+          customer_id: parseInt(data.customer_id),
+          customer: customer,
+          product: data.product,
+          delivery_date: data.delivery_date,
+          status: data.status,
+          total_amount: parseFloat(data.total_amount) || 0,
+          payment_status: data.payment_status,
+          notes: data.notes || ''
+        };
+        updateCustomerStats();
+        showNotification('Order updated successfully!', 'success');
         renderOrders();
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-        showNotification('Error loading orders', 'error');
+        closeModal();
       }
     }
 
-    async function fetchCustomers() {
-      try {
-        const response = await fetch('/api/customers', {
-          headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-          }
-        });
-        allCustomers = await response.json();
-        renderCustomers();
-        updateCustomerDropdown();
-      } catch (error) {
-        console.error('Error fetching customers:', error);
-        showNotification('Error loading customers', 'error');
-      }
-    }
-
-    async function createOrder(data) {
-      try {
-        const response = await fetch('/api/sales-orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        const result = await response.json();
-        if (result.success) {
-          showNotification(result.message, 'success');
-          fetchOrders();
-          fetchCustomers();
-          closeModal();
-        } else {
-          showNotification('Error creating order', 'error');
-        }
-      } catch (error) {
-        console.error('Error creating order:', error);
-        showNotification('Error creating order', 'error');
-      }
-    }
-
-    async function updateOrder(id, data) {
-      try {
-        const response = await fetch(`/api/sales-orders/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        const result = await response.json();
-        if (result.success) {
-          showNotification(result.message, 'success');
-          fetchOrders();
-          fetchCustomers();
-          closeModal();
-        } else {
-          showNotification('Error updating order', 'error');
-        }
-      } catch (error) {
-        console.error('Error updating order:', error);
-        showNotification('Error updating order', 'error');
-      }
-    }
-
-    async function deleteOrder(id) {
+    function deleteOrder(id) {
       if (!confirm('Are you sure you want to delete this order?')) return;
       
-      try {
-        const response = await fetch(`/api/sales-orders/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
+      const index = allOrders.findIndex(o => o.id === id);
+      if (index !== -1) {
+        allOrders.splice(index, 1);
+        updateCustomerStats();
+        showNotification('Order deleted successfully!', 'success');
+        renderOrders();
+      }
+    }
+
+    function createCustomer(data) {
+      const customer = {
+        customer_id: customerIdCounter++,
+        customer_name: data.customer_name,
+        customer_type: data.customer_type,
+        phone: data.phone || '',
+        email: data.email || '',
+        contact_person: data.contact_person || '',
+        address: data.address || '',
+        total_orders: 0,
+        total_spent: 0
+      };
+      allCustomers.push(customer);
+      showNotification('Customer created successfully!', 'success');
+      updateCustomerDropdown();
+      renderCustomers();
+      closeModal();
+    }
+
+    function updateCustomer(id, data) {
+      const index = allCustomers.findIndex(c => c.customer_id === id);
+      if (index !== -1) {
+        allCustomers[index] = {
+          ...allCustomers[index],
+          customer_name: data.customer_name,
+          customer_type: data.customer_type,
+          phone: data.phone || '',
+          email: data.email || '',
+          contact_person: data.contact_person || '',
+          address: data.address || ''
+        };
+        
+        // Update customer reference in orders
+        allOrders.forEach(order => {
+          if (order.customer_id === id) {
+            order.customer = allCustomers[index];
           }
         });
-        const result = await response.json();
-        if (result.success) {
-          showNotification(result.message, 'success');
-          fetchOrders();
-          fetchCustomers();
-        } else {
-          showNotification('Error deleting order', 'error');
-        }
-      } catch (error) {
-        console.error('Error deleting order:', error);
-        showNotification('Error deleting order', 'error');
+        
+        showNotification('Customer updated successfully!', 'success');
+        updateCustomerDropdown();
+        renderCustomers();
+        renderOrders();
+        closeModal();
       }
     }
 
-    async function createCustomer(data) {
-      try {
-        const response = await fetch('/api/customers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        const result = await response.json();
-        if (result.success) {
-          showNotification(result.message, 'success');
-          fetchCustomers();
-          closeModal();
-        } else {
-          showNotification('Error creating customer', 'error');
-        }
-      } catch (error) {
-        console.error('Error creating customer:', error);
-        showNotification('Error creating customer', 'error');
-      }
-    }
-
-    async function updateCustomer(id, data) {
-      try {
-        const response = await fetch(`/api/customers/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        const result = await response.json();
-        if (result.success) {
-          showNotification(result.message, 'success');
-          fetchCustomers();
-          closeModal();
-        } else {
-          showNotification('Error updating customer', 'error');
-        }
-      } catch (error) {
-        console.error('Error updating customer:', error);
-        showNotification('Error updating customer', 'error');
-      }
-    }
-
-    async function deleteCustomer(id) {
+    function deleteCustomer(id) {
       if (!confirm('Are you sure you want to delete this customer? All related orders will be deleted.')) return;
       
-      try {
-        const response = await fetch(`/api/customers/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json'
-          }
-        });
-        const result = await response.json();
-        if (result.success) {
-          showNotification(result.message, 'success');
-          fetchCustomers();
-          fetchOrders();
-        } else {
-          showNotification('Error deleting customer', 'error');
-        }
-      } catch (error) {
-        console.error('Error deleting customer:', error);
-        showNotification('Error deleting customer', 'error');
+      const index = allCustomers.findIndex(c => c.customer_id === id);
+      if (index !== -1) {
+        // Delete all orders for this customer
+        allOrders = allOrders.filter(o => o.customer_id !== id);
+        allCustomers.splice(index, 1);
+        showNotification('Customer deleted successfully!', 'success');
+        updateCustomerDropdown();
+        renderCustomers();
+        renderOrders();
       }
+    }
+
+    function updateCustomerStats() {
+      allCustomers.forEach(customer => {
+        const customerOrders = allOrders.filter(o => o.customer_id === customer.customer_id);
+        customer.total_orders = customerOrders.length;
+        customer.total_spent = customerOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
+      });
     }
 
     // Render Functions
@@ -518,7 +467,7 @@
           <td class="px-4 py-2">${formatDate(order.order_date)}</td>
           <td class="px-4 py-2">${formatDate(order.delivery_date)}</td>
           <td class="px-4 py-2">${getStatusBadge(order.status)}</td>
-          <td class="px-4 py-2">${parseFloat(order.total_amount).toFixed(2)}</td>
+          <td class="px-4 py-2">₱${parseFloat(order.total_amount).toFixed(2)}</td>
           <td class="px-4 py-2">${getPaymentBadge(order.payment_status)}</td>
           <td class="px-4 py-2 flex gap-2">
             <button onclick="editOrder(${order.id})" class="bg-yellow-500 hover:scale-110 transition rounded px-2 py-1"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -554,7 +503,7 @@
             <span class="text-gray-300 text-xs">${customer.email || 'N/A'}</span>
           </td>
           <td class="px-4 py-2">${customer.total_orders || 0}</td>
-          <td class="px-4 py-2">${parseFloat(customer.total_spent || 0).toFixed(2)}</td>
+          <td class="px-4 py-2">₱${parseFloat(customer.total_spent || 0).toFixed(2)}</td>
           <td class="px-4 py-2 flex gap-2">
             <button onclick="editCustomer(${customer.customer_id})" class="bg-yellow-500 hover:scale-110 transition rounded px-2 py-1"><i class="fa-solid fa-pen-to-square"></i></button>
             <button onclick="deleteCustomer(${customer.customer_id})" class="bg-red-600 hover:scale-110 transition rounded px-2 py-1"><i class="fa-solid fa-trash"></i></button>
@@ -612,7 +561,7 @@
     }
 
     // Edit Functions
-    window.editOrder = async function(id) {
+    window.editOrder = function(id) {
       const order = allOrders.find(o => o.id === id);
       if (!order) return;
 
@@ -636,7 +585,7 @@
       modal.classList.remove('hidden');
     }
 
-    window.editCustomer = async function(id) {
+    window.editCustomer = function(id) {
       const customer = allCustomers.find(c => c.customer_id === id);
       if (!customer) return;
 
@@ -677,6 +626,9 @@
       modal.classList.remove('hidden');
     }
 
+    window.deleteOrder = deleteOrder;
+    window.deleteCustomer = deleteCustomer;
+
     // Tab Switching
     customersTab.addEventListener("click", () => {
       currentView = 'customers';
@@ -688,7 +640,7 @@
       salesTab.classList.add("bg-primary", "text-white");
       newOrderBtn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> New Customer';
       searchInput.value = '';
-      fetchCustomers();
+      renderCustomers();
     });
 
     salesTab.addEventListener("click", () => {
@@ -701,7 +653,7 @@
       customersTab.classList.add("bg-primary", "text-white");
       newOrderBtn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> New Order';
       searchInput.value = '';
-      fetchOrders();
+      renderOrders();
     });
 
     // Modal Logic
@@ -760,7 +712,7 @@
     }
 
     // Form Submission
-    submitBtn.addEventListener("click", async (e) => {
+    submitBtn.addEventListener("click", (e) => {
       e.preventDefault();
       
       if (currentView === 'sales' || currentEditType === 'order') {
@@ -780,9 +732,9 @@
         }
         
         if (currentEditId) {
-          await updateOrder(currentEditId, formData);
+          updateOrder(currentEditId, formData);
         } else {
-          await createOrder(formData);
+          createOrder(formData);
         }
       } else {
         const formData = {
@@ -800,9 +752,9 @@
         }
         
         if (currentEditId) {
-          await updateCustomer(currentEditId, formData);
+          updateCustomer(currentEditId, formData);
         } else {
-          await createCustomer(formData);
+          createCustomer(formData);
         }
       }
     });
@@ -820,8 +772,8 @@
     paymentFilter.addEventListener('change', renderOrders);
 
     // Initialize
-    fetchOrders();
-    fetchCustomers();
+    renderOrders();
+    renderCustomers();
   </script>
 </body>
 </html>
