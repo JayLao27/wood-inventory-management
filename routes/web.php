@@ -1,20 +1,23 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SalesOrderController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
-    return view('Auth.Login');
+    return redirect()->route('sales-orders.index');
 });
 
-Route::get('/sales', function () {
-    return view('Systems.sales');
-})->middleware(['auth', 'verified'])->name('sales');
+// Auth
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Protected
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+    // Customers CRUD
+    Route::resource('customers', CustomerController::class);
 
-require __DIR__.'/auth.php';
+    // Sales Orders CRUD
+    Route::resource('sales-orders', SalesOrderController::class);
+});
