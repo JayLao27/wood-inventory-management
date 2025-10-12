@@ -16,7 +16,7 @@ class SalesOrderController extends Controller
         $customers = Customer::orderBy('name')->get();
         $products = Product::orderBy('name')->get();
 
-        return view('SalesOrder.dashboard', compact('salesOrders', 'customers', 'products'));
+        return view('Systems.dashboard', compact('salesOrders', 'customers', 'products'));
     }
 
     public function store(Request $request)
