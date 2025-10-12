@@ -229,7 +229,11 @@
 
         <div>
           <label class="block text-sm font-medium mb-1">Contact Number</label>
-          <input type="text" id="customerPhone" placeholder="+63 XXX XXX XXXX" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
+          <div class="relative">
+            <input type="text" id="customerPhone" placeholder="09XXXXXXXXX" maxlength="11" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent" oninput="validatePhoneNumber(this)">
+            <div id="phoneValidationIndicator" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full"></div>
+          </div>
+          <p id="phoneValidationMessage" class="text-xs mt-1"></p>
         </div>
 
         <div>
@@ -257,6 +261,33 @@
 
   <!-- Scripts -->
   <script>
+    // Phone number validation function
+    function validatePhoneNumber(input) {
+      const phoneNumber = input.value.trim();
+      const indicator = document.getElementById('phoneValidationIndicator');
+      const message = document.getElementById('phoneValidationMessage');
+      
+      // Only allow numbers
+      input.value = phoneNumber.replace(/[^0-9]/g, '');
+      
+      if (phoneNumber.length === 0) {
+        // Empty input
+        indicator.style.backgroundColor = '';
+        message.textContent = '';
+        message.className = 'text-xs mt-1';
+      } else if (phoneNumber.length === 11 && phoneNumber.startsWith('09')) {
+        // Valid phone number (11 digits starting with 09)
+        indicator.style.backgroundColor = '#10B981'; // Green
+        message.textContent = 'Valid phone number';
+        message.className = 'text-xs mt-1 text-green-600';
+      } else {
+        // Invalid phone number
+        indicator.style.backgroundColor = '#EF4444'; // Red
+        message.textContent = 'Phone number must be 11 digits starting with 09';
+        message.className = 'text-xs mt-1 text-red-600';
+      }
+    }
+    
     // In-Memory Data Storage
     let allOrders = [];
     let allCustomers = [];
