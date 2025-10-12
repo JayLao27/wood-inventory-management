@@ -2,33 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
-    use HasFactory;
-
-    protected $primaryKey = 'customer_id';
-
-    protected $fillable = [
-        'customer_name',
-        'contact_person',
-        'phone',
-        'email',
-        'address',
-        'customer_type',
-        'total_orders',
-        'total_spent'
-    ];
-
-    protected $casts = [
-        'total_orders' => 'integer',
-        'total_spent' => 'decimal:2'
-    ];
+    protected $fillable = ['name', 'customer_type', 'phone', 'email'];
 
     public function salesOrders()
     {
-        return $this->hasMany(SalesOrder::class, 'customer_id', 'customer_id');
+        return $this->hasMany(SalesOrder::class);
+    }
+
+    public function totalOrders()
+    {
+        return $this->salesOrders()->count();
+    }
+
+    public function totalSpent()
+    {
+        return $this->salesOrders()->sum('total_amount');
     }
 }

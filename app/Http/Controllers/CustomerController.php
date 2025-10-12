@@ -7,87 +7,37 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of customers.
-     */
-    public function index()
-    {
-        $customers = Customer::withCount('salesOrders')
-            ->withSum('salesOrders', 'total_amount')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        return response()->json($customers);
-    }
+	public function index() {
+		$customers = Customer::all();
+		return view('customers.index', compact('customers'));
+	}
 
-    /**
-     * Store a newly created customer.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_type' => 'required|in:Retail,Wholesale,Contractor',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'contact_person' => 'nullable|string|max:255',
-            'address' => 'nullable|string'
-        ]);
+	public function store(Request $request) {
+		$request->validate([
+			'name' => 'required|string|max:255',
+			'customer_type' => 'required|in:Retail,Contractor,Wholesale',
+			'phone' => ['nullable','regex:/^09\\d{9}$/'],
+			'email' => 'required|email:rfc,dns|unique:customers,email',
+			'address' => 'nullable|string|max:255',
+		]);
+		Customer::create($request->only('name','customer_type','phone','email','address'));
+		return redirect()->route('sales-orders.index')->with('success', 'Customer added.');
+	}
 
-        $validated['total_orders'] = 0;
-        $validated['total_spent'] = 0;
+	public function update(Request $request, Customer $customer) {
+		$request->validate([
+			'name' => 'required|string|max:255',
+			'customer_type' => 'required|in:Retail,Contractor,Wholesale',
+			'phone' => ['nullable','regex:/^09\\d{9}$/'],
+			'email' => 'required|email:rfc,dns|unique:customers,email,' . $customer->id,
+			'address' => 'nullable|string|max:255',
+		]);
+		$customer->update($request->only('name','customer_type','phone','email','address'));
+		return redirect()->route('sales-orders.index')->with('success', 'Customer updated.');
+	}
 
-        $customer = Customer::create($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer created successfully',
-            'customer' => $customer
-        ], 201);
-    }
-
-    /**
-     * Display the specified customer.
-     */
-    public function show(Customer $customer)
-    {
-        $customer->load('salesOrders');
-        return response()->json($customer);
-    }
-
-    /**
-     * Update the specified customer.
-     */
-    public function update(Request $request, Customer $customer)
-    {
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_type' => 'required|in:Retail,Wholesale,Contractor',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'contact_person' => 'nullable|string|max:255',
-            'address' => 'nullable|string'
-        ]);
-
-        $customer->update($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer updated successfully',
-            'customer' => $customer
-        ]);
-    }
-
-    /**
-     * Remove the specified customer.
-     */
-    public function destroy(Customer $customer)
-    {
-        $customer->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer deleted successfully'
-        ]);
-    }
+	public function destroy(Customer $customer) {
+		$customer->delete();
+		return redirect()->route('sales-orders.index')->with('success', 'Customer deleted.');
+	}
 }

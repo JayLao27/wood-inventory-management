@@ -2,150 +2,124 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SalesOrder;
 use App\Models\Customer;
+use App\Models\Product;
+use App\Models\SalesOrder;
+use App\Models\SalesOrderItem;
 use Illuminate\Http\Request;
 
 class SalesOrderController extends Controller
 {
-    /**
-     * Display a listing of sales orders.
-     */
     public function index()
     {
-        $orders = SalesOrder::with('customer')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        return response()->json($orders);
+        $salesOrders = SalesOrder::with(['customer', 'items.product'])->latest()->get();
+        $customers = Customer::orderBy('name')->get();
+        $products = Product::orderBy('name')->get();
+
+        return view('SalesOrder.dashboard', compact('salesOrders', 'customers', 'products'));
     }
 
-    /**
-     * Store a newly created sales order.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,customer_id',
+            'customer_id' => 'required|exists:customers,id',
             'delivery_date' => 'required|date|after_or_equal:today',
-            'product' => 'required|string|max:255',
-            'total_amount' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:Pending,In Production,Ready,Delivered,Cancelled',
-            'payment_status' => 'nullable|in:Unpaid,Partial,Paid',
-            'notes' => 'nullable|string'
+            'note' => 'nullable|string',
+            'items' => 'nullable|array',
+            'items.*.product_id' => 'required_with:items|exists:products,id',
+            'items.*.quantity' => 'required_with:items|integer|min:1',
         ]);
 
-        $validated['order_date'] = now();
-        $validated['status'] = $validated['status'] ?? 'Pending';
-        $validated['payment_status'] = $validated['payment_status'] ?? 'Unpaid';
-        $validated['total_amount'] = $validated['total_amount'] ?? 0;
+        $orderNumber = $this->generateOrderNumber();
 
-        $order = SalesOrder::create($validated);
+        $salesOrder = SalesOrder::create([
+            'order_number' => $orderNumber,
+            'customer_id' => $validated['customer_id'],
+            'order_date' => now()->toDateString(),
+            'delivery_date' => $validated['delivery_date'],
+            'status' => 'Pending',
+            'total_amount' => 0,
+            'paid_amount' => 0,
+            'payment_status' => 'Pending',
+            'note' => $validated['note'] ?? null,
+        ]);
 
-        // Update customer totals
-        $customer = Customer::find($validated['customer_id']);
-        $customer->increment('total_orders');
-        $customer->increment('total_spent', $validated['total_amount']);
+        $totalAmount = 0;
+        if (!empty($validated['items'])) {
+            foreach ($validated['items'] as $item) {
+                $product = Product::find($item['product_id']);
+                if (!$product) { continue; }
+                $unitPrice = (float) $product->unit_price;
+                $quantity = (int) $item['quantity'];
+                $lineTotal = $unitPrice * $quantity;
 
-        $order->load('customer');
+                SalesOrderItem::create([
+                    'sales_order_id' => $salesOrder->id,
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'total_price' => $lineTotal,
+                ]);
+                $totalAmount += $lineTotal;
+            }
+        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Order created successfully',
-            'order' => $order
-        ], 201);
+        $salesOrder->update(['total_amount' => $totalAmount]);
+
+        return redirect()->back()->with('success', 'Sales order created.');
     }
 
-    /**
-     * Display the specified sales order.
-     */
-    public function show(SalesOrder $salesOrder)
+    public function update(Request $request, SalesOrder $sales_order)
     {
-        $salesOrder->load('customer');
-        return response()->json($salesOrder);
-    }
-
-    /**
-     * Update the specified sales order.
-     */
-    public function update(Request $request, SalesOrder $salesOrder)
-    {
-        $oldAmount = $salesOrder->total_amount;
-        $oldCustomerId = $salesOrder->customer_id;
-
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,customer_id',
-            'delivery_date' => 'required|date',
-            'product' => 'required|string|max:255',
-            'total_amount' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:Pending,In Production,Ready,Delivered,Cancelled',
-            'payment_status' => 'nullable|in:Unpaid,Partial,Paid',
-            'notes' => 'nullable|string'
+            'customer_id' => 'required|exists:customers,id',
+            'delivery_date' => 'required|date|after_or_equal:today',
+            'status' => 'required|in:In production,Confirmed,Pending,Delivered,Ready',
+            'payment_status' => 'required|in:Pending,Partial,Paid',
+            'note' => 'nullable|string',
         ]);
 
-        $salesOrder->update($validated);
-
-        // Update customer totals if amount or customer changed
-        if ($oldCustomerId != $validated['customer_id']) {
-            // Decrease old customer
-            $oldCustomer = Customer::find($oldCustomerId);
-            if ($oldCustomer) {
-                $oldCustomer->decrement('total_orders');
-                $oldCustomer->decrement('total_spent', $oldAmount);
-            }
-
-            // Increase new customer
-            $newCustomer = Customer::find($validated['customer_id']);
-            if ($newCustomer) {
-                $newCustomer->increment('total_orders');
-                $newCustomer->increment('total_spent', $validated['total_amount'] ?? 0);
-            }
-        } elseif ($oldAmount != ($validated['total_amount'] ?? 0)) {
-            $customer = Customer::find($validated['customer_id']);
-            if ($customer) {
-                $difference = ($validated['total_amount'] ?? 0) - $oldAmount;
-                if ($difference > 0) {
-                    $customer->increment('total_spent', $difference);
-                } else {
-                    $customer->decrement('total_spent', abs($difference));
-                }
-            }
-        }
-
-        $salesOrder->load('customer');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Order updated successfully',
-            'order' => $salesOrder
+        $sales_order->update([
+            'customer_id' => $validated['customer_id'],
+            'delivery_date' => $validated['delivery_date'],
+            'status' => $validated['status'],
+            'payment_status' => $validated['payment_status'],
+            'note' => $validated['note'] ?? null,
         ]);
+
+        return redirect()->back()->with('success', 'Sales order updated.');
     }
 
-    /**
-     * Remove the specified sales order.
-     */
-    public function destroy(SalesOrder $salesOrder)
+    public function destroy(SalesOrder $sales_order)
     {
-        $customer = Customer::find($salesOrder->customer_id);
-        if ($customer) {
-            $customer->decrement('total_orders');
-            $customer->decrement('total_spent', $salesOrder->total_amount);
-        }
-
-        $salesOrder->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Order deleted successfully'
-        ]);
+        $sales_order->delete();
+        return redirect()->back()->with('success', 'Sales order deleted.');
     }
 
-    /**
-     * Get list of customers for dropdown.
-     */
-    public function getCustomers()
+    private function generateOrderNumber(): string
     {
-        $customers = Customer::orderBy('customer_name')->get();
-        return response()->json($customers);
+        $year = now()->format('Y');
+        $prefix = 'WO-' . $year . '-';
+
+        $last = SalesOrder::where('order_number', 'like', $prefix . '%')
+            ->orderBy('order_number', 'desc')
+            ->value('order_number');
+
+        $nextSeq = 1;
+        if ($last) {
+            $parts = explode('-', $last);
+            $seqPart = end($parts);
+            $num = (int) ltrim($seqPart, '0');
+            $nextSeq = $num + 1;
+        }
+
+        do {
+            $candidate = sprintf('%s%03d', $prefix, $nextSeq);
+            $exists = SalesOrder::where('order_number', $candidate)->exists();
+            if (!$exists) {
+                return $candidate;
+            }
+            $nextSeq++;
+        } while (true);
     }
 }

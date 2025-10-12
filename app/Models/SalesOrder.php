@@ -2,49 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SalesOrder extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'order_number',
-        'customer_id',
-        'order_date',
-        'delivery_date',
-        'product',
-        'total_amount',
-        'status',
-        'payment_status',
-        'notes'
-    ];
-
-    protected $casts = [
-        'order_date' => 'date',
-        'delivery_date' => 'date',
-        'total_amount' => 'decimal:2'
+        'order_number', 'customer_id', 'order_date',
+        'delivery_date', 'status', 'total_amount',
+        'paid_amount', 'payment_status', 'note'
     ];
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+        return $this->belongsTo(Customer::class);
     }
 
-    protected static function boot()
+    public function items()
     {
-        parent::boot();
-
-        static::creating(function ($order) {
-            if (!$order->order_number) {
-                $lastOrder = static::orderBy('id', 'desc')->first();
-                $nextId = $lastOrder ? $lastOrder->id + 1 : 1;
-                $order->order_number = 'WO-' . date('Y') . '-' . str_pad($nextId, 3, '0', STR_PAD_LEFT);
-            }
-            if (!$order->order_date) {
-                $order->order_date = now();
-            }
-        });
+        return $this->hasMany(SalesOrderItem::class);
     }
 }
+
