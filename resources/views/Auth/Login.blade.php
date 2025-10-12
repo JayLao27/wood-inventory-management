@@ -1,48 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RM Woodworks - Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Login</title>
+	@vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="m-0 font-sans bg-[#FFF1DA] flex h-screen">
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+	<div class="w-full max-w-sm bg-white rounded-lg shadow p-6">
+		<h1 class="text-xl font-semibold mb-1">Welcome</h1>
+		<p class="text-gray-600 mb-4">Sign in to continue</p>
 
-  <!-- Left Panel -->
-  <div class="flex-1 flex items-center justify-center bg-contain bg-center bg-no-repeat" 
-       style="background-image: url('{{ asset('images/woodworks-bg.png') }}');">
-    <img src="{{ asset('images/logo.png') }}" alt="RM Woodworks Logo" class="max-w-[300px]">
-  </div>
+		@if($errors->any())
+			<div class="mb-4 px-4 py-3 rounded bg-red-100 text-red-800">
+				<ul class="list-disc list-inside">
+					@foreach($errors->all() as $error)
+						<li>{{ $error }}</li>
+					@endforeach
+				</ul>
+			</div>
+		@endif
 
-  <!-- Right Panel -->
-  <div class="flex-1 flex items-center justify-center">
-    <div class="bg-[#fff9f1] p-10 rounded-xl shadow-md w-full max-w-md text-center">
-      <img src="{{ asset('images/logo.png') }}" alt="Small Logo" class="h-14 mb-4 mx-auto">
-      <h2 class="m-0 text-[22px] font-semibold text-[#6B3D00]">RM Woodworks</h2>
-      <p class="text-sm mb-5 text-[#A75F00]">Management System Login</p>
+		<form method="POST" action="{{ route('login.attempt') }}" class="grid gap-3">
+			@csrf
+			<div>
+				<label class="text-sm">Email</label>
+				<input type="email" name="email" value="{{ old('email') }}" required class="w-full border rounded px-3 py-2">
+			</div>
+			<div>
+				<label class="text-sm">Password</label>
+				<input type="password" name="password" required class="w-full border rounded px-3 py-2">
+			</div>
+			<label class="inline-flex items-center gap-2 text-sm">
+				<input type="checkbox" name="remember" class="border rounded">
+				Remember me
+			</label>
+			<button type="submit" class="w-full bg-gray-800 text-white rounded py-2">Sign in</button>
+		</form>
 
-      <!-- Login Form -->
-      <form method="POST" action="{{ route('login') }}" class="space-y-4">
-        @csrf
-        <input type="email" name="email" placeholder="Enter your email" required
-               class="w-full px-4 py-3 border border-[#FFD28C] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#E17100]">
-        <input type="password" name="password" placeholder="Enter your password" required
-               class="w-full px-4 py-3 border border-[#FFD28C] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#E17100]">
-        <button type="submit" 
-                class="w-full py-3 bg-[#E17100] text-white text-base font-semibold rounded-md hover:bg-[#c86000] transition">
-          Sign In
-        </button>
-      </form>
-
-      <!-- Demo Accounts -->
-      <div class="bg-[#FFF1DA] border border-[#FFD28C] rounded-md p-3 mt-6 text-left text-sm">
-        <p class="font-semibold text-[#E17100]">Demo accounts:</p>
-        <p>Admin: admin@rmwoodworks.com / admin123</p>
-        <p>Manager: manager@rmwoodworks.com / manager123</p>
-        <p>Worker: worker@rmwoodworks.com / worker123</p>
-      </div>
-    </div>
-  </div>
-
+		<div class="text-xs text-gray-500 mt-4">
+			Demo: manager@worker.com / manager123
+		</div>
+	</div>
 </body>
 </html>
