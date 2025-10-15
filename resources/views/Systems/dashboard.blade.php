@@ -238,7 +238,12 @@
 								<td class="px-4 py-2">₱{{ number_format($customer->totalSpent(), 2) }}</td>
 								<td class="px-4 py-2">
 									<button class="text-green-300 mr-2" onclick="openModal('viewCustomerModal-{{ $customer->id }}')">View</button>
-									<button class="text-yellow-300" onclick="openModal('editCustomerModal-{{ $customer->id }}')">Edit</button>
+									<button class="text-yellow-300 mr-2" onclick="openModal('editCustomerModal-{{ $customer->id }}')">Edit</button>
+									<form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this customer?')">
+										@csrf
+										@method('DELETE')
+										<button type="submit" class="text-red-300">Delete</button>
+									</form>
 								</td>
 							</tr>
 
