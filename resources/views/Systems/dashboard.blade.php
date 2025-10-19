@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<--add comment--->
+<----->
 @section('content')
 	<div class="flex h-screen bg-gray-100">
 		<!-- Sidebar -->
