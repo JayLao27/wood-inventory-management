@@ -16,13 +16,29 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Demo manager account
-        User::updateOrCreate(
-            ['email' => 'manager@worker.com'],
-            [
-                'name' => 'Manager',
-                'password' => Hash::make('manager123'),
-            ]
-        );
+      User::updateOrCreate(
+    ['email' => 'admin@rmwoodworks.com'],
+    [
+        'name' => 'Admin',
+        'password' => Hash::make('admin123'),
+    ]
+);
+
+User::updateOrCreate(
+    ['email' => 'manager@rmwoodworks.com'],
+    [
+        'name' => 'Manager',
+        'password' => Hash::make('manager123'),
+    ]
+);
+
+User::updateOrCreate(
+    ['email' => 'worker@rmwoodworks.com'],
+    [
+        'name' => 'Worker',
+        'password' => Hash::make('worker123'),
+    ]
+);
 
         // Sample products
         $samples = [

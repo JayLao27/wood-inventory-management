@@ -3,9 +3,10 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
-    return redirect()->route('sales-orders.index');
+    return redirect()->route('login');
 });
 
 // Auth
@@ -15,6 +16,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Protected
 Route::middleware('auth')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile
+    Route::get('/profile', function () {
+        return view('profile.edit');
+    })->name('profile.edit');
+    
     // Customers CRUD
     Route::resource('customers', CustomerController::class);
 

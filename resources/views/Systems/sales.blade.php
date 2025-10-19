@@ -1,825 +1,747 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sales and Order Management System</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#1f2a38",
-            hover: "#fff1da",
-            accent: "#f28c28",
-            bg: "#f2e9d8",
-            card: "#0f3a3d",
-            beige: "#faedcd",
-            retail: "#6f65ff",
-            wholesale: "#5eb8ff",
-            contractor: "#d27fd6",
-          },
-          fontFamily: {
-            poppins: ["Poppins", "sans-serif"],
-          },
-        },
-      },
-    };
-  </script>
-  <script src="https://kit.fontawesome.com/57ad728d01.js" crossorigin="anonymous"></script>
-</head>
+@extends('layouts.app')
 
-<body class="bg-bg text-primary font-poppins min-h-screen p-8">
+@section('content')
+	@php
+		$customerTypeBg = [
+			'Wholesale' => '#64B5F6',
+			'Retail' => '#6366F1',
+			'Contractor' => '#BA68C8',
+		];
+		$statusBg = [
+			'In production' => '#FFB74D',
+			'Pending' => '#64B5F6',
+			'Delivered' => '#81C784',
+			'Ready' => '#BA68C8',
+		];
+		$paymentBg = [
+			'Pending' => '#ffffff',
+			'Partial' => '#FFB74D',
+			'Paid' => '#81C784',
+		];
+	@endphp
+	<div class="flex h-screen bg-gray-100">
+		<!-- Sidebar -->
+		<div class="w-64 bg-slate-700 text-white flex flex-col">
+			<!-- Logo Section -->
+			<div class="p-6 border-b border-slate-600">
+				<div class="flex items-center space-x-3">
+					<div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+						<svg class="w-6 h-6 text-slate-700" fill="currentColor" viewBox="0 0 20 20">
+							<path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+						</svg>
+					</div>
+					<div>
+						<h1 class="text-lg font-bold">RM WOOD WORKS</h1>
+						<p class="text-sm text-slate-300">Management System</p>
+					</div>
+				</div>
+			</div>
 
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-8">
-    <div>
-      <h1 class="text-3xl font-semibold">Sales & Orders</h1>
-      <p class="text-gray-600">Manage customer orders, sales, and deliveries</p>
-    </div>
-    <div>
-      <button id="newOrderBtn" class="bg-gray-700 text-white px-4 py-2 rounded-md ml-2 hover:bg-accent transition">
-        <i class="fa-solid fa-plus mr-1"></i> New Order
-      </button>
-    </div>
-  </div>
+			<!-- Navigation Menu -->
+			<nav class="flex-1 p-4">
+				<ul class="space-y-2">
+					<li>
+						<a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-600 hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+							</svg>
+							<span>Dashboard</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-600 hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+							</svg>
+							<span>Inventory</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-600 hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+							</svg>
+							<span>Production</span>
+						</a>
+					</li>
+					<li>
+						<a href="{{ route('sales-orders.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-orange-500 text-white">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+							</svg>
+							<span>Sales & Orders</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-600 hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+								<path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/>
+							</svg>
+							<span>Procurement</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-600 hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+							</svg>
+							<span>Accounting</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
 
-  <!-- Sales Management Section -->
-  <section class="bg-card text-white p-6 rounded-2xl">
-    <header class="mb-4">
-      <h2 class="text-xl font-semibold">Sales Management</h2>
-      <p class="text-gray-300">Manage customer orders and track sales performance</p>
-    </header>
+			<!-- Footer -->
+			<div class="p-4 border-t border-slate-600">
+				<p class="text-xs text-slate-400">© 2024 RM Woodworks</p>
+			</div>
+		</div>
 
-    <div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
-      <input type="search" id="searchInput" placeholder="Search order or customers..." class="w-full md:w-3/4 rounded-full px-4 py-2 text-primary focus:outline-none" />
-      <div class="flex gap-2">
-        <select id="statusFilter" class="bg-bg text-primary rounded-md px-3 py-2">
-          <option value="">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="In Production">In Production</option>
-          <option value="Ready">Ready</option>
-          <option value="Delivered">Delivered</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-        <select id="paymentFilter" class="bg-bg text-primary rounded-md px-3 py-2">
-          <option value="">All Payment</option>
-          <option value="Unpaid">Unpaid</option>
-          <option value="Partial">Partial</option>
-          <option value="Paid">Paid</option>
-        </select>
-      </div>
-    </div>
+		<!-- Main Content -->
+		<div class="flex-1 flex flex-col overflow-hidden">
+			<!-- Header -->
+			<div class="bg-amber-50 p-8">
+				<div class="flex justify-between items-center">
+					<div>
+						<h1 class="text-4xl font-bold text-gray-800">Sales & Orders</h1>
+						<p class="text-lg text-gray-600 mt-2">Manage customer orders, sales, and deliveries</p>
+					</div>
+					<div>
+						<button id="headerActionBtn" class="bg-gray-700 text-white px-4 py-2 rounded-md ml-2 hover:bg-orange-500 transition" onclick="openActionModal()">
+							+ New Order
+						</button>
+					</div>
+				</div>
+			</div>
 
-    <!-- Toggle Buttons -->
-    <div class="flex justify-center gap-2 mb-6">
-      <button id="salesTab" class="bg-accent text-primary px-72 py-2 rounded-md border border-gray-600 hover:bg-hover hover:text-black transition flex items-center gap-2">
-        <i class="fa-solid fa-cart-shopping"></i> Sales Orders
-      </button>
-      <button id="customersTab" class="bg-primary text-white px-72 py-2 rounded-md border border-gray-600 hover:bg-hover hover:text-black transition flex items-center gap-2">
-        <i class="fa-solid fa-users"></i> Customers
-      </button>
-    </div>
+			<!-- Dashboard Content -->
+			<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
+				<!-- Summary Cards Row -->
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+					<!-- Total Revenue Card -->
+					<div class="bg-slate-700 text-white p-6 rounded-xl">
+						<div class="flex justify-between items-start">
+							<div>
+								<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
+								<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->sum('total_amount'), 2) }}</p>
+								<p class="text-slate-300 text-sm mt-1">All time sales</p>
+							</div>
+							<div class="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+									<path d="M3 4a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+								</svg>
+							</div>
+						</div>
+					</div>
 
-    <!-- Sales Table -->
-    <div id="salesTable" class="overflow-x-auto">
-      <table class="min-w-full border-collapse text-left text-sm">
-        <thead class="bg-primary text-gray-300">
-          <tr>
-            <th class="px-4 py-2">Order #</th>
-            <th class="px-4 py-2">Customer</th>
-            <th class="px-4 py-2">Product</th>
-            <th class="px-4 py-2">Order Date</th>
-            <th class="px-4 py-2">Delivery Date</th>
-            <th class="px-4 py-2">Status</th>
-            <th class="px-4 py-2">Total Amount</th>
-            <th class="px-4 py-2">Payment Status</th>
-            <th class="px-4 py-2">Action</th>
-          </tr>
-        </thead>
-        <tbody id="salesTableBody">
-          <tr>
-            <td colspan="9" class="text-center py-4">No orders yet. Click "New Order" to create one.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+					<!-- Payments Received Card -->
+					<div class="bg-slate-700 text-white p-6 rounded-xl">
+						<div class="flex justify-between items-start">
+							<div>
+								<h3 class="text-sm font-medium text-slate-300">Payments Received</h3>
+								<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->where('payment_status', 'Paid')->sum('total_amount'), 2) }}</p>
+								<p class="text-slate-300 text-sm mt-1">Paid orders</p>
+							</div>
+							<div class="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+									<path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+								</svg>
+							</div>
+						</div>
+					</div>
 
-    <!-- Customer Table -->
-    <div id="customerTable" class="hidden overflow-x-auto">
-      <table class="min-w-full border-collapse text-left text-sm">
-        <thead class="bg-primary text-gray-300">
-          <tr>
-            <th class="px-4 py-2">Name</th>
-            <th class="px-4 py-2">Type</th>
-            <th class="px-4 py-2">Contact</th>
-            <th class="px-4 py-2">Total Orders</th>
-            <th class="px-4 py-2">Total Spent</th>
-            <th class="px-4 py-2">Action</th>
-          </tr>
-        </thead>
-        <tbody id="customerTableBody">
-          <tr>
-            <td colspan="6" class="text-center py-4">No customers yet. Click "New Customer" to add one.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+					<!-- Pending Payments Card -->
+					<div class="bg-slate-700 text-white p-6 rounded-xl">
+						<div class="flex justify-between items-start">
+							<div>
+								<h3 class="text-sm font-medium text-slate-300">Pending Payments</h3>
+								<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->whereIn('payment_status', ['Pending', 'Partial'])->sum('total_amount'), 2) }}</p>
+								<p class="text-slate-300 text-sm mt-1">Outstanding amount</p>
+							</div>
+							<div class="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+									<path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+								</svg>
+							</div>
+						</div>
+					</div>
 
-  <!-- Modal -->
-  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-beige p-6 rounded-lg w-[90%] max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
-      <h2 id="modalTitle" class="text-xl font-semibold mb-1">Create New Sales Order</h2>
-      <p id="modalSubtitle" class="text-gray-600 mb-4 text-sm">Create a new sales order for a customer.</p>
+					<!-- Active Orders Card -->
+					<div class="bg-slate-700 text-white p-6 rounded-xl">
+						<div class="flex justify-between items-start">
+							<div>
+								<h3 class="text-sm font-medium text-slate-300">Active Orders</h3>
+								<p class="text-3xl font-bold mt-2">{{ $salesOrders->whereIn('status', ['Pending', 'In production', 'Ready'])->count() }}</p>
+								<p class="text-slate-300 text-sm mt-1">Orders in progress</p>
+							</div>
+							<div class="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
+								<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+									<path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+								</svg>
+							</div>
+						</div>
+					</div>
+				</div>
 
-      <!-- Sales Order Form -->
-<<<<<<< HEAD
-     <div>
-  <label class="block text-sm font-medium mb-1">Customer</label>
-  <select id="customerDropdown"
-    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none">
-    <option value="">Select Customer</option>
-    <option value="Home Design Studio">Home Design Studio</option>
-    <option value="Bright Interiors">Bright Interiors</option>
-    <option value="Modern Concepts">Modern Concepts</option>
-    <option value="Elite Contractors">Elite Contractors</option>
-  </select>
-</div>
+				<!-- Sales Management Card -->
+				<section class="bg-slate-700 text-white p-6 rounded-2xl">
+					<header class="mb-4">
+						<h2 class="text-xl font-semibold">Sales Management</h2>
+						<p class="text-gray-300">Manage customer orders and track sales performance</p>
+					</header>
 
-=======
-      <form id="orderForm" class="space-y-3">
-        <input type="hidden" id="orderIdField" />
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Customer <span class="text-red-500">*</span></label>
-          <select id="orderCustomer" required class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-            <option value="">Select Customer</option>
-          </select>
-        </div>
->>>>>>> 905a5a19dd4fd0045e0b10a6c981fa35b63d29db
+					<!-- Search + Filters -->
+					<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+						<input type="search" id="searchInput" placeholder="Search order or customers..." class="bg-white w-full md:w-3/4 rounded-full px-4 py-2 text-gray-900 focus:outline-none">
+						<div class="flex gap-2">
+							<select id="statusFilter" class="bg-white text-gray-900 rounded-md px-3 py-2">
+								<option value="">All Status</option>
+								<option value="Pending">Pending</option>
+								<option value="In production">In Production</option>
+								<option value="Ready">Ready</option>
+								<option value="Delivered">Delivered</option>
+							</select>
+							<select id="paymentFilter" class="bg-white text-gray-900 rounded-md px-3 py-2">
+								<option value="">All Payment</option>
+								<option value="Pending">Unpaid</option>
+								<option value="Partial">Partial</option>
+								<option value="Paid">Paid</option>
+							</select>
+						</div>
+					</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Delivery Date <span class="text-red-500">*</span></label>
-          <input type="date" id="orderDeliveryDate" required class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-        </div>
+					<!-- Tabs -->
+					<div class="flex justify-center gap-2 mb-6">
+						<button id="salesTab" class="bg-orange-500 text-gray-900 px-60 py-2 rounded-md border border-gray-600 hover:bg-yellow-100 hover:text-black transition">Sales Orders</button>
+						<button id="customersTab" class="bg-slate-600 text-white px-60 py-2 rounded-md border border-gray-600 hover:bg-yellow-100 hover:text-black transition">Customers</button>
+					</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Product <span class="text-red-500">*</span></label>
-          <select id="orderProduct" required class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-            <option value="">Select Product</option>
-            <option>Classic Oak Dining Chair</option>
-            <option>Pine Coffee Table</option>
-            <option>Oak Kitchen Cabinet</option>
-            <option>Pine Bookshelf</option>
-            <option>Oak Dining Table</option>
-          </select>
-        </div>
+					<!-- Sales Orders Table -->
+					<div id="salesTable" class="overflow-x-auto">
+						<table class="min-w-full border-collapse text-left text-sm">
+							<thead class="bg-slate-800 text-gray-300">
+								<tr>
+									<th class="px-4 py-2">Order #</th>
+									<th class="px-4 py-2">Customer</th>
+									<th class="px-4 py-2">Order Date</th>
+									<th class="px-4 py-2">Delivery Date</th>
+									<th class="px-4 py-2">Status</th>
+									<th class="px-4 py-2">Total Amount</th>
+									<th class="px-4 py-2">Payment Status</th>
+									<th class="px-4 py-2">Action</th>
+								</tr>
+							</thead>
+							<tbody id="salesTbody">
+								@forelse($salesOrders as $order)
+									<tr class="border-t border-slate-600 data-row" data-status="{{ $order->status }}" data-payment="{{ $order->payment_status }}">
+										<td class="px-4 py-2">{{ $order->order_number }}</td>
+										<td class="px-4 py-2">
+											<div class="font-medium">{{ $order->customer?->name }}</div>
+											@php $ct = $order->customer?->customer_type; $ctBg = $customerTypeBg[$ct] ?? '#e5e7eb'; @endphp
+											<span class="mt-1 inline-block text-xs text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $ct }}</span>
+										</td>
+										<td class="px-4 py-2">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
+										<td class="px-4 py-2">{{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</td>
+										@php
+											$sb = $order->status === 'Pending' ? '#ffffff' : ($statusBg[$order->status] ?? '#e5e7eb');
+											$stText = $order->status === 'Pending' ? 'text-gray-900' : 'text-white';
+										@endphp
+										<td class="px-4 py-2"><span class="inline-block text-xs px-2 py-0.5 rounded {{ $stText }}" style="background: {{ $sb }};">{{ $order->status }}</span></td>
+										<td class="px-4 py-2">₱{{ number_format($order->total_amount, 2) }}</td>
+										@php
+											$pb = $paymentBg[$order->payment_status] ?? '#ffffff';
+											$ptText = $order->payment_status === 'Pending' ? 'text-gray-900' : 'text-white';
+											$pendingBorder = $order->payment_status==='Pending' ? 'border border-gray-300' : '';
+										@endphp
+										<td class="px-4 py-2">
+											<span class="inline-block text-xs px-2 py-0.5 rounded {{ $ptText }} {{ $pendingBorder }}" style="background: {{ $pb }};">{{ $order->payment_status }}</span>
+										</td>
+										<td class="px-4 py-2">
+											<button class="text-green-300 mr-2" onclick="openModal('viewOrderModal-{{ $order->id }}')">View</button>
+											<button class="text-yellow-300" onclick="openModal('editOrderModal-{{ $order->id }}')">Edit</button>
+											<form action="{{ route('sales-orders.destroy', $order) }}" method="POST" class="inline-block" onsubmit="return confirm('Cancel this order?')">
+												@csrf
+												@method('DELETE')
+												<button type="submit" class="text-red-300 ml-2">Cancel</button>
+											</form>
+										</td>
+									</tr>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Total Amount</label>
-          <input type="number" id="orderAmount" step="0.01" min="0" placeholder="0.00" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-        </div>
+									<!-- View Order Modal -->
+									<div id="viewOrderModal-{{ $order->id }}" class="fixed inset-0 bg-black/70 hidden">
+										<div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-2xl w-[92%] mx-auto mt-16 p-6">
+											<div class="flex items-center justify-between mb-4">
+												<h3 class="text-2xl font-bold">Order Details</h3>
+												<button class="text-xl" onclick="closeModal('viewOrderModal-{{ $order->id }}')">✕</button>
+											</div>
+											<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg leading-relaxed">
+												<div><span class="font-semibold">Order #:</span> {{ $order->order_number }}</div>
+												<div><span class="font-semibold">Customer:</span> {{ $order->customer?->name }}</div>
+												<div><span class="font-semibold">Customer Type:</span> <span class="px-2 py-0.5 rounded text-white" style="background: {{ $customerTypeBg[$order->customer?->customer_type] ?? '#e5e7eb' }};">{{ $order->customer?->customer_type }}</span></div>
+												<div><span class="font-semibold">Order Date:</span> {{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</div>
+												<div><span class="font-semibold">Delivery Date:</span> {{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</div>
+												@php
+													$vsb = $order->status === 'Pending' ? '#ffffff' : ($statusBg[$order->status] ?? '#e5e7eb');
+													$vstText = $order->status === 'Pending' ? 'color: #111827;' : 'color: #ffffff;';
+												@endphp
+												<div><span class="font-semibold">Status:</span> <span class="px-2 py-0.5 rounded" style="background: {{ $vsb }}; {{ $vstText }}">{{ $order->status }}</span></div>
+												@php
+													$vpb = $paymentBg[$order->payment_status] ?? '#ffffff';
+													$vptText = $order->payment_status === 'Pending' ? 'color: #111827;' : 'color: #ffffff;';
+												@endphp
+												<div><span class="font-semibold">Payment Status:</span> <span class="px-2 py-0.5 rounded" style="background: {{ $vpb }}; {{ $vptText }}">{{ $order->payment_status }}</span></div>
+												<div><span class="font-semibold">Total Amount:</span> ₱{{ number_format($order->total_amount, 2) }}</div>
+												<div class="md:col-span-2"><span class="font-semibold">Notes:</span>
+													<div class="mt-1 whitespace-pre-wrap">{{ $order->note ?: '—' }}</div>
+												</div>
+											</div>
+											<div class="flex justify-end mt-6">
+												<button class="px-4 py-2 bg-gray-900 text-white rounded" onclick="closeModal('viewOrderModal-{{ $order->id }}')">Close</button>
+											</div>
+										</div>
+									</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Status</label>
-          <select id="orderStatus" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-            <option value="Pending">Pending</option>
-            <option value="In Production">In Production</option>
-            <option value="Ready">Ready</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-        </div>
+									<!-- Edit Order Modal -->
+									<div id="editOrderModal-{{ $order->id }}" class="fixed inset-0 bg-black/50 hidden">
+										<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-6">
+											<div class="flex items-center justify-between mb-4">
+												<h3 class="font-semibold">Edit Order {{ $order->order_number }}</h3>
+												<button onclick="closeModal('editOrderModal-{{ $order->id }}')">✕</button>
+											</div>
+											<form method="POST" action="{{ route('sales-orders.update', $order) }}">
+												@csrf
+												@method('PUT')
+												<div class="grid gap-4">
+													<div>
+														<label class="text-sm">Customer</label>
+														<select name="customer_id" class="w-full border rounded px-2 py-1">
+															@foreach($customers as $c)
+																<option value="{{ $c->id }}" @selected($order->customer_id==$c->id)>{{ $c->name }} ({{ $c->customer_type }})</option>
+															@endforeach
+														</select>
+													</div>
+													<div>
+														<label class="text-sm">Delivery Date</label>
+														<input type="date" name="delivery_date" value="{{ $order->delivery_date }}" class="w-full border rounded px-2 py-1">
+													</div>
+													<div class="grid grid-cols-2 gap-3">
+														<div>
+															<label class="text-sm">Status</label>
+															<select name="status" class="w-full border rounded px-2 py-1">
+																@foreach(['In production','Pending','Delivered','Ready'] as $s)
+																	<option value="{{ $s }}" @selected($order->status==$s)>{{ $s }}</option>
+																@endforeach
+															</select>
+														</div>
+														<div>
+															<label class="text-sm">Payment Status</label>
+															<select name="payment_status" class="w-full border rounded px-2 py-1">
+																@foreach(['Pending','Partial','Paid'] as $ps)
+																	<option value="{{ $ps }}" @selected($order->payment_status==$ps)>{{ $ps }}</option>
+																@endforeach
+															</select>
+														</div>
+													</div>
+													<div>
+														<label class="text-sm">Notes</label>
+														<textarea name="note" class="w-full border rounded px-2 py-1" rows="3">{{ $order->note }}</textarea>
+													</div>
+													<div class="flex justify-end gap-2">
+														<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('editOrderModal-{{ $order->id }}')">Cancel</button>
+														<button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded">Save</button>
+													</div>
+												</form>
+											</div>
+									</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Payment Status</label>
-          <select id="orderPaymentStatus" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-            <option value="Unpaid">Unpaid</option>
-            <option value="Partial">Partial</option>
-            <option value="Paid">Paid</option>
-          </select>
-        </div>
+								@empty
+									<tr><td colspan="8" class="text-center py-4">No orders yet. Click "New Order" to create one.</td></tr>
+								@endforelse
+								<tr id="salesNoMatch" class="hidden"><td colspan="8" class="text-center py-4">No matches</td></tr>
+							</tbody>
+						</table>
+					</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Notes</label>
-          <textarea id="orderNotes" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-        </div>
-      </form>
+					<!-- Customers Table -->
+					<div id="customerTable" class="hidden overflow-x-auto">
+						<table class="min-w-full border-collapse text-left text-sm">
+							<thead class="bg-slate-800 text-gray-300">
+								<tr>
+									<th class="px-4 py-2">Name</th>
+									<th class="px-4 py-2">Type</th>
+									<th class="px-4 py-2">Contact</th>
+									<th class="px-4 py-2">Email</th>
+									<th class="px-4 py-2">Total Orders</th>
+									<th class="px-4 py-2">Total Spent</th>
+									<th class="px-4 py-2">Action</th>
+								</tr>
+							</thead>
+							<tbody id="customersTbody">
+								@forelse($customers as $customer)
+									<tr class="border-t border-slate-600 data-row">
+										<td class="px-4 py-2">{{ $customer->name }}</td>
+										@php $ctBg = $customerTypeBg[$customer->customer_type] ?? '#e5e7eb'; @endphp
+										<td class="px-4 py-2"><span class="inline-block text-xs text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span></td>
+										<td class="px-4 py-2">{{ $customer->phone }}</td>
+										<td class="px-4 py-2">{{ $customer->email }}</td>
+										<td class="px-4 py-2">{{ $customer->totalOrders() }}</td>
+										<td class="px-4 py-2">₱{{ number_format($customer->totalSpent(), 2) }}</td>
+										<td class="px-4 py-2">
+											<button class="text-green-300 mr-2" onclick="openModal('viewCustomerModal-{{ $customer->id }}')">View</button>
+											<button class="text-yellow-300 mr-2" onclick="openModal('editCustomerModal-{{ $customer->id }}')">Edit</button>
+											<form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this customer?')">
+												@csrf
+												@method('DELETE')
+												<button type="submit" class="text-red-300">Delete</button>
+											</form>
+										</td>
+									</tr>
 
-      <!-- Customer Form -->
-      <form id="customerForm" class="hidden space-y-3">
-        <input type="hidden" id="customerIdField" />
-        
-        <div>
-          <label class="block text-sm font-medium mb-1">Name <span class="text-red-500">*</span></label>
-          <input type="text" id="customerName" required placeholder="Customer name" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-        </div>
+									<!-- View Customer Modal -->
+									<div id="viewCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/70 hidden">
+										<div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-2xl w-[92%] mx-auto mt-16 p-6">
+											<div class="flex items-center justify-between mb-4">
+												<h3 class="text-2xl font-bold">Customer Details</h3>
+												<button class="text-xl" onclick="closeModal('viewCustomerModal-{{ $customer->id }}')">✕</button>
+											</div>
+											<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg leading-relaxed">
+												<div><span class="font-semibold">Name:</span> {{ $customer->name }}</div>
+												<div><span class="font-semibold">Type:</span> <span class="px-2 py-0.5 rounded text-white" style="background: {{ $customerTypeBg[$customer->customer_type] ?? '#e5e7eb' }};">{{ $customer->customer_type }}</span></div>
+												<div><span class="font-semibold">Contact #:</span> {{ $customer->phone ?: '—' }}</div>
+												<div><span class="font-semibold">Email:</span> {{ $customer->email ?: '—' }}</div>
+												<div><span class="font-semibold">Total Orders:</span> {{ $customer->totalOrders() }}</div>
+												<div><span class="font-semibold">Total Spent:</span> ₱{{ number_format($customer->totalSpent(), 2) }}</div>
+											</div>
+											<div class="flex justify-end mt-6">
+												<button class="px-4 py-2 bg-gray-900 text-white rounded" onclick="closeModal('viewCustomerModal-{{ $customer->id }}')">Close</button>
+											</div>
+										</div>
+									</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Type <span class="text-red-500">*</span></label>
-          <input type="hidden" id="customerType" value="Retail">
-          <div class="flex gap-2">
-            <button type="button" class="type-btn bg-retail text-white px-3 py-1 rounded-full text-xs ring-2 ring-retail" data-type="Retail">Retail</button>
-            <button type="button" class="type-btn bg-gray-300 text-gray-600 px-3 py-1 rounded-full text-xs" data-type="Wholesale">Wholesale</button>
-            <button type="button" class="type-btn bg-gray-300 text-gray-600 px-3 py-1 rounded-full text-xs" data-type="Contractor">Contractor</button>
-          </div>
-        </div>
+									<!-- Edit Customer Modal -->
+									<div id="editCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/50 hidden">
+										<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-6">
+											<div class="flex items-center justify-between mb-4">
+												<h3 class="font-semibold">Edit Customer</h3>
+												<button onclick="closeModal('editCustomerModal-{{ $customer->id }}')">✕</button>
+											</div>
+											<form method="POST" action="{{ route('customers.update', $customer) }}">
+												@csrf
+												@method('PUT')
+												<div class="grid gap-4">
+													<div>
+														<label class="text-sm">Name</label>
+														<input type="text" name="name" value="{{ $customer->name }}" class="w-full border rounded px-2 py-1">
+													</div>
+													<div class="grid grid-cols-2 gap-3">
+														<div>
+															<label class="text-sm">Type</label>
+															<select name="customer_type" class="w-full border rounded px-2 py-1">
+																@foreach(['Retail','Contractor','Wholesale'] as $t)
+																	<option value="{{ $t }}" @selected($customer->customer_type==$t)>{{ $t }}</option>
+																@endforeach
+															</select>
+														</div>
+														<div>
+															<label class="text-sm">Phone</label>
+															<input type="text" name="phone" value="{{ $customer->phone }}" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX">
+														</div>
+													</div>
+													<div class="grid grid-cols-2 gap-3">
+														<div>
+															<label class="text-sm">Email</label>
+															<input type="email" name="email" value="{{ $customer->email }}" class="w-full border rounded px-2 py-1">
+														</div>
+													</div>
+													<div class="flex justify-end gap-2">
+														<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('editCustomerModal-{{ $customer->id }}')">Cancel</button>
+														<button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded">Save</button>
+													</div>
+												</form>
+											</div>
+									</div>
+								@empty
+									<tr><td colspan="7" class="text-center py-4">No customers yet. Click "New Customer" to add one.</td></tr>
+								@endforelse
+								<tr id="customersNoMatch" class="hidden"><td colspan="7" class="text-center py-4">No matches</td></tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Contact Number</label>
-          <div class="relative">
-            <input type="text" id="customerPhone" placeholder="09XXXXXXXXX" maxlength="11" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent" oninput="validatePhoneNumber(this)">
-            <div id="phoneValidationIndicator" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full"></div>
-          </div>
-          <p id="phoneValidationMessage" class="text-xs mt-1"></p>
-        </div>
+				<!-- New Order Modal -->
+				<div id="newOrderModal" class="fixed inset-0 bg-black/50 hidden">
+					<div class="bg-white text-gray-900 rounded shadow max-w-2xl w-full mx-auto mt-16 p-6">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="font-semibold">Create New Order</h3>
+							<button onclick="closeModal('newOrderModal')">✕</button>
+						</div>
+						<form method="POST" action="{{ route('sales-orders.store') }}">
+							@csrf
+							<div class="grid gap-4">
+								<div>
+									<label class="text-sm">Customer <span class="text-red-500">*</span></label>
+									<select name="customer_id" class="w-full border rounded px-2 py-1" required>
+										<option value="">Select Customer</option>
+										@foreach($customers as $c)
+											<option value="{{ $c->id }}">{{ $c->name }} ({{ $c->customer_type }})</option>
+										@endforeach
+									</select>
+								</div>
+								<div class="grid grid-cols-2 gap-3">
+									<div>
+										<label class="text-sm">Delivery Date <span class="text-red-500">*</span></label>
+										<input type="date" name="delivery_date" class="w-full border rounded px-2 py-1" required>
+									</div>
+									<div>
+										<label class="text-sm">Status</label>
+										<input type="text" value="Pending" class="w-full border rounded px-2 py-1 bg-gray-100" disabled>
+									</div>
+								</div>
+								<div class="grid grid-cols-3 gap-3 items-end">
+									<div>
+										<label class="text-sm">Product</label>
+										<select id="newItemProduct" name="items[0][product_id]" class="w-full border rounded px-2 py-1">
+											<option value="">-- select product --</option>
+											@foreach($products as $p)
+												<option value="{{ $p->id }}" data-price="{{ number_format($p->unit_price,2,'.','') }}">{{ $p->name }}</option>
+											@endforeach
+										</select>
+									</div>
+									<div>
+										<label class="text-sm">Quantity</label>
+										<input id="newItemQty" type="number" min="1" name="items[0][quantity]" class="w-full border rounded px-2 py-1" placeholder="1">
+									</div>
+									<div>
+										<label class="text-sm">Unit Price</label>
+										<input id="newItemUnitPrice" type="text" class="w-full border rounded px-2 py-1 bg-gray-100" value="" placeholder="auto" disabled>
+										<input id="newItemUnitPriceHidden" type="hidden" name="items[0][unit_price]" value="">
+										<div class="text-xs text-gray-500 mt-1" id="newItemLineTotal">Line total: ₱0.00</div>
+									</div>
+								</div>
+								<div>
+									<label class="text-sm">Notes</label>
+									<textarea name="note" rows="2" class="w-full border rounded px-2 py-1" placeholder="Optional notes..."></textarea>
+								</div>
+								<div class="flex justify-end gap-2 mt-2">
+									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newOrderModal')">Cancel</button>
+									<button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded">Create</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Email</label>
-          <input type="email" id="customerEmail" placeholder="email@example.com" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-        </div>
+				<!-- New Customer Modal -->
+				<div id="newCustomerModal" class="fixed inset-0 bg-black/50 hidden">
+					<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-6">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="font-semibold">Add New Customer</h3>
+							<button onclick="closeModal('newCustomerModal')">✕</button>
+						</div>
+						<form method="POST" action="{{ route('customers.store') }}">
+							@csrf
+							<div class="grid gap-4">
+								<div>
+									<label class="text-sm">Name <span class="text-red-500">*</span></label>
+									<input type="text" name="name" class="w-full border rounded px-2 py-1" required>
+								</div>
+								<div class="grid grid-cols-2 gap-3">
+									<div>
+										<label class="text-sm">Type <span class="text-red-500">*</span></label>
+										<select name="customer_type" class="w-full border rounded px-2 py-1" required>
+											@foreach(['Retail','Contractor','Wholesale'] as $t)
+												<option value="{{ $t }}">{{ $t }}</option>
+											@endforeach
+										</select>
+									</div>
+									<div>
+										<label class="text-sm">Phone</label>
+										<input type="text" name="phone" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX">
+									</div>
+								</div>
+								<div>
+									<label class="text-sm">Email</label>
+									<input type="email" name="email" class="w-full border rounded px-2 py-1">
+								</div>
+								<div class="flex justify-end gap-2">
+									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newCustomerModal')">Cancel</button>
+									<button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded">Create</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Contact Person</label>
-          <input type="text" id="customerContactPerson" placeholder="Contact person name" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent">
-        </div>
+	<script>
+		// Header action button behavior based on active tab
+		function openActionModal() {
+			const inSales = !document.getElementById('salesTable').classList.contains('hidden');
+			if (inSales) {
+				openModal('newOrderModal');
+			} else {
+				openModal('newCustomerModal');
+			}
+		}
 
-        <div>
-          <label class="block text-sm font-medium mb-1">Address</label>
-          <textarea id="customerAddress" rows="2" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-        </div>
-      </form>
+		function openModal(modalId) {
+			document.getElementById(modalId).classList.remove('hidden');
+		}
 
-      <div class="flex justify-end mt-4 gap-2">
-        <button id="closeModalBtn" class="px-4 py-2 rounded-md bg-gray-300 text-primary hover:bg-gray-400">Cancel</button>
-        <button id="submitBtn" class="px-4 py-2 rounded-md bg-primary text-white hover:bg-accent">Save</button>
-      </div>
-    </div>
-  </div>
+		function closeModal(modalId) {
+			document.getElementById(modalId).classList.add('hidden');
+		}
 
-  <!-- Scripts -->
-  <script>
-    // Phone number validation function
-    function validatePhoneNumber(input) {
-      const phoneNumber = input.value.trim();
-      const indicator = document.getElementById('phoneValidationIndicator');
-      const message = document.getElementById('phoneValidationMessage');
-      
-      // Only allow numbers
-      input.value = phoneNumber.replace(/[^0-9]/g, '');
-      
-      if (phoneNumber.length === 0) {
-        // Empty input
-        indicator.style.backgroundColor = '';
-        message.textContent = '';
-        message.className = 'text-xs mt-1';
-      } else if (phoneNumber.length === 11 && phoneNumber.startsWith('09')) {
-        // Valid phone number (11 digits starting with 09)
-        indicator.style.backgroundColor = '#10B981'; // Green
-        message.textContent = 'Valid phone number';
-        message.className = 'text-xs mt-1 text-green-600';
-      } else {
-        // Invalid phone number
-        indicator.style.backgroundColor = '#EF4444'; // Red
-        message.textContent = 'Phone number must be 11 digits starting with 09';
-        message.className = 'text-xs mt-1 text-red-600';
-      }
-    }
-    
-    // In-Memory Data Storage
-    let allOrders = [];
-    let allCustomers = [];
-    let orderIdCounter = 1;
-    let customerIdCounter = 1;
+		(function() {
+			const salesTab = document.getElementById('salesTab');
+			const customersTab = document.getElementById('customersTab');
+			const salesTable = document.getElementById('salesTable');
+			const customerTable = document.getElementById('customerTable');
+			const headerBtn = document.getElementById('headerActionBtn');
+			const searchInput = document.getElementById('searchInput');
+			const statusFilter = document.getElementById('statusFilter');
+			const paymentFilter = document.getElementById('paymentFilter');
+			const salesTbody = document.getElementById('salesTbody');
+			const customersTbody = document.getElementById('customersTbody');
+			const salesNoMatch = document.getElementById('salesNoMatch');
+			const customersNoMatch = document.getElementById('customersNoMatch');
+			// New order real-time pricing refs
+			const newItemProduct = document.getElementById('newItemProduct');
+			const newItemQty = document.getElementById('newItemQty');
+			const newItemUnitPrice = document.getElementById('newItemUnitPrice');
+			const newItemUnitPriceHidden = document.getElementById('newItemUnitPriceHidden');
+			const newItemLineTotal = document.getElementById('newItemLineTotal');
 
-    // State
-    let currentView = 'sales';
-    let currentEditId = null;
-    let currentEditType = null;
+			function setMode(mode) {
+				if (mode === 'sales') {
+					salesTable.classList.remove('hidden');
+					customerTable.classList.add('hidden');
+					headerBtn.textContent = '+ New Order';
+					salesTab.classList.add('bg-orange-500','text-gray-900');
+					salesTab.classList.remove('bg-slate-600','text-white');
+					customersTab.classList.add('bg-slate-600','text-white');
+					customersTab.classList.remove('bg-orange-500','text-gray-900');
+				} else {
+					salesTable.classList.add('hidden');
+					customerTable.classList.remove('hidden');
+					headerBtn.textContent = '+ New Customer';
+					customersTab.classList.add('bg-orange-500','text-gray-900');
+					customersTab.classList.remove('bg-slate-600','text-white');
+					salesTab.classList.add('bg-slate-600','text-white');
+					salesTab.classList.remove('bg-orange-500','text-gray-900');
+				}
+				applyFilters();
+			}
 
-    // DOM Elements
-    const salesTab = document.getElementById("salesTab");
-    const customersTab = document.getElementById("customersTab");
-    const salesTable = document.getElementById("salesTable");
-    const customerTable = document.getElementById("customerTable");
-    const salesTableBody = document.getElementById("salesTableBody");
-    const customerTableBody = document.getElementById("customerTableBody");
-    const newOrderBtn = document.getElementById("newOrderBtn");
-    const modal = document.getElementById("modal");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalSubtitle = document.getElementById("modalSubtitle");
-    const orderForm = document.getElementById("orderForm");
-    const customerForm = document.getElementById("customerForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const searchInput = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
-    const paymentFilter = document.getElementById("paymentFilter");
+			salesTab.addEventListener('click', () => setMode('sales'));
+			customersTab.addEventListener('click', () => setMode('customers'));
 
-    // Customer Type Buttons
-    const typeButtons = document.querySelectorAll('.type-btn');
-    typeButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        typeButtons.forEach(b => {
-          b.classList.remove('ring-2');
-          b.classList.add('bg-gray-300', 'text-gray-600');
-          b.classList.remove('bg-retail', 'bg-wholesale', 'bg-contractor', 'text-white');
-        });
-        
-        const type = this.dataset.type;
-        document.getElementById('customerType').value = type;
-        this.classList.remove('bg-gray-300', 'text-gray-600');
-        this.classList.add('text-white', 'ring-2');
-        
-        if (type === 'Retail') {
-          this.classList.add('bg-retail', 'ring-retail');
-        } else if (type === 'Wholesale') {
-          this.classList.add('bg-wholesale', 'ring-wholesale');
-        } else {
-          this.classList.add('bg-contractor', 'ring-contractor');
-        }
-      });
-    });
+			function stringIncludes(haystack, needle) {
+				return haystack.toLowerCase().includes(needle.toLowerCase());
+			}
 
-    // Helper Functions
-    function generateOrderNumber() {
-      const date = new Date();
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `ORD-${year}${month}${day}-${String(orderIdCounter).padStart(4, '0')}`;
-    }
+			function applyFilters() {
+				const q = searchInput.value.trim();
+				const sVal = statusFilter.value;
+				const pVal = paymentFilter.value;
+				const inSales = !salesTable.classList.contains('hidden');
 
-    function createOrder(data) {
-      const customer = allCustomers.find(c => c.customer_id === parseInt(data.customer_id));
-      const order = {
-        id: orderIdCounter++,
-        order_number: generateOrderNumber(),
-        customer_id: parseInt(data.customer_id),
-        customer: customer,
-        product: data.product,
-        order_date: new Date().toISOString().split('T')[0],
-        delivery_date: data.delivery_date,
-        status: data.status,
-        total_amount: parseFloat(data.total_amount) || 0,
-        payment_status: data.payment_status,
-        notes: data.notes || ''
-      };
-      allOrders.push(order);
-      updateCustomerStats();
-      showNotification('Order created successfully!', 'success');
-      renderOrders();
-      closeModal();
-    }
+				if (inSales) {
+					let any = false;
+					const rows = salesTbody.querySelectorAll('tr.data-row');
+					rows.forEach(tr => {
+						let show = true;
+						if (q) {
+							const text = tr.textContent || '';
+							show = show && stringIncludes(text, q);
+						}
+						if (sVal) {
+							show = show && (tr.dataset.status === sVal);
+						}
+						if (pVal) {
+							show = show && (tr.dataset.payment === pVal);
+						}
+						tr.classList.toggle('hidden', !show);
+						any = any || show;
+					});
+					salesNoMatch.classList.toggle('hidden', any);
+				} else {
+					let any = false;
+					const rows = customersTbody.querySelectorAll('tr.data-row');
+					rows.forEach(tr => {
+						let show = true;
+						if (q) {
+							const nameCell = tr.querySelector('td:nth-child(1)');
+							const typeCell = tr.querySelector('td:nth-child(2)');
+							const contactCell = tr.querySelector('td:nth-child(3)');
+							const hay = [nameCell, typeCell, contactCell].map(c => (c?.textContent || '')).join(' ');
+							show = show && stringIncludes(hay, q);
+						}
+						tr.classList.toggle('hidden', !show);
+						any = any || show;
+					});
+					customersNoMatch.classList.toggle('hidden', any);
+				}
+			}
 
-    function updateOrder(id, data) {
-      const index = allOrders.findIndex(o => o.id === id);
-      if (index !== -1) {
-        const customer = allCustomers.find(c => c.customer_id === parseInt(data.customer_id));
-        allOrders[index] = {
-          ...allOrders[index],
-          customer_id: parseInt(data.customer_id),
-          customer: customer,
-          product: data.product,
-          delivery_date: data.delivery_date,
-          status: data.status,
-          total_amount: parseFloat(data.total_amount) || 0,
-          payment_status: data.payment_status,
-          notes: data.notes || ''
-        };
-        updateCustomerStats();
-        showNotification('Order updated successfully!', 'success');
-        renderOrders();
-        closeModal();
-      }
-    }
+			searchInput.addEventListener('input', applyFilters);
+			statusFilter.addEventListener('change', applyFilters);
+			paymentFilter.addEventListener('change', applyFilters);
 
-    function deleteOrder(id) {
-      if (!confirm('Are you sure you want to delete this order?')) return;
-      
-      const index = allOrders.findIndex(o => o.id === id);
-      if (index !== -1) {
-        allOrders.splice(index, 1);
-        updateCustomerStats();
-        showNotification('Order deleted successfully!', 'success');
-        renderOrders();
-      }
-    }
+			// ---- Real-time unit price + line total for New Order modal ----
+			function toNumber(value) {
+				const n = parseFloat(value);
+				return Number.isFinite(n) ? n : 0;
+			}
 
-    function createCustomer(data) {
-      const customer = {
-        customer_id: customerIdCounter++,
-        customer_name: data.customer_name,
-        customer_type: data.customer_type,
-        phone: data.phone || '',
-        email: data.email || '',
-        contact_person: data.contact_person || '',
-        address: data.address || '',
-        total_orders: 0,
-        total_spent: 0
-      };
-      allCustomers.push(customer);
-      showNotification('Customer created successfully!', 'success');
-      updateCustomerDropdown();
-      renderCustomers();
-      closeModal();
-    }
+			function formatCurrency(num) {
+				return '₱' + num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+			}
 
-    function updateCustomer(id, data) {
-      const index = allCustomers.findIndex(c => c.customer_id === id);
-      if (index !== -1) {
-        allCustomers[index] = {
-          ...allCustomers[index],
-          customer_name: data.customer_name,
-          customer_type: data.customer_type,
-          phone: data.phone || '',
-          email: data.email || '',
-          contact_person: data.contact_person || '',
-          address: data.address || ''
-        };
-        
-        // Update customer reference in orders
-        allOrders.forEach(order => {
-          if (order.customer_id === id) {
-            order.customer = allCustomers[index];
-          }
-        });
-        
-        showNotification('Customer updated successfully!', 'success');
-        updateCustomerDropdown();
-        renderCustomers();
-        renderOrders();
-        closeModal();
-      }
-    }
+			function getSelectedUnitPrice() {
+				if (!newItemProduct) return 0;
+				const opt = newItemProduct.options[newItemProduct.selectedIndex];
+				const priceAttr = opt ? opt.getAttribute('data-price') : null;
+				return toNumber(priceAttr);
+			}
 
-    function deleteCustomer(id) {
-      if (!confirm('Are you sure you want to delete this customer? All related orders will be deleted.')) return;
-      
-      const index = allCustomers.findIndex(c => c.customer_id === id);
-      if (index !== -1) {
-        // Delete all orders for this customer
-        allOrders = allOrders.filter(o => o.customer_id !== id);
-        allCustomers.splice(index, 1);
-        showNotification('Customer deleted successfully!', 'success');
-        updateCustomerDropdown();
-        renderCustomers();
-        renderOrders();
-      }
-    }
+			function updatePricingFields() {
+				const unit = getSelectedUnitPrice();
+				const qty = toNumber(newItemQty?.value || '0');
+				if (newItemUnitPrice) newItemUnitPrice.value = unit ? formatCurrency(unit) : '';
+				if (newItemUnitPriceHidden) newItemUnitPriceHidden.value = unit ? unit.toFixed(2) : '';
+				const total = unit * (qty || 0);
+				if (newItemLineTotal) newItemLineTotal.textContent = 'Line total: ' + formatCurrency(total);
+			}
 
-    function updateCustomerStats() {
-      allCustomers.forEach(customer => {
-        const customerOrders = allOrders.filter(o => o.customer_id === customer.customer_id);
-        customer.total_orders = customerOrders.length;
-        customer.total_spent = customerOrders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
-      });
-    }
+			if (newItemProduct) {
+				newItemProduct.addEventListener('change', () => {
+					// If quantity empty or <1, default to 1 on first select
+					if (newItemQty && (!newItemQty.value || toNumber(newItemQty.value) < 1)) {
+						newItemQty.value = '1';
+					}
+					updatePricingFields();
+				});
+			}
+			if (newItemQty) {
+				['input','change','blur'].forEach(evt => newItemQty.addEventListener(evt, () => {
+					if (toNumber(newItemQty.value) < 1) newItemQty.value = '1';
+					updatePricingFields();
+				}));
+			}
 
-    // Render Functions
-    function renderOrders() {
-      let filtered = [...allOrders];
-      
-      // Apply filters
-      const search = searchInput.value.toLowerCase();
-      if (search) {
-        filtered = filtered.filter(order => 
-          order.order_number.toLowerCase().includes(search) ||
-          order.customer?.customer_name.toLowerCase().includes(search) ||
-          order.product.toLowerCase().includes(search)
-        );
-      }
-      
-      if (statusFilter.value) {
-        filtered = filtered.filter(order => order.status === statusFilter.value);
-      }
-      
-      if (paymentFilter.value) {
-        filtered = filtered.filter(order => order.payment_status === paymentFilter.value);
-      }
+			// Initialize pricing display if fields already have values
+			updatePricingFields();
 
-      if (filtered.length === 0) {
-        salesTableBody.innerHTML = '<tr><td colspan="9" class="text-center py-4">No orders found</td></tr>';
-        return;
-      }
-
-      salesTableBody.innerHTML = filtered.map(order => `
-        <tr class="odd:bg-[#14494c] even:bg-[#155c5f]">
-          <td class="px-4 py-2">${order.order_number}</td>
-          <td class="px-4 py-2">${order.customer?.customer_name || 'N/A'}</td>
-          <td class="px-4 py-2">${order.product}</td>
-          <td class="px-4 py-2">${formatDate(order.order_date)}</td>
-          <td class="px-4 py-2">${formatDate(order.delivery_date)}</td>
-          <td class="px-4 py-2">${getStatusBadge(order.status)}</td>
-          <td class="px-4 py-2">₱${parseFloat(order.total_amount).toFixed(2)}</td>
-          <td class="px-4 py-2">${getPaymentBadge(order.payment_status)}</td>
-          <td class="px-4 py-2 flex gap-2">
-            <button onclick="editOrder(${order.id})" class="bg-yellow-500 hover:scale-110 transition rounded px-2 py-1"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button onclick="deleteOrder(${order.id})" class="bg-red-600 hover:scale-110 transition rounded px-2 py-1"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderCustomers() {
-      const search = searchInput.value.toLowerCase();
-      let filtered = [...allCustomers];
-      
-      if (search) {
-        filtered = filtered.filter(customer => 
-          customer.customer_name.toLowerCase().includes(search) ||
-          customer.email?.toLowerCase().includes(search) ||
-          customer.phone?.toLowerCase().includes(search)
-        );
-      }
-
-      if (filtered.length === 0) {
-        customerTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">No customers found</td></tr>';
-        return;
-      }
-
-      customerTableBody.innerHTML = filtered.map(customer => `
-        <tr class="odd:bg-[#14494c] even:bg-[#155c5f]">
-          <td class="px-4 py-2">${customer.customer_name}</td>
-          <td class="px-4 py-2">${getCustomerTypeBadge(customer.customer_type)}</td>
-          <td class="px-4 py-2">
-            ${customer.phone || 'N/A'}<br>
-            <span class="text-gray-300 text-xs">${customer.email || 'N/A'}</span>
-          </td>
-          <td class="px-4 py-2">${customer.total_orders || 0}</td>
-          <td class="px-4 py-2">₱${parseFloat(customer.total_spent || 0).toFixed(2)}</td>
-          <td class="px-4 py-2 flex gap-2">
-            <button onclick="editCustomer(${customer.customer_id})" class="bg-yellow-500 hover:scale-110 transition rounded px-2 py-1"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button onclick="deleteCustomer(${customer.customer_id})" class="bg-red-600 hover:scale-110 transition rounded px-2 py-1"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function updateCustomerDropdown() {
-      const select = document.getElementById('orderCustomer');
-      select.innerHTML = '<option value="">Select Customer</option>' + 
-        allCustomers.map(customer => 
-          `<option value="${customer.customer_id}">${customer.customer_name}</option>`
-        ).join('');
-    }
-
-    // Helper Functions
-    function formatDate(date) {
-      if (!date) return 'N/A';
-      const d = new Date(date);
-      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
-    }
-
-    function getStatusBadge(status) {
-      const colors = {
-        'Pending': 'bg-gray-500',
-        'In Production': 'bg-yellow-600',
-        'Ready': 'bg-blue-500',
-        'Delivered': 'bg-green-600',
-        'Cancelled': 'bg-red-600'
-      };
-      return `<span class="${colors[status]} px-2 py-1 rounded text-white text-xs">${status}</span>`;
-    }
-
-    function getPaymentBadge(status) {
-      const colors = {
-        'Unpaid': 'bg-red-500',
-        'Partial': 'bg-indigo-500',
-        'Paid': 'bg-green-600'
-      };
-      return `<span class="${colors[status]} px-2 py-1 rounded text-white text-xs">${status}</span>`;
-    }
-
-    function getCustomerTypeBadge(type) {
-      const colors = {
-        'Retail': 'bg-retail',
-        'Wholesale': 'bg-wholesale',
-        'Contractor': 'bg-contractor'
-      };
-      return `<span class="${colors[type]} text-white px-3 py-1 rounded-full text-xs">${type}</span>`;
-    }
-
-    function showNotification(message, type) {
-      alert(message);
-    }
-
-    // Edit Functions
-    window.editOrder = function(id) {
-      const order = allOrders.find(o => o.id === id);
-      if (!order) return;
-
-      currentEditId = id;
-      currentEditType = 'order';
-      
-      modalTitle.textContent = 'Edit Sales Order';
-      modalSubtitle.textContent = 'Update sales order information.';
-      orderForm.classList.remove('hidden');
-      customerForm.classList.add('hidden');
-      
-      document.getElementById('orderIdField').value = id;
-      document.getElementById('orderCustomer').value = order.customer_id;
-      document.getElementById('orderDeliveryDate').value = order.delivery_date;
-      document.getElementById('orderProduct').value = order.product;
-      document.getElementById('orderAmount').value = order.total_amount;
-      document.getElementById('orderStatus').value = order.status;
-      document.getElementById('orderPaymentStatus').value = order.payment_status;
-      document.getElementById('orderNotes').value = order.notes || '';
-      
-      modal.classList.remove('hidden');
-    }
-
-    window.editCustomer = function(id) {
-      const customer = allCustomers.find(c => c.customer_id === id);
-      if (!customer) return;
-
-      currentEditId = id;
-      currentEditType = 'customer';
-      
-      modalTitle.textContent = 'Edit Customer';
-      modalSubtitle.textContent = 'Update customer information.';
-      customerForm.classList.remove('hidden');
-      orderForm.classList.add('hidden');
-      
-      document.getElementById('customerIdField').value = id;
-      document.getElementById('customerName').value = customer.customer_name;
-      document.getElementById('customerType').value = customer.customer_type;
-      document.getElementById('customerPhone').value = customer.phone || '';
-      document.getElementById('customerEmail').value = customer.email || '';
-      document.getElementById('customerContactPerson').value = customer.contact_person || '';
-      document.getElementById('customerAddress').value = customer.address || '';
-      
-      // Update type buttons
-      typeButtons.forEach(btn => {
-        btn.classList.remove('ring-2', 'bg-retail', 'bg-wholesale', 'bg-contractor', 'text-white');
-        btn.classList.add('bg-gray-300', 'text-gray-600');
-        
-        if (btn.dataset.type === customer.customer_type) {
-          btn.classList.remove('bg-gray-300', 'text-gray-600');
-          btn.classList.add('text-white', 'ring-2');
-          if (customer.customer_type === 'Retail') {
-            btn.classList.add('bg-retail', 'ring-retail');
-          } else if (customer.customer_type === 'Wholesale') {
-            btn.classList.add('bg-wholesale', 'ring-wholesale');
-          } else {
-            btn.classList.add('bg-contractor', 'ring-contractor');
-          }
-        }
-      });
-      
-      modal.classList.remove('hidden');
-    }
-
-    window.deleteOrder = deleteOrder;
-    window.deleteCustomer = deleteCustomer;
-
-    // Tab Switching
-    customersTab.addEventListener("click", () => {
-      currentView = 'customers';
-      salesTable.classList.add("hidden");
-      customerTable.classList.remove("hidden");
-      customersTab.classList.add("bg-accent", "text-primary");
-      customersTab.classList.remove("bg-primary", "text-white");
-      salesTab.classList.remove("bg-accent", "text-primary");
-      salesTab.classList.add("bg-primary", "text-white");
-      newOrderBtn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> New Customer';
-      searchInput.value = '';
-      renderCustomers();
-    });
-
-    salesTab.addEventListener("click", () => {
-      currentView = 'sales';
-      customerTable.classList.add("hidden");
-      salesTable.classList.remove("hidden");
-      salesTab.classList.add("bg-accent", "text-primary");
-      salesTab.classList.remove("bg-primary", "text-white");
-      customersTab.classList.remove("bg-accent", "text-primary");
-      customersTab.classList.add("bg-primary", "text-white");
-      newOrderBtn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> New Order';
-      searchInput.value = '';
-      renderOrders();
-    });
-
-    // Modal Logic
-    newOrderBtn.addEventListener("click", () => {
-      currentEditId = null;
-      currentEditType = null;
-      
-      if (currentView === 'customers') {
-        modalTitle.textContent = "Create New Customer";
-        modalSubtitle.textContent = "Add a new customer record.";
-        customerForm.classList.remove("hidden");
-        orderForm.classList.add("hidden");
-        customerForm.reset();
-        document.getElementById('customerType').value = 'Retail';
-        
-        // Reset type buttons
-        typeButtons.forEach(btn => {
-          btn.classList.remove('ring-2', 'bg-retail', 'bg-wholesale', 'bg-contractor', 'text-white');
-          btn.classList.add('bg-gray-300', 'text-gray-600');
-          if (btn.dataset.type === 'Retail') {
-            btn.classList.remove('bg-gray-300', 'text-gray-600');
-            btn.classList.add('bg-retail', 'text-white', 'ring-2', 'ring-retail');
-          }
-        });
-      } else {
-        if (allCustomers.length === 0) {
-          alert('Please add a customer first before creating an order.');
-          return;
-        }
-        modalTitle.textContent = "Create New Sales Order";
-        modalSubtitle.textContent = "Create a new sales order for a customer.";
-        orderForm.classList.remove("hidden");
-        customerForm.classList.add("hidden");
-        orderForm.reset();
-        document.getElementById('orderStatus').value = 'Pending';
-        document.getElementById('orderPaymentStatus').value = 'Unpaid';
-        
-        // Set minimum date to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('orderDeliveryDate').setAttribute('min', today);
-      }
-      modal.classList.remove("hidden");
-    });
-
-    closeModalBtn.addEventListener("click", closeModal);
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
-
-    function closeModal() {
-      modal.classList.add("hidden");
-      orderForm.reset();
-      customerForm.reset();
-      currentEditId = null;
-      currentEditType = null;
-    }
-
-    // Form Submission
-    submitBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      
-      if (currentView === 'sales' || currentEditType === 'order') {
-        const formData = {
-          customer_id: document.getElementById('orderCustomer').value,
-          delivery_date: document.getElementById('orderDeliveryDate').value,
-          product: document.getElementById('orderProduct').value,
-          total_amount: document.getElementById('orderAmount').value || 0,
-          status: document.getElementById('orderStatus').value,
-          payment_status: document.getElementById('orderPaymentStatus').value,
-          notes: document.getElementById('orderNotes').value
-        };
-        
-        if (!formData.customer_id || !formData.delivery_date || !formData.product) {
-          alert('Please fill in all required fields');
-          return;
-        }
-        
-        if (currentEditId) {
-          updateOrder(currentEditId, formData);
-        } else {
-          createOrder(formData);
-        }
-      } else {
-        const formData = {
-          customer_name: document.getElementById('customerName').value,
-          customer_type: document.getElementById('customerType').value,
-          phone: document.getElementById('customerPhone').value,
-          email: document.getElementById('customerEmail').value,
-          contact_person: document.getElementById('customerContactPerson').value,
-          address: document.getElementById('customerAddress').value
-        };
-        
-        if (!formData.customer_name || !formData.customer_type) {
-          alert('Please fill in all required fields');
-          return;
-        }
-        
-        if (currentEditId) {
-          updateCustomer(currentEditId, formData);
-        } else {
-          createCustomer(formData);
-        }
-      }
-    });
-
-    // Search and Filter
-    searchInput.addEventListener('input', () => {
-      if (currentView === 'sales') {
-        renderOrders();
-      } else {
-        renderCustomers();
-      }
-    });
-
-    statusFilter.addEventListener('change', renderOrders);
-    paymentFilter.addEventListener('change', renderOrders);
-
-    // Initialize
-    renderOrders();
-    renderCustomers();
-  </script>
-</body>
-</html>
+			// default: sales tab
+			setMode('sales');
+		})();
+	</script>
+@endsection
