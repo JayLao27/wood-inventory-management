@@ -19,6 +19,9 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
+       // Sales
+    Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
+
     // Profile
     Route::get('/profile', function () {
         return view('profile.edit');
