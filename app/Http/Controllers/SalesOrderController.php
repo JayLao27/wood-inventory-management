@@ -99,7 +99,7 @@ class SalesOrderController extends Controller
     private function generateOrderNumber(): string
     {
         $year = now()->format('Y');
-        $prefix = 'WO-' . $year . '-';
+        $prefix = 'SO-' . $year . '-';
 
         $last = SalesOrder::where('order_number', 'like', $prefix . '%')
             ->orderBy('order_number', 'desc')

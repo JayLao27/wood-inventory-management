@@ -9,18 +9,22 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Auth
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Auth
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Protected
-Route::middleware('auth')->group(function () {
+    // Protected
+    Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-       // Sales
+    // Inventory    
+    Route::get('/inventory', [DashboardController::class, 'index'])->name('inventory');
+    // Sales
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
+
+
+
 
     // Profile
     Route::get('/profile', function () {
