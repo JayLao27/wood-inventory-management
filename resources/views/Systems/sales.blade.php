@@ -488,7 +488,7 @@
 									<select name="customer_id" class="w-full border rounded px-2 py-1" required>
 										<option value="">Select Customer</option>
 										@foreach($customers as $c)
-											<option value="{{ $c->id }}">{{ $c->name }} ({{ $c->customer_type }})</option>
+											<option value="{{ $c->id }}">{{ $c->name }} ({{ $c->customer_type }}	)</option>
 										@endforeach
 									</select>
 								</div>

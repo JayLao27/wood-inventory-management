@@ -61,7 +61,7 @@
 					Sign In
 				</button>
 			</form>
-
+			
 			<div class="mt-6 bg-white/70 rounded-md p-4 text-sm">
 				<p class="font-semibold text-[#A0522D] mb-1">Demo accounts:</p>
 				<ul class="text-[#7A3E00] space-y-1">
