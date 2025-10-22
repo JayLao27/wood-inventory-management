@@ -4,6 +4,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,7 +21,7 @@ Route::get('/', function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // Inventory    
-    Route::get('/inventory', [DashboardController::class, 'index'])->name('inventory');
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
     // Sales
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
 
@@ -32,6 +33,8 @@ Route::get('/', function () {
         return view('profile.edit');
     })->name('profile.edit');
     
+
+
     // Customers CRUD
     Route::resource('customers', CustomerController::class);
 

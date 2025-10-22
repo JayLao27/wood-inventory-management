@@ -10,7 +10,7 @@ class AuthController extends Controller
 	public function showLogin()
 	{
 		if (Auth::check()) {
-			return redirect()->route('sales-orders.index');
+			return redirect()->route('dashboard');
 		}
 		return view('auth.login');
 	}
@@ -24,7 +24,7 @@ class AuthController extends Controller
 
 		if (Auth::attempt($credentials, $request->boolean('remember'))) {
 			$request->session()->regenerate();
-			return redirect()->intended(route('sales-orders.index'));
+			return redirect()->intended(route('dashboard'));
 		}
 
 		return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
