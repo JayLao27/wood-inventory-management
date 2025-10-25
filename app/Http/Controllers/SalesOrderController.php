@@ -14,7 +14,7 @@ class SalesOrderController extends Controller
     {
         $salesOrders = SalesOrder::with(['customer', 'items.product'])->latest()->get();
         $customers = Customer::orderBy('name')->get();
-        $products = Product::orderBy('name')->get();
+        $products = Product::orderBy('product_name')->get();
 
         return view('Systems.sales', compact('salesOrders', 'customers', 'products'));
     }
