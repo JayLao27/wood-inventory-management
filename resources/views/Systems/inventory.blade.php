@@ -17,7 +17,7 @@
                         <button class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
                             Receive Stock
                         </button>
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <button onclick="openAddItemModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                             + Add Item
                         </button>
                     </div>
@@ -31,8 +31,8 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Total Items</p>
-                            <p class="text-3xl font-bold mt-2">10</p>
-                            <p class="text-slate-400 text-xs mt-1">10 Materials</p>
+                            <p class="text-3xl font-bold mt-2">{{ $totalItems ?? 10 }}</p>
+                            <p class="text-slate-400 text-xs mt-1">{{ $totalItems ?? 10 }} Items</p>
                         </div>
                         <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -47,7 +47,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Low Stock Alerts</p>
-                            <p class="text-3xl font-bold mt-2">3</p>
+                            <p class="text-3xl font-bold mt-2">{{ $lowStockAlerts ?? 3 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Items requiring attention</p>
                         </div>
                         <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
@@ -63,7 +63,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Total Value</p>
-                            <p class="text-3xl font-bold mt-2">₱343,711.41</p>
+                            <p class="text-3xl font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
                             <p class="text-slate-400 text-xs mt-1">Raw materials inventory value</p>
                         </div>
                         <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
@@ -79,7 +79,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">New Order</p>
-                            <p class="text-3xl font-bold mt-2">2</p>
+                            <p class="text-3xl font-bold mt-2">{{ $newOrders ?? 2 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Finished products inventory value</p>
                         </div>
                         <div class="w-12 h-12 bg-blue-400 rounded-lg flex items-center justify-center">
@@ -95,7 +95,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Pending Deliveries</p>
-                            <p class="text-3xl font-bold mt-2">3</p>
+                            <p class="text-3xl font-bold mt-2">{{ $pendingDeliveries ?? 3 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Purchase orders awaiting delivery</p>
                             <p class="text-slate-400 text-xs">View auto-requests</p>
                         </div>
@@ -115,7 +115,7 @@
                         <h2 class="text-xl font-bold text-white">Inventory Items</h2>
                         <p class="text-slate-300 text-sm mt-1">Manage your raw materials and finished products</p>
                     </div>
-                    <button class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+                    <button onclick="openAddItemModal()" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
                         + Add Product
                     </button>
                 </div>
@@ -142,8 +142,8 @@
 
                 <!-- Tabs -->
                 <div class="flex space-x-1 mb-6">
-                    <button class="px-4 py-2 bg-slate-600 text-white rounded-lg">Materials</button>
-                    <button class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600">Products</button>
+                    <button onclick="showTab('materials')" id="materials-tab" class="px-4 py-2 bg-slate-600 text-white rounded-lg">Materials</button>
+                    <button onclick="showTab('products')" id="products-tab" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600">Products</button>
                 </div>
 
                 <!-- Inventory Table -->
