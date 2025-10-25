@@ -271,4 +271,351 @@
                 </div>
             </div>
         </div>
+
+        <!-- Add Item Modal -->
+        <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Add New Item</h3>
+                            <button onclick="closeAddItemModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="addItemForm" method="POST" action="{{ route('inventory.store') }}">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+                                    <select name="type" id="itemType" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Type</option>
+                                        <option value="material">Material</option>
+                                        <option value="product">Product</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                                    <input type="text" name="name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                    <input type="text" name="category" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                                    <input type="text" name="unit" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Stock *</label>
+                                    <input type="number" name="current_stock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Stock *</label>
+                                    <input type="number" name="minimum_stock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div id="unitCostField">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit Cost *</label>
+                                    <input type="number" name="unit_cost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div id="supplierField">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Supplier</label>
+                                    <select name="supplier_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select Supplier</option>
+                                        @foreach($suppliers ?? [] as $supplier)
+                                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                
+                                <div id="productionCostField" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost</label>
+                                    <input type="number" name="production_cost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div id="sellingPriceField" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price</label>
+                                    <input type="number" name="selling_price" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" onclick="closeAddItemModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Add Item
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Item Modal -->
+        <div id="editItemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Edit Item</h3>
+                            <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="editItemForm" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+                                    <input type="text" id="editItemType" readonly class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                                    <input type="text" name="name" id="editName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                    <input type="text" name="category" id="editCategory" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                                    <input type="text" name="unit" id="editUnit" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Stock *</label>
+                                    <input type="number" name="current_stock" id="editCurrentStock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Stock *</label>
+                                    <input type="number" name="minimum_stock" id="editMinimumStock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div id="editUnitCostField">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit Cost *</label>
+                                    <input type="number" name="unit_cost" id="editUnitCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div id="editSupplierField">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Supplier</label>
+                                    <select name="supplier_id" id="editSupplier" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select Supplier</option>
+                                        @foreach($suppliers ?? [] as $supplier)
+                                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                
+                                <div id="editProductionCostField" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost</label>
+                                    <input type="number" name="production_cost" id="editProductionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div id="editSellingPriceField" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price</label>
+                                    <input type="number" name="selling_price" id="editSellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea name="description" id="editDescription" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" onclick="closeEditModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Update Item
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Adjustment Modal -->
+        <div id="stockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-md w-full">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Adjust Stock</h3>
+                            <button onclick="closeStockModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="stockForm" method="POST">
+                            @csrf
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Movement Type *</label>
+                                    <select name="movement_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Movement Type</option>
+                                        <option value="in">Stock In</option>
+                                        <option value="out">Stock Out</option>
+                                        <option value="adjustment">Adjustment</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                                    <input type="number" name="quantity" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                    <textarea name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" onclick="closeStockModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Adjust Stock
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Tab functionality
+            function showTab(tab) {
+                const materialsTab = document.getElementById('materials-tab');
+                const productsTab = document.getElementById('products-tab');
+                const materialsTable = document.getElementById('materials-table');
+                const productsTable = document.getElementById('products-table');
+                
+                if (tab === 'materials') {
+                    materialsTab.className = 'px-4 py-2 bg-slate-600 text-white rounded-lg';
+                    productsTab.className = 'px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600';
+                    materialsTable.classList.remove('hidden');
+                    productsTable.classList.add('hidden');
+                } else {
+                    productsTab.className = 'px-4 py-2 bg-slate-600 text-white rounded-lg';
+                    materialsTab.className = 'px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600';
+                    productsTable.classList.remove('hidden');
+                    materialsTable.classList.add('hidden');
+                }
+            }
+
+            // Modal functions
+            function openAddItemModal() {
+                document.getElementById('addItemModal').classList.remove('hidden');
+            }
+
+            function closeAddItemModal() {
+                document.getElementById('addItemModal').classList.add('hidden');
+                document.getElementById('addItemForm').reset();
+            }
+
+            function openEditModal(type, id) {
+                // This would typically fetch item data via AJAX
+                document.getElementById('editItemModal').classList.remove('hidden');
+                document.getElementById('editItemForm').action = `/inventory/${id}`;
+                document.getElementById('editItemType').value = type;
+            }
+
+            function closeEditModal() {
+                document.getElementById('editItemModal').classList.add('hidden');
+            }
+
+            function openStockModal(type, id) {
+                document.getElementById('stockModal').classList.remove('hidden');
+                document.getElementById('stockForm').action = `/inventory/${id}/adjust-stock`;
+                document.querySelector('input[name="type"]').value = type;
+            }
+
+            function closeStockModal() {
+                document.getElementById('stockModal').classList.add('hidden');
+            }
+
+            function deleteItem(type, id) {
+                if (confirm('Are you sure you want to delete this item?')) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/inventory/${id}/${type}`;
+                    
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    
+                    const tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '_token';
+                    tokenInput.value = '{{ csrf_token() }}';
+                    
+                    form.appendChild(methodInput);
+                    form.appendChild(tokenInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+
+            // Handle item type change in add modal
+            document.getElementById('itemType').addEventListener('change', function() {
+                const type = this.value;
+                const unitCostField = document.getElementById('unitCostField');
+                const supplierField = document.getElementById('supplierField');
+                const productionCostField = document.getElementById('productionCostField');
+                const sellingPriceField = document.getElementById('sellingPriceField');
+                
+                if (type === 'material') {
+                    unitCostField.classList.remove('hidden');
+                    supplierField.classList.remove('hidden');
+                    productionCostField.classList.add('hidden');
+                    sellingPriceField.classList.add('hidden');
+                } else if (type === 'product') {
+                    unitCostField.classList.add('hidden');
+                    supplierField.classList.add('hidden');
+                    productionCostField.classList.remove('hidden');
+                    sellingPriceField.classList.remove('hidden');
+                }
+            });
+
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('fixed')) {
+                    closeAddItemModal();
+                    closeEditModal();
+                    closeStockModal();
+                }
+            });
+        </script>
 @endsection
