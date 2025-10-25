@@ -428,7 +428,7 @@
 										<select id="newItemProduct" name="items[0][product_id]" class="w-full border rounded px-2 py-1">
 											<option value="">-- select product --</option>
 											@foreach($products as $p)
-												<option value="{{ $p->id }}" data-price="{{ number_format($p->unit_price,2,'.','') }}">{{ $p->name }}</option>
+												<option value="{{ $p->id }}" data-price="{{ number_format($p->selling_price,2,'.','') }}">{{ $p->product_name }}</option>
 											@endforeach
 										</select>
 									</div>

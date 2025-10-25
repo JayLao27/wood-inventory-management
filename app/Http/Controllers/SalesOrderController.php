@@ -49,7 +49,7 @@ class SalesOrderController extends Controller
             foreach ($validated['items'] as $item) {
                 $product = Product::find($item['product_id']);
                 if (!$product) { continue; }
-                $unitPrice = (float) $product->unit_price;
+                $unitPrice = (float) $product->selling_price;
                 $quantity = (int) $item['quantity'];
                 $lineTotal = $unitPrice * $quantity;
 
