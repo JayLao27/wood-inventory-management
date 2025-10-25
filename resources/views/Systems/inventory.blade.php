@@ -146,8 +146,8 @@
                     <button onclick="showTab('products')" id="products-tab" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600">Products</button>
                 </div>
 
-                <!-- Inventory Table -->
-                <div class="overflow-x-auto">
+                <!-- Materials Table -->
+                <div id="materials-table" class="overflow-x-auto">
                     <table class="w-full text-white">
                         <thead>
                             <tr class="border-b border-slate-600">
@@ -162,30 +162,35 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-600">
-                            <tr class="hover:bg-slate-600">
-                                <td class="py-3 px-4">Oak Lumber 2x4</td>
-                                <td class="py-3 px-4">Wood</td>
-                                <td class="py-3 px-4">150 pieces</td>
-                                <td class="py-3 px-4">50 pieces</td>
-                                <td class="py-3 px-4">₱699</td>
-                                <td class="py-3 px-4">Premium wood supply</td>
+                            @forelse($materials ?? [] as $material)
+                            <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('material', {{ $material->id }})">
+                                <td class="py-3 px-4">{{ $material->name }}</td>
+                                <td class="py-3 px-4">{{ $material->category }}</td>
+                                <td class="py-3 px-4">{{ $material->current_stock }} {{ $material->unit }}</td>
+                                <td class="py-3 px-4">{{ $material->minimum_stock }} {{ $material->unit }}</td>
+                                <td class="py-3 px-4">₱{{ number_format($material->unit_cost, 2) }}</td>
+                                <td class="py-3 px-4">{{ $material->supplier->name ?? 'N/A' }}</td>
                                 <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">In Stock</span>
+                                    @if($material->isLowStock())
+                                        <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-full">Low Stock</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">In Stock</span>
+                                    @endif
                                 </td>
                                 <td class="py-3 px-4">
                                     <div class="flex space-x-2">
-                                        <button class="p-1 hover:bg-slate-500 rounded">
+                                        <button onclick="event.stopPropagation(); openEditModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                            </svg>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                                 <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                                             </svg>
                                         </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
+                                        <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -194,30 +199,60 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr class="hover:bg-slate-600">
-                                <td class="py-3 px-4">Pine Lumber 2x6</td>
-                                <td class="py-3 px-4">Wood</td>
-                                <td class="py-3 px-4">200 pieces</td>
-                                <td class="py-3 px-4">75 pieces</td>
-                                <td class="py-3 px-4">₱899</td>
-                                <td class="py-3 px-4">Premium wood supply</td>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="py-8 px-4 text-center text-slate-400">No materials found</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Products Table -->
+                <div id="products-table" class="overflow-x-auto hidden">
+                    <table class="w-full text-white">
+                        <thead>
+                            <tr class="border-b border-slate-600">
+                                <th class="text-left py-3 px-4 font-medium">Name</th>
+                                <th class="text-left py-3 px-4 font-medium">Category</th>
+                                <th class="text-left py-3 px-4 font-medium">Current Stock</th>
+                                <th class="text-left py-3 px-4 font-medium">Min Stock</th>
+                                <th class="text-left py-3 px-4 font-medium">Production Cost</th>
+                                <th class="text-left py-3 px-4 font-medium">Selling Price</th>
+                                <th class="text-left py-3 px-4 font-medium">Status</th>
+                                <th class="text-left py-3 px-4 font-medium">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-600">
+                            @forelse($products ?? [] as $product)
+                            <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('product', {{ $product->id }})">
+                                <td class="py-3 px-4">{{ $product->product_name }}</td>
+                                <td class="py-3 px-4">{{ $product->category }}</td>
+                                <td class="py-3 px-4">{{ $product->current_stock }} {{ $product->unit }}</td>
+                                <td class="py-3 px-4">{{ $product->minimum_stock }} {{ $product->unit }}</td>
+                                <td class="py-3 px-4">₱{{ number_format($product->production_cost, 2) }}</td>
+                                <td class="py-3 px-4">₱{{ number_format($product->selling_price, 2) }}</td>
                                 <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-full">Low Stock</span>
+                                    @if($product->isLowStock())
+                                        <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-full">Low Stock</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">In Stock</span>
+                                    @endif
                                 </td>
                                 <td class="py-3 px-4">
                                     <div class="flex space-x-2">
-                                        <button class="p-1 hover:bg-slate-500 rounded">
+                                        <button onclick="event.stopPropagation(); openEditModal('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                            </svg>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); openStockModal('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                                 <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                                             </svg>
                                         </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
+                                        <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -226,102 +261,11 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr class="hover:bg-slate-600">
-                                <td class="py-3 px-4">Wood Screws 2"</td>
-                                <td class="py-3 px-4">Hardware</td>
-                                <td class="py-3 px-4">850 pieces</td>
-                                <td class="py-3 px-4">1000 pieces</td>
-                                <td class="py-3 px-4">₱9</td>
-                                <td class="py-3 px-4">Hardware supply</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">In Stock</span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <div class="flex space-x-2">
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="py-8 px-4 text-center text-slate-400">No products found</td>
                             </tr>
-                            <tr class="hover:bg-slate-600">
-                                <td class="py-3 px-4">Wood Glue</td>
-                                <td class="py-3 px-4">Adhesive</td>
-                                <td class="py-3 px-4">25 bottles</td>
-                                <td class="py-3 px-4">10 bottles</td>
-                                <td class="py-3 px-4">₱499</td>
-                                <td class="py-3 px-4">Hardware supply</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">In Stock</span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <div class="flex space-x-2">
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-600">
-                                <td class="py-3 px-4">Wood Stain - Oak</td>
-                                <td class="py-3 px-4">Finishing</td>
-                                <td class="py-3 px-4">4 liters</td>
-                                <td class="py-3 px-4">5 liters</td>
-                                <td class="py-3 px-4">₱1,499</td>
-                                <td class="py-3 px-4">Finishing solutions</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-full">Low Stock</span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <div class="flex space-x-2">
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        <button class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
