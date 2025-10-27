@@ -38,27 +38,28 @@ class InventoryController extends Controller
         $request->validate([
             'type' => 'required|in:product,material',
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'product_name' => 'required_if:type,product|string|max:255',
+            'category' => 'required|string',
             'description' => 'nullable|string',
             'unit' => 'required|string|max:50',
             'current_stock' => 'required|numeric|min:0',
             'minimum_stock' => 'required|numeric|min:0',
-            'unit_cost' => 'required|numeric|min:0',
-            'selling_price' => 'nullable|numeric|min:0',
-            'production_cost' => 'nullable|numeric|min:0',
-            'supplier_id' => 'nullable|exists:suppliers,id'
+            'unit_cost' => 'required_if:type,material|numeric|min:0',
+            'supplier_id' => 'required_if:type,material|exists:suppliers,id',
+            'selling_price' => 'required_if:type,product|numeric|min:0',
+            'production_cost' => 'required_if:type,product|numeric|min:0'
         ]);
 
         if ($request->type === 'product') {
             $item = Product::create([
-                'product_name' => $request->name,
+                'product_name' => $request->product_name,
                 'description' => $request->description,
                 'category' => $request->category,
                 'unit' => $request->unit,
                 'current_stock' => $request->current_stock,
                 'minimum_stock' => $request->minimum_stock,
-                'selling_price' => $request->selling_price ?? 0,
-                'production_cost' => $request->production_cost ?? 0,
+                'selling_price' => $request->selling_price,
+                'production_cost' => $request->production_cost,
                 'status' => 'active'
             ]);
         } else {
@@ -83,7 +84,8 @@ class InventoryController extends Controller
             'notes' => 'Initial stock entry'
         ]);
 
-        return redirect()->route('inventory')->with('success', 'Item added successfully!');
+        $itemType = $request->type === 'product' ? 'Product' : 'Material';
+        return redirect()->route('inventory')->with('success', $itemType . ' added successfully!');
     }
 
     public function update(Request $request, $id)
@@ -91,28 +93,29 @@ class InventoryController extends Controller
         $request->validate([
             'type' => 'required|in:product,material',
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'product_name' => 'required_if:type,product|string|max:255',
+            'category' => 'required|string',
             'description' => 'nullable|string',
             'unit' => 'required|string|max:50',
             'current_stock' => 'required|numeric|min:0',
             'minimum_stock' => 'required|numeric|min:0',
-            'unit_cost' => 'required|numeric|min:0',
-            'selling_price' => 'nullable|numeric|min:0',
-            'production_cost' => 'nullable|numeric|min:0',
-            'supplier_id' => 'nullable|exists:suppliers,id'
+            'unit_cost' => 'required_if:type,material|numeric|min:0',
+            'supplier_id' => 'required_if:type,material|exists:suppliers,id',
+            'selling_price' => 'required_if:type,product|numeric|min:0',
+            'production_cost' => 'required_if:type,product|numeric|min:0'
         ]);
 
         if ($request->type === 'product') {
             $item = Product::findOrFail($id);
             $item->update([
-                'product_name' => $request->name,
+                'product_name' => $request->product_name,
                 'description' => $request->description,
                 'category' => $request->category,
                 'unit' => $request->unit,
                 'current_stock' => $request->current_stock,
                 'minimum_stock' => $request->minimum_stock,
-                'selling_price' => $request->selling_price ?? 0,
-                'production_cost' => $request->production_cost ?? 0
+                'selling_price' => $request->selling_price,
+                'production_cost' => $request->production_cost
             ]);
         } else {
             $item = Material::findOrFail($id);
@@ -127,7 +130,8 @@ class InventoryController extends Controller
             ]);
         }
 
-        return redirect()->route('inventory')->with('success', 'Item updated successfully!');
+        $itemType = $request->type === 'product' ? 'Product' : 'Material';
+        return redirect()->route('inventory')->with('success', $itemType . ' updated successfully!');
     }
 
     public function destroy($id, $type)
@@ -140,7 +144,8 @@ class InventoryController extends Controller
 
         $item->delete();
 
-        return redirect()->route('inventory')->with('success', 'Item deleted successfully!');
+        $itemType = $type === 'product' ? 'Product' : 'Material';
+        return redirect()->route('inventory')->with('success', $itemType . ' deleted successfully!');
     }
 
     public function adjustStock(Request $request, $id)

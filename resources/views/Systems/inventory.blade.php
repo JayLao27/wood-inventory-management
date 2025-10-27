@@ -113,11 +113,22 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-xl font-bold text-white">Inventory Items</h2>
-                        <p class="text-slate-300 text-sm mt-1">Manage your raw materials and finished products</p>
+                        <p class="text-slate-300 text-sm mt-1">Manage raw materials from suppliers and finished products from production</p>
                     </div>
-                    <button onclick="openAddItemModal()" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                        + Add Product
-                    </button>
+                    <div class="flex space-x-3">
+                        <button id="addMaterialBtn" onclick="openAddMaterialModal()" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>+ Add Material</span>
+                        </button>
+                        <button id="addProductBtn" onclick="openAddProductModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>+ Add Product</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Search and Filter Bar -->
@@ -227,7 +238,7 @@
                             @forelse($products ?? [] as $product)
                             <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('product', {{ $product->id }})">
                                 <td class="py-3 px-4">{{ $product->product_name }}</td>
-                                <td class="py-3 px-4">{{ $product->category }}</td>
+                                <td class="py-3 px-4">{{ ucfirst($product->category) }}</td>
                                 <td class="py-3 px-4">{{ $product->current_stock }} {{ $product->unit }}</td>
                                 <td class="py-3 px-4">{{ $product->minimum_stock }} {{ $product->unit }}</td>
                                 <td class="py-3 px-4">₱{{ number_format($product->production_cost, 2) }}</td>
@@ -272,40 +283,38 @@
             </div>
         </div>
 
-        <!-- Add Item Modal -->
-        <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <!-- Add Material Modal -->
+        <div id="addMaterialModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
                 <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-900">Add New Item</h3>
-                            <button onclick="closeAddItemModal()" class="text-gray-400 hover:text-gray-600">
+                            <h3 class="text-xl font-bold text-gray-900">Add New Material</h3>
+                            <button onclick="closeAddMaterialModal()" class="text-gray-400 hover:text-gray-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                             </button>
                         </div>
                         
-                        <form id="addItemForm" method="POST" action="{{ route('inventory.store') }}">
+                        <form id="addMaterialForm" method="POST" action="{{ route('inventory.store') }}">
                             @csrf
+                            <input type="hidden" name="type" value="material">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
-                                    <select name="type" id="itemType" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                        <option value="">Select Type</option>
-                                        <option value="material">Material</option>
-                                        <option value="product">Product</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Material Name *</label>
                                     <input type="text" name="name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                                    <input type="text" name="category" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                    <select name="category" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Category</option>
+                                        <option value="lumber">Lumber</option>
+                                        <option value="hardware">Hardware</option>
+                                        <option value="finishing">Finishing</option>
+                                        <option value="tools">Tools</option>
+                                    </select>
                                 </div>
                                 
                                 <div>
@@ -323,14 +332,14 @@
                                     <input type="number" name="minimum_stock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
-                                <div id="unitCostField">
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit Cost *</label>
-                                    <input type="number" name="unit_cost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <input type="number" name="unit_cost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
-                                <div id="supplierField">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Supplier</label>
-                                    <select name="supplier_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Supplier *</label>
+                                    <select name="supplier_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                         <option value="">Select Supplier</option>
                                         @foreach($suppliers ?? [] as $supplier)
                                             <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -338,14 +347,83 @@
                                     </select>
                                 </div>
                                 
-                                <div id="productionCostField" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost</label>
-                                    <input type="number" name="production_cost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" onclick="closeAddMaterialModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Add Material
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Add New Product</h3>
+                            <button onclick="closeAddItemModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="addItemForm" method="POST" action="{{ route('inventory.store') }}">
+                            @csrf
+                            <input type="hidden" name="type" value="product">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                                    <input type="text" name="product_name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
-                                <div id="sellingPriceField" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price</label>
-                                    <input type="number" name="selling_price" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                    <select name="category" id="categorySelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Category</option>
+                                        <option value="chairs" data-production-cost="3000" data-selling-price="8000">Chairs</option>
+                                        <option value="tables" data-production-cost="4000" data-selling-price="9000">Tables</option>
+                                        <option value="cabinets" data-production-cost="7000" data-selling-price="14000">Cabinets</option>
+                                        <option value="storage" data-production-cost="2000" data-selling-price="7000">Storage</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                                    <input type="text" name="unit" value="pieces" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Stock *</label>
+                                    <input type="number" name="current_stock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Stock *</label>
+                                    <input type="number" name="minimum_stock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost *</label>
+                                    <input type="number" name="production_cost" id="productionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
+                                    <input type="number" name="selling_price" id="sellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
                                 <div class="md:col-span-2">
@@ -387,18 +465,19 @@
                             @method('PUT')
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
-                                    <input type="text" id="editItemType" readonly class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                                    <input type="text" name="product_name" id="editProductName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                                    <input type="text" name="name" id="editName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                                    <input type="text" name="category" id="editCategory" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                    <select name="category" id="editCategory" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Category</option>
+                                        <option value="chairs">Chairs</option>
+                                        <option value="tables">Tables</option>
+                                        <option value="cabinets">Cabinets</option>
+                                        <option value="storage">Storage</option>
+                                    </select>
                                 </div>
                                 
                                 <div>
@@ -416,29 +495,14 @@
                                     <input type="number" name="minimum_stock" id="editMinimumStock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
-                                <div id="editUnitCostField">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit Cost *</label>
-                                    <input type="number" name="unit_cost" id="editUnitCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost *</label>
+                                    <input type="number" name="production_cost" id="editProductionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
-                                <div id="editSupplierField">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Supplier</label>
-                                    <select name="supplier_id" id="editSupplier" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <option value="">Select Supplier</option>
-                                        @foreach($suppliers ?? [] as $supplier)
-                                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                
-                                <div id="editProductionCostField" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost</label>
-                                    <input type="number" name="production_cost" id="editProductionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                </div>
-                                
-                                <div id="editSellingPriceField" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price</label>
-                                    <input type="number" name="selling_price" id="editSellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
+                                    <input type="number" name="selling_price" id="editSellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
                                 <div class="md:col-span-2">
@@ -477,6 +541,7 @@
                         
                         <form id="stockForm" method="POST">
                             @csrf
+                            <input type="hidden" name="type" id="stockItemType">
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Movement Type *</label>
@@ -535,20 +600,28 @@
             }
 
             // Modal functions
-            function openAddItemModal() {
-                document.getElementById('addItemModal').classList.remove('hidden');
+            function openAddMaterialModal() {
+                document.getElementById('addMaterialModal').classList.remove('hidden');
             }
 
-            function closeAddItemModal() {
-                document.getElementById('addItemModal').classList.add('hidden');
-                document.getElementById('addItemForm').reset();
+            function closeAddMaterialModal() {
+                document.getElementById('addMaterialModal').classList.add('hidden');
+                document.getElementById('addMaterialForm').reset();
+            }
+
+            function openAddProductModal() {
+                document.getElementById('addProductModal').classList.remove('hidden');
+            }
+
+            function closeAddProductModal() {
+                document.getElementById('addProductModal').classList.add('hidden');
+                document.getElementById('addProductForm').reset();
             }
 
             function openEditModal(type, id) {
                 // This would typically fetch item data via AJAX
                 document.getElementById('editItemModal').classList.remove('hidden');
                 document.getElementById('editItemForm').action = `/inventory/${id}`;
-                document.getElementById('editItemType').value = type;
             }
 
             function closeEditModal() {
@@ -558,7 +631,7 @@
             function openStockModal(type, id) {
                 document.getElementById('stockModal').classList.remove('hidden');
                 document.getElementById('stockForm').action = `/inventory/${id}/adjust-stock`;
-                document.querySelector('input[name="type"]').value = type;
+                document.getElementById('stockItemType').value = type;
             }
 
             function closeStockModal() {
@@ -588,34 +661,34 @@
                 }
             }
 
-            // Handle item type change in add modal
-            document.getElementById('itemType').addEventListener('change', function() {
-                const type = this.value;
-                const unitCostField = document.getElementById('unitCostField');
-                const supplierField = document.getElementById('supplierField');
-                const productionCostField = document.getElementById('productionCostField');
-                const sellingPriceField = document.getElementById('sellingPriceField');
+            // Handle category selection and auto-fill pricing
+            document.getElementById('categorySelect').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const productionCost = selectedOption.getAttribute('data-production-cost');
+                const sellingPrice = selectedOption.getAttribute('data-selling-price');
                 
-                if (type === 'material') {
-                    unitCostField.classList.remove('hidden');
-                    supplierField.classList.remove('hidden');
-                    productionCostField.classList.add('hidden');
-                    sellingPriceField.classList.add('hidden');
-                } else if (type === 'product') {
-                    unitCostField.classList.add('hidden');
-                    supplierField.classList.add('hidden');
-                    productionCostField.classList.remove('hidden');
-                    sellingPriceField.classList.remove('hidden');
+                if (productionCost) {
+                    document.getElementById('productionCost').value = productionCost;
+                }
+                if (sellingPrice) {
+                    document.getElementById('sellingPrice').value = sellingPrice;
                 }
             });
 
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('fixed')) {
-                    closeAddItemModal();
+                    closeAddMaterialModal();
+                    closeAddProductModal();
                     closeEditModal();
                     closeStockModal();
                 }
             });
+
+            // Initialize tab state on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                showTab('materials'); // Start with materials tab active
+            });
+
         </script>
 @endsection
