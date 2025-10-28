@@ -43,7 +43,8 @@ Route::get('/', function () {
     // Sales
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
 
-
+    //Accounting
+    Route::get('/accounting', [InventoryController::class, 'index'])->name('accounting');
 
 
     // Profile
