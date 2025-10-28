@@ -115,12 +115,22 @@
                         <h2 class="text-xl font-bold text-white">Inventory Items</h2>
                         <p class="text-slate-300 text-sm mt-1">Manage raw materials from suppliers and finished products from production</p>
                     </div>
-                    <button onclick="openAddItemModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>+ Add Item</span>
-                    </button>
+                    <div id="materialsButton" class="flex space-x-3">
+                        <button onclick="openAddItemModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>+ Add Item</span>
+                        </button>
+                    </div>
+                    <div id="productsButton" class="flex space-x-3 hidden">
+                        <button onclick="openAddProductModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>+ Add Product</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Search and Filter Bar -->
@@ -218,31 +228,52 @@
                             <tr class="border-b border-slate-600">
                                 <th class="text-left py-3 px-4 font-medium">Name</th>
                                 <th class="text-left py-3 px-4 font-medium">Category</th>
-                                <th class="text-left py-3 px-4 font-medium">Current Stock</th>
-                                <th class="text-left py-3 px-4 font-medium">Min Stock</th>
                                 <th class="text-left py-3 px-4 font-medium">Production Cost</th>
                                 <th class="text-left py-3 px-4 font-medium">Selling Price</th>
-                                <th class="text-left py-3 px-4 font-medium">Status</th>
                                 <th class="text-left py-3 px-4 font-medium">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-600">
-                            <tr>
-                                <td colspan="8" class="py-8 px-4 text-center text-slate-400">No products found</td>
+                            @forelse($products ?? [] as $product)
+                            <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('product', {{ $product->id }})">
+                                <td class="py-3 px-4">{{ $product->product_name }}</td>
+                                <td class="py-3 px-4">{{ ucfirst($product->category) }}</td>
+                                <td class="py-3 px-4">₱{{ number_format($product->production_cost, 2) }}</td>
+                                <td class="py-3 px-4">₱{{ number_format($product->selling_price, 2) }}</td>
+                                <td class="py-3 px-4">
+                                    <div class="flex space-x-2">
+                                        <button onclick="event.stopPropagation(); openEditModal('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                            </svg>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="py-8 px-4 text-center text-slate-400">No products found</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Add Item Modal -->
+        <!-- Add Item Modal (for Materials) -->
         <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
                 <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-900">Add New Item</h3>
+                            <h3 class="text-xl font-bold text-gray-900">Add New Material</h3>
                             <button onclick="closeAddItemModal()" class="text-gray-400 hover:text-gray-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -252,30 +283,21 @@
                         
                         <form id="addItemForm" method="POST" action="{{ route('inventory.store') }}">
                             @csrf
+                            <input type="hidden" name="type" value="material">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
-                                    <select name="type" id="itemType" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                        <option value="">Select Type</option>
-                                        <option value="material">Material</option>
-                                        <option value="product">Product</option>
-                                    </select>
-                                </div>
-                                
-                                <div id="nameField">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                                    <input type="text" name="name" id="itemName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div id="productNameField" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
-                                    <input type="text" name="product_name" id="productName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Material Name *</label>
+                                    <input type="text" name="name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                                    <select name="category" id="categorySelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                    <select name="category" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                         <option value="">Select Category</option>
+                                        <option value="lumber">Lumber</option>
+                                        <option value="hardware">Hardware</option>
+                                        <option value="finishing">Finishing</option>
+                                        <option value="tools">Tools</option>
                                     </select>
                                 </div>
                                 
@@ -294,29 +316,19 @@
                                     <input type="number" name="minimum_stock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
-                                <div id="unitCostField" class="hidden">
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit Cost *</label>
-                                    <input type="number" name="unit_cost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <input type="number" name="unit_cost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
-                                <div id="supplierField" class="hidden">
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Supplier *</label>
-                                    <select name="supplier_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <select name="supplier_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                         <option value="">Select Supplier</option>
                                         @foreach($suppliers ?? [] as $supplier)
                                             <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                                         @endforeach
                                     </select>
-                                </div>
-                                
-                                <div id="productionCostField" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost *</label>
-                                    <input type="number" name="production_cost" id="productionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                </div>
-                                
-                                <div id="sellingPriceField" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
-                                    <input type="number" name="selling_price" id="sellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
                                 
                                 <div class="md:col-span-2">
@@ -331,6 +343,75 @@
                                 </button>
                                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                                     Add Item
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Add New Product</h3>
+                            <button onclick="closeAddProductModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="addProductForm" method="POST" action="{{ route('inventory.store') }}">
+                            @csrf
+                            <input type="hidden" name="type" value="product">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                                    <input type="text" name="product_name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                    <select name="category" id="productCategorySelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Category</option>
+                                        <option value="chairs" data-production-cost="3000" data-selling-price="8000">Chairs</option>
+                                        <option value="tables" data-production-cost="4000" data-selling-price="9000">Tables</option>
+                                        <option value="cabinets" data-production-cost="7000" data-selling-price="14000">Cabinets</option>
+                                        <option value="storage" data-production-cost="2000" data-selling-price="7000">Storage</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                                    <input type="text" name="unit" value="pieces" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost *</label>
+                                    <input type="number" name="production_cost" id="productProductionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
+                                    <input type="number" name="selling_price" id="productSellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" onclick="closeAddProductModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Add Product
                                 </button>
                             </div>
                         </form>
@@ -478,17 +559,23 @@
                 const productsTab = document.getElementById('products-tab');
                 const materialsTable = document.getElementById('materials-table');
                 const productsTable = document.getElementById('products-table');
+                const materialsButton = document.getElementById('materialsButton');
+                const productsButton = document.getElementById('productsButton');
                 
                 if (tab === 'materials') {
                     materialsTab.className = 'px-4 py-2 bg-slate-600 text-white rounded-lg';
                     productsTab.className = 'px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600';
                     materialsTable.classList.remove('hidden');
                     productsTable.classList.add('hidden');
+                    materialsButton.classList.remove('hidden');
+                    productsButton.classList.add('hidden');
                 } else {
                     productsTab.className = 'px-4 py-2 bg-slate-600 text-white rounded-lg';
                     materialsTab.className = 'px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600';
                     productsTable.classList.remove('hidden');
                     materialsTable.classList.add('hidden');
+                    materialsButton.classList.add('hidden');
+                    productsButton.classList.remove('hidden');
                 }
             }
 
@@ -500,8 +587,15 @@
             function closeAddItemModal() {
                 document.getElementById('addItemModal').classList.add('hidden');
                 document.getElementById('addItemForm').reset();
-                // Reset form fields visibility
-                resetFormFields();
+            }
+
+            function openAddProductModal() {
+                document.getElementById('addProductModal').classList.remove('hidden');
+            }
+
+            function closeAddProductModal() {
+                document.getElementById('addProductModal').classList.add('hidden');
+                document.getElementById('addProductForm').reset();
             }
 
             function openEditModal(type, id) {
@@ -547,104 +641,26 @@
                 }
             }
 
-            // Handle item type change
-            document.getElementById('itemType').addEventListener('change', function() {
-                const type = this.value;
-                updateFormFields(type);
-                updateCategoryOptions(type);
-            });
-
-            // Handle category selection and auto-fill pricing
-            document.getElementById('categorySelect').addEventListener('change', function() {
+            // Handle product category selection and auto-fill pricing
+            document.getElementById('productCategorySelect').addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
                 const productionCost = selectedOption.getAttribute('data-production-cost');
                 const sellingPrice = selectedOption.getAttribute('data-selling-price');
                 
                 if (productionCost) {
-                    document.getElementById('productionCost').value = productionCost;
+                    document.getElementById('productProductionCost').value = productionCost;
                 }
                 if (sellingPrice) {
-                    document.getElementById('sellingPrice').value = sellingPrice;
+                    document.getElementById('productSellingPrice').value = sellingPrice;
                 }
             });
 
-            // Function to update form fields based on type
-            function updateFormFields(type) {
-                const nameField = document.getElementById('nameField');
-                const productNameField = document.getElementById('productNameField');
-                const unitCostField = document.getElementById('unitCostField');
-                const supplierField = document.getElementById('supplierField');
-                const productionCostField = document.getElementById('productionCostField');
-                const sellingPriceField = document.getElementById('sellingPriceField');
-                
-                if (type === 'material') {
-                    nameField.classList.remove('hidden');
-                    productNameField.classList.add('hidden');
-                    unitCostField.classList.remove('hidden');
-                    supplierField.classList.remove('hidden');
-                    productionCostField.classList.add('hidden');
-                    sellingPriceField.classList.add('hidden');
-                } else if (type === 'product') {
-                    nameField.classList.add('hidden');
-                    productNameField.classList.remove('hidden');
-                    unitCostField.classList.add('hidden');
-                    supplierField.classList.add('hidden');
-                    productionCostField.classList.remove('hidden');
-                    sellingPriceField.classList.remove('hidden');
-                }
-            }
-
-            // Function to update category options based on type
-            function updateCategoryOptions(type) {
-                const categorySelect = document.getElementById('categorySelect');
-                categorySelect.innerHTML = '<option value="">Select Category</option>';
-                
-                if (type === 'material') {
-                    const materialCategories = [
-                        { value: 'lumber', text: 'Lumber' },
-                        { value: 'hardware', text: 'Hardware' },
-                        { value: 'finishing', text: 'Finishing' },
-                        { value: 'tools', text: 'Tools' }
-                    ];
-                    materialCategories.forEach(cat => {
-                        const option = document.createElement('option');
-                        option.value = cat.value;
-                        option.textContent = cat.text;
-                        categorySelect.appendChild(option);
-                    });
-                } else if (type === 'product') {
-                    const productCategories = [
-                        { value: 'chairs', text: 'Chairs', productionCost: '3000', sellingPrice: '8000' },
-                        { value: 'tables', text: 'Tables', productionCost: '4000', sellingPrice: '9000' },
-                        { value: 'cabinets', text: 'Cabinets', productionCost: '7000', sellingPrice: '14000' },
-                        { value: 'storage', text: 'Storage', productionCost: '2000', sellingPrice: '7000' }
-                    ];
-                    productCategories.forEach(cat => {
-                        const option = document.createElement('option');
-                        option.value = cat.value;
-                        option.textContent = cat.text;
-                        option.setAttribute('data-production-cost', cat.productionCost);
-                        option.setAttribute('data-selling-price', cat.sellingPrice);
-                        categorySelect.appendChild(option);
-                    });
-                }
-            }
-
-            // Function to reset form fields
-            function resetFormFields() {
-                document.getElementById('nameField').classList.remove('hidden');
-                document.getElementById('productNameField').classList.add('hidden');
-                document.getElementById('unitCostField').classList.add('hidden');
-                document.getElementById('supplierField').classList.add('hidden');
-                document.getElementById('productionCostField').classList.add('hidden');
-                document.getElementById('sellingPriceField').classList.add('hidden');
-                document.getElementById('categorySelect').innerHTML = '<option value="">Select Category</option>';
-            }
 
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('fixed')) {
                     closeAddItemModal();
+                    closeAddProductModal();
                     closeEditModal();
                     closeStockModal();
                 }

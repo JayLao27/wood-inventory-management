@@ -42,8 +42,8 @@ class InventoryController extends Controller
             'category' => 'required|string',
             'description' => 'nullable|string',
             'unit' => 'required|string|max:50',
-            'current_stock' => 'required|numeric|min:0',
-            'minimum_stock' => 'required|numeric|min:0',
+            'current_stock' => 'required_if:type,material|numeric|min:0',
+            'minimum_stock' => 'required_if:type,material|numeric|min:0',
             'unit_cost' => 'required_if:type,material|numeric|min:0',
             'supplier_id' => 'required_if:type,material|exists:suppliers,id',
             'selling_price' => 'required_if:type,product|numeric|min:0',
@@ -56,8 +56,8 @@ class InventoryController extends Controller
                 'description' => $request->description,
                 'category' => $request->category,
                 'unit' => $request->unit,
-                'current_stock' => $request->current_stock,
-                'minimum_stock' => $request->minimum_stock,
+                'current_stock' => 0,
+                'minimum_stock' => 0,
                 'selling_price' => $request->selling_price,
                 'production_cost' => $request->production_cost,
                 'status' => 'active'
@@ -74,15 +74,17 @@ class InventoryController extends Controller
             ]);
         }
 
-        // Create initial inventory movement
-        InventoryMovement::create([
-            'item_type' => $request->type,
-            'item_id' => $item->id,
-            'movement_type' => 'in',
-            'quantity' => $request->current_stock,
-            'reference_type' => 'initial_stock',
-            'notes' => 'Initial stock entry'
-        ]);
+        // Create initial inventory movement only for materials
+        if ($request->type === 'material') {
+            InventoryMovement::create([
+                'item_type' => $request->type,
+                'item_id' => $item->id,
+                'movement_type' => 'in',
+                'quantity' => $request->current_stock,
+                'reference_type' => 'initial_stock',
+                'notes' => 'Initial stock entry'
+            ]);
+        }
 
         $itemType = $request->type === 'product' ? 'Product' : 'Material';
         return redirect()->route('inventory')->with('success', $itemType . ' added successfully!');
