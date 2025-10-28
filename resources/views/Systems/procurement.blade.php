@@ -118,7 +118,7 @@
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                         </svg>
-                        <span>+ New Purchase Order</span>
+                        <span> New Purchase Order</span>
                     </button>
                 </div>
                 <div id="suppliersButton" class="flex space-x-3 hidden">
@@ -126,7 +126,7 @@
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                         </svg>
-                        <span>+ New Supplier</span>
+                        <span> New Supplier</span>
                     </button>
                 </div>
             </div>

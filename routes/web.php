@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProcurementController;
+use App\Http\Controllers\ProductionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -35,6 +36,10 @@ Route::get('/', function () {
     Route::put('/procurement/purchase-orders/{id}', [ProcurementController::class, 'updatePurchaseOrder'])->name('procurement.purchase-order.update');
     Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'destroySupplier'])->name('procurement.supplier.destroy');
     Route::delete('/procurement/purchase-orders/{id}', [ProcurementController::class, 'destroyPurchaseOrder'])->name('procurement.purchase-order.destroy');
+    // Production
+    Route::get('/production', [ProductionController::class, 'index'])->name('production');
+    Route::post('/production', [ProductionController::class, 'store'])->name('production.store');
+    Route::put('/production/{workOrder}', [ProductionController::class, 'update'])->name('production.update');
     // Sales
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
 

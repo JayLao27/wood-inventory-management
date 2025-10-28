@@ -10,14 +10,6 @@
                         <h1 class="text-3xl font-bold text-gray-900">Inventory Management</h1>
                         <p class="text-gray-600 mt-2">Track and manage raw materials and finished products</p>
                     </div>
-                    <div class="flex space-x-3">
-                        <button class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
-                            Reports
-                        </button>
-                        <button class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
-                            Receive Stock
-                        </button>
-                    </div>
                 </div>
             </div>
 
