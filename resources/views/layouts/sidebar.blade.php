@@ -51,7 +51,7 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-600 hover:text-white transition">
+                <a href="{{ route('procurement') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('procurement') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
                         <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/>
