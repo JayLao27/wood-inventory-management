@@ -56,7 +56,12 @@ class ProcurementController extends Controller
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
+        // Generate order number
+        $lastOrder = PurchaseOrder::orderBy('id', 'desc')->first();
+        $orderNumber = 'PO-' . date('Y') . '-' . str_pad(($lastOrder ? $lastOrder->id + 1 : 1), 3, '0', STR_PAD_LEFT);
+
         $purchaseOrder = PurchaseOrder::create([
+            'order_number' => $orderNumber,
             'supplier_id' => $request->supplier_id,
             'order_date' => $request->order_date,
             'expected_delivery' => $request->expected_delivery,
@@ -75,7 +80,7 @@ class ProcurementController extends Controller
                 'material_id' => $item['material_id'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
-                'line_total' => $lineTotal,
+                'total_price' => $lineTotal,
             ]);
         }
 
