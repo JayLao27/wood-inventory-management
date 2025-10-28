@@ -125,7 +125,7 @@
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                             </svg>
-                            <span>+ Add Product</span>
+                            <span> Add Product</span>
                         </button>
                     </div>
                 </div>
@@ -152,8 +152,8 @@
 
                 <!-- Tabs -->
                 <div class="flex space-x-1 mb-6">
-                    <button onclick="showTab('materials')" id="materials-tab" class="px-4 py-2 text-gray-800 rounded-lg" style="background-color: #FFF1DA;">Materials</button>
-                    <button onclick="showTab('products')" id="products-tab" class="px-4 py-2 text-white rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; opacity: 1;">Products</button>
+                    <button onclick="showTab('materials')" id="materials-tab" class="px-[270px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Materials</button>
+                    <button onclick="showTab('products')" id="products-tab" class="px-[270px] py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Products</button>
                 </div>
 
                 <!-- Materials Table -->
@@ -246,8 +246,7 @@
                                         </button>
                                         <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                             </svg>
                                         </button>
                                     </div>
@@ -454,16 +453,6 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
                                     <input type="text" name="unit" id="editUnit" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Stock *</label>
-                                    <input type="number" name="current_stock" id="editCurrentStock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Stock *</label>
-                                    <input type="number" name="minimum_stock" id="editMinimumStock" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
                                 
                                 <div>

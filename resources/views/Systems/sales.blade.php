@@ -28,11 +28,6 @@
 						<h1 class="text-4xl font-bold text-gray-800">Sales & Orders</h1>
 						<p class="text-lg text-gray-600 mt-2">Manage customer orders, sales, and deliveries</p>
 					</div>
-					<div>
-						<button id="headerActionBtn" class="bg-gray-700 text-white px-4 py-2 rounded-md ml-2 hover:bg-orange-500 transition" onclick="openActionModal()">
-							+ New Order
-						</button>
-					</div>
 				</div>
 			</div>
 
@@ -109,9 +104,12 @@
 
 				<!-- Sales Management Card -->
 				<section class="bg-slate-700 text-white p-6 rounded-2xl">
-					<header class="mb-4">
-						<h2 class="text-xl font-semibold">Sales Management</h2>
-						<p class="text-gray-300">Manage customer orders and track sales performance</p>
+					<header class="flex justify-between items-center mb-4">
+						<div>
+							<h2 class="text-xl font-semibold">Sales Management</h2>
+							<p class="text-gray-300">Manage customer orders and track sales performance</p>
+						</div>
+						<button id="headerBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onclick="openModal('newOrderModal')">+ New Order</button>
 					</header>
 
 					<!-- Search + Filters -->
@@ -136,8 +134,8 @@
 
 					<!-- Tabs -->
 					<div class="flex justify-center gap-2 mb-6">
-						<button id="salesTab" class="px-48 py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Sales Orders</button>
-						<button id="customersTab" class="px-48 py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Customers</button>
+						<button id="salesTab" class="px-64 py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Sales Orders</button>
+						<button id="customersTab" class="px-64 py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Customers</button>
 					</div>
 
 					<!-- Sales Orders Table -->
@@ -501,15 +499,6 @@
 	</div>
 
 	<script>
-		// Header action button behavior based on active tab
-		function openActionModal() {
-			const inSales = !document.getElementById('salesTable').classList.contains('hidden');
-			if (inSales) {
-				openModal('newOrderModal');
-			} else {
-				openModal('newCustomerModal');
-			}
-		}
 
 		function openModal(modalId) {
 			document.getElementById(modalId).classList.remove('hidden');
@@ -524,7 +513,7 @@
 			const customersTab = document.getElementById('customersTab');
 			const salesTable = document.getElementById('salesTable');
 			const customerTable = document.getElementById('customerTable');
-			const headerBtn = document.getElementById('headerActionBtn');
+			const headerBtn = document.getElementById('headerBtn');
 			const searchInput = document.getElementById('searchInput');
 			const statusFilter = document.getElementById('statusFilter');
 			const paymentFilter = document.getElementById('paymentFilter');
@@ -544,6 +533,7 @@
 					salesTable.classList.remove('hidden');
 					customerTable.classList.add('hidden');
 					headerBtn.textContent = '+ New Order';
+					headerBtn.setAttribute('onclick', 'openModal("newOrderModal")');
 					salesTab.style.backgroundColor = '#FFF1DA';
 					salesTab.style.color = '#111827';
 					salesTab.style.border = 'none';
@@ -554,6 +544,7 @@
 					salesTable.classList.add('hidden');
 					customerTable.classList.remove('hidden');
 					headerBtn.textContent = '+ New Customer';
+					headerBtn.setAttribute('onclick', 'openModal("newCustomerModal")');
 					customersTab.style.backgroundColor = '#FFF1DA';
 					customersTab.style.color = '#111827';
 					customersTab.style.border = 'none';

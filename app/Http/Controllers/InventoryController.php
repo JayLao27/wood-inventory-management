@@ -94,13 +94,13 @@ class InventoryController extends Controller
     {
         $request->validate([
             'type' => 'required|in:product,material',
-            'name' => 'required|string|max:255',
+            'name' => 'required_if:type,material|string|max:255',
             'product_name' => 'required_if:type,product|string|max:255',
             'category' => 'required|string',
             'description' => 'nullable|string',
             'unit' => 'required|string|max:50',
-            'current_stock' => 'required|numeric|min:0',
-            'minimum_stock' => 'required|numeric|min:0',
+            'current_stock' => 'required_if:type,material|numeric|min:0',
+            'minimum_stock' => 'required_if:type,material|numeric|min:0',
             'unit_cost' => 'required_if:type,material|numeric|min:0',
             'supplier_id' => 'required_if:type,material|exists:suppliers,id',
             'selling_price' => 'required_if:type,product|numeric|min:0',
@@ -114,8 +114,6 @@ class InventoryController extends Controller
                 'description' => $request->description,
                 'category' => $request->category,
                 'unit' => $request->unit,
-                'current_stock' => $request->current_stock,
-                'minimum_stock' => $request->minimum_stock,
                 'selling_price' => $request->selling_price,
                 'production_cost' => $request->production_cost
             ]);
