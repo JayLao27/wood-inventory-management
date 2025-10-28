@@ -136,8 +136,8 @@
 
 					<!-- Tabs -->
 					<div class="flex justify-center gap-2 mb-6">
-						<button id="salesTab" class="bg-orange-500 text-gray-900 px-48 py-2 rounded-md border border-gray-600 hover:bg-yellow-100 hover:text-black transition">Sales Orders</button>
-						<button id="customersTab" class="bg-slate-600 text-white px-48 py-2 rounded-md border border-gray-600 hover:bg-yellow-100 hover:text-black transition">Customers</button>
+						<button id="salesTab" class="px-48 py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Sales Orders</button>
+						<button id="customersTab" class="px-48 py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Customers</button>
 					</div>
 
 					<!-- Sales Orders Table -->
@@ -544,18 +544,22 @@
 					salesTable.classList.remove('hidden');
 					customerTable.classList.add('hidden');
 					headerBtn.textContent = '+ New Order';
-					salesTab.classList.add('bg-orange-500','text-gray-900');
-					salesTab.classList.remove('bg-slate-600','text-white');
-					customersTab.classList.add('bg-slate-600','text-white');
-					customersTab.classList.remove('bg-orange-500','text-gray-900');
+					salesTab.style.backgroundColor = '#FFF1DA';
+					salesTab.style.color = '#111827';
+					salesTab.style.border = 'none';
+					customersTab.style.backgroundColor = '#374151';
+					customersTab.style.color = '#FFFFFF';
+					customersTab.style.border = '1px solid #FFFFFF';
 				} else {
 					salesTable.classList.add('hidden');
 					customerTable.classList.remove('hidden');
 					headerBtn.textContent = '+ New Customer';
-					customersTab.classList.add('bg-orange-500','text-gray-900');
-					customersTab.classList.remove('bg-slate-600','text-white');
-					salesTab.classList.add('bg-slate-600','text-white');
-					salesTab.classList.remove('bg-orange-500','text-gray-900');
+					customersTab.style.backgroundColor = '#FFF1DA';
+					customersTab.style.color = '#111827';
+					customersTab.style.border = 'none';
+					salesTab.style.backgroundColor = '#374151';
+					salesTab.style.color = '#FFFFFF';
+					salesTab.style.border = '1px solid #FFFFFF';
 				}
 				applyFilters();
 			}

@@ -37,7 +37,7 @@ class InventoryController extends Controller
     {
         $request->validate([
             'type' => 'required|in:product,material',
-            'name' => 'required|string|max:255',
+            'name' => 'required_if:type,material|string|max:255',
             'product_name' => 'required_if:type,product|string|max:255',
             'category' => 'required|string',
             'description' => 'nullable|string',

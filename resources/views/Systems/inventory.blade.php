@@ -17,9 +17,6 @@
                         <button class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
                             Receive Stock
                         </button>
-                        <button onclick="openAddItemModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                            + Add Item
-                        </button>
                     </div>
                 </div>
             </div>
@@ -120,7 +117,7 @@
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                             </svg>
-                            <span>+ Add Item</span>
+                            <span>Add Item</span>
                         </button>
                     </div>
                     <div id="productsButton" class="flex space-x-3 hidden">
@@ -155,8 +152,8 @@
 
                 <!-- Tabs -->
                 <div class="flex space-x-1 mb-6">
-                    <button onclick="showTab('materials')" id="materials-tab" class="px-4 py-2 bg-slate-600 text-white rounded-lg">Materials</button>
-                    <button onclick="showTab('products')" id="products-tab" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600">Products</button>
+                    <button onclick="showTab('materials')" id="materials-tab" class="px-4 py-2 text-gray-800 rounded-lg" style="background-color: #FFF1DA;">Materials</button>
+                    <button onclick="showTab('products')" id="products-tab" class="px-4 py-2 text-white rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; opacity: 1;">Products</button>
                 </div>
 
                 <!-- Materials Table -->
@@ -563,15 +560,23 @@
                 const productsButton = document.getElementById('productsButton');
                 
                 if (tab === 'materials') {
-                    materialsTab.className = 'px-4 py-2 bg-slate-600 text-white rounded-lg';
-                    productsTab.className = 'px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600';
+                    materialsTab.style.backgroundColor = '#FFF1DA';
+                    materialsTab.style.color = '#111827';
+                    materialsTab.style.border = 'none';
+                    productsTab.style.backgroundColor = '#374151';
+                    productsTab.style.color = '#FFFFFF';
+                    productsTab.style.border = '1px solid #FFFFFF';
                     materialsTable.classList.remove('hidden');
                     productsTable.classList.add('hidden');
                     materialsButton.classList.remove('hidden');
                     productsButton.classList.add('hidden');
                 } else {
-                    productsTab.className = 'px-4 py-2 bg-slate-600 text-white rounded-lg';
-                    materialsTab.className = 'px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-600';
+                    productsTab.style.backgroundColor = '#FFF1DA';
+                    productsTab.style.color = '#111827';
+                    productsTab.style.border = 'none';
+                    materialsTab.style.backgroundColor = '#374151';
+                    materialsTab.style.color = '#FFFFFF';
+                    materialsTab.style.border = '1px solid #FFFFFF';
                     productsTable.classList.remove('hidden');
                     materialsTable.classList.add('hidden');
                     materialsButton.classList.add('hidden');
@@ -668,7 +673,11 @@
 
             // Initialize tab state on page load
             document.addEventListener('DOMContentLoaded', function() {
-                showTab('materials'); // Start with materials tab active
+                showTab('materials');
+                const materialsTab = document.getElementById('materials-tab');
+                materialsTab.style.borderRadius = '10px';
+                const productsTab = document.getElementById('products-tab');
+                productsTab.style.borderRadius = '10px';
             });
 
         </script>

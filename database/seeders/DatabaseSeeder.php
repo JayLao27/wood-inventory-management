@@ -40,15 +40,5 @@ User::updateOrCreate(
     ]
 );
 
-        // Sample products
-        $samples = [
-            ['name' => 'Plywood 3/4"', 'unit_price' => 1200],
-            ['name' => 'MDF Board 1/2"', 'unit_price' => 900],
-            ['name' => 'Solid Wood Panel', 'unit_price' => 2500],
-            ['name' => 'Edge Banding Roll', 'unit_price' => 300],
-        ];
-        foreach ($samples as $p) {
-            Product::updateOrCreate(['name' => $p['name']], $p);
-        }
     }
 }
