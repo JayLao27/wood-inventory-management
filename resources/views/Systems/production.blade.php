@@ -99,7 +99,7 @@
                 </div>
 
                 <!-- Search and Filter Bar -->
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-12">
                     <div class="flex-1 max-w-md">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
