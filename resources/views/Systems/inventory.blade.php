@@ -143,9 +143,9 @@
                 </div>
 
                 <!-- Tabs -->
-                <div class="flex space-x-1 mb-6">
-                    <button onclick="showTab('materials')" id="materials-tab" class="px-[255px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Materials</button>
-                    <button onclick="showTab('products')" id="products-tab" class="px-[255px] py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Products</button>
+                <div class="flex space-x-1 w-full mb-6">
+                    <button onclick="showTab('materials')" id="materials-tab" class="flex-auto px-[255px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Materials</button>
+                    <button onclick="showTab('products')" id="products-tab" class="flex-auto px-[255px] py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Products</button>
                 </div>
 
                 <!-- Materials Table -->
