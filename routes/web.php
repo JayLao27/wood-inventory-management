@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\AuthController;
@@ -44,7 +45,7 @@ Route::get('/', function () {
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
 
     //Accounting
-    Route::get('/accounting', [InventoryController::class, 'index'])->name('accounting');
+    Route::get('/accounting', [AccountingController::class, 'index'])->name('accounting');
 
 
     // Profile
