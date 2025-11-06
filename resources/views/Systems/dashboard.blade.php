@@ -33,7 +33,7 @@
 						<div class="flex justify-between items-start">
 							<div>
 								<h3 class="text-sm font-medium text-slate-300">Active Orders</h3>
-								<p class="text-3xl font-bold mt-2">23</p>
+								<p class="text-3xl font-bold mt-2">{{ $salesOrders->whereIn('status', ['Pending', 'In production', 'Ready'])->count() }}</p>
 								<p class="text-green-400 text-sm mt-1">+12 new this week</p>
 							</div>
 							<div class="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
