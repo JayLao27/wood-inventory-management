@@ -6,17 +6,17 @@
 				<h1 class="text-4xl font-bold text-gray-800">Dashboard</h1>
 				<p class="text-lg text-gray-600 mt-2">Wood works management system</p>
 			</div>
-
+			<!-- Main Content Area -->
 			<!-- Dashboard Content -->
 			<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
-				<!-- Summary Cards Row -->
+				<!-- Dashboard Content -->
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 					<!-- Total Revenue Card -->
 					<div class="bg-slate-700 text-white p-6 rounded-xl">
 						<div class="flex justify-between items-start">
 							<div>
 								<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
-								<p class="text-3xl font-bold mt-2">₱500,000</p>
+								<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->sum('total_amount'), 2) }}</p>
 								<p class="text-green-400 text-sm mt-1">+20.1% from last month</p>
 							</div>
 							<div class="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
