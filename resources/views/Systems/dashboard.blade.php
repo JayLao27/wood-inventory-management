@@ -302,12 +302,12 @@
 						<p class="text-slate-300 text-sm mb-6">Common task and shortcuts</p>
 						
 						<div class="space-y-3">
-							<button class="w-full flex items-center space-x-3 bg-slate-600 hover:bg-slate-500 px-4 py-3 rounded-lg text-sm transition">
+							<a href="{{ route('sales') }}" class="w-full flex items-center space-x-3 bg-slate-600 hover:bg-slate-500 px-4 py-3 rounded-lg text-sm transition">
 								<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 									<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
 								</svg>
 								<span>Add New Customer</span>
-							</button>
+							</a>
 							<button class="w-full flex items-center space-x-3 bg-slate-600 hover:bg-slate-500 px-4 py-3 rounded-lg text-sm transition">
 								<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 									<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
