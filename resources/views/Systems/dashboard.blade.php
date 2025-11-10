@@ -77,6 +77,7 @@
 					</div>
 				</div>
 
+				
 				<!-- Management Section Cards -->
 				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 					<!-- Inventory Management Card -->
