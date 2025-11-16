@@ -77,12 +77,12 @@
 					</div>
 				</div>
 
-				
+
 				<!-- Management Section Cards -->
 				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 					<!-- Inventory Management Card -->
 					<div class="bg-slate-700 text-white p-6 rounded-xl">
-						<div class="flex items-center space-x-3 mb-4">
+						<div class="flex itePPms-center space-x-3 mb-4">
 							<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
 								<path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
 							</svg>
