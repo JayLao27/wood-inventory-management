@@ -52,11 +52,11 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Total Value</p>
-                            <p class="text-3xl font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
+                            <p class="text-3xl  font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
                             <p class="text-slate-400 text-xs mt-1">Raw materials inventory value</p>
                         </div>
                         <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-6 h-6 text-white m-auto" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                             </svg>
                         </div>
@@ -98,7 +98,7 @@
             </div>
 
             <!-- Inventory Items Section -->
-            <div class="bg-slate-700 rounded-lg p-6">
+            <div class="bg-slate-700 rounded-lg p-6 ">
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-xl font-bold text-white">Inventory Items</h2>
@@ -529,6 +529,7 @@
                 </div>
             </div>
         </div>
+        
 
         <script>
             // Tab functionality
