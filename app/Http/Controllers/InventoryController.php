@@ -81,7 +81,7 @@ class InventoryController extends Controller
                 'item_id' => $item->id,
                 'movement_type' => 'in',
                 'quantity' => $request->current_stock,
-                'reference_type' => 'initial_stock',
+                'reference_type' => 'i  nitial_stock',
                 'notes' => 'Initial stock entry'
             ]);
         }
