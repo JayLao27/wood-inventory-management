@@ -44,7 +44,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Total Value</p>
-                            <p class="text-3xl  font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
+                            <p class="text-2xl  font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
                             <p class="text-slate-400 text-xs mt-1">Raw materials inventory value</p>
                         </div>
                       @include('icons.cart', ['class' => 'icon-cart']) <!-- need fixing -->
