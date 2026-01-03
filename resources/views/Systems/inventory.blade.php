@@ -47,7 +47,7 @@
                             <p class="text-3xl  font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
                             <p class="text-slate-400 text-xs mt-1">Raw materials inventory value</p>
                         </div>
-                      @include('icons.cart', ['class' => 'icon-cart'])
+                      @include('icons.cart', ['class' => 'icon-cart']) <!-- need fixing -->
                     </div>
                 </div>
                 
