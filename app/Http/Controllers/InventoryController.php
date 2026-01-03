@@ -20,7 +20,7 @@ class InventoryController extends Controller
         // Calculate metrics
         $totalItems = $products->count() + $materials->count();
         $lowStockAlerts = $products->where('current_stock', '<=', 'minimum_stock')->count() + 
-                         $materials->where('current_stock', '<=', 'minimum_stock')->count();
+                         $materials->where('current_stock', '<=', 'minimum_stock')->count(); //w
         $totalValue = $materials->sum(function($material) {
             return $material->current_stock * $material->unit_cost;
         });
