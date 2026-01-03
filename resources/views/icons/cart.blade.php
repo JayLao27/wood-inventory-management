@@ -1,7 +1,7 @@
  <svg
 width="38" height="38" viewBox="0 0 27 25"
 class="{{ $class ?? '' }}" 
-fill="currentColor" 
+fill="white" 
 aria-hidden="true">
  
 
