@@ -31,11 +31,11 @@
                 <div class="bg-slate-700 rounded-lg p-6 text-white">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-slate-300 text-sm">Low Stock Alerts</p>
-                            <p class="text-3xl font-bold mt-2">{{ $lowStockAlerts ?? 3 }}</p>
-                            <p class="text-slate-400 text-xs mt-1">Items requiring attention</p>
+                    <p class="text-slate-300 text-sm">Low Stock Alerts</p>
+                   <p class="text-3xl font-bold mt-2 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-500' : '' }}">{{ $lowStockAlerts ?? 3 }}</p>
+                    <p class="text-slate-400 text-xs mt-1 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-500' : '' }}">{{ $lowStockAlerts ?? 3 }} Items</p>
                         </div>
-                        @include('icons.cart', ['class' => 'icon-cart'])
+                        @include('icons.cart', ['class' => ($lowStockAlerts ?? 3) > 4 ? 'icon-cart text-red-500' : 'icon-cart'])
                     </div>
                 </div>
 
