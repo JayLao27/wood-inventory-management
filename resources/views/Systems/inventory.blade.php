@@ -32,7 +32,7 @@
                     <div class="flex justify-between items-start">
                     <div>
                     <p class="text-slate-300 text-sm">Low Stock Alerts</p>
-                   <p class="text-3xl font-bold text-white mt-2 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-500' : '' }}">{{ $lowStockAlerts ?? 3 }}</p>
+    <!--changing red when lowstocks--><p class="text-3xl font-bold text-white mt-2 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-500' : '' }}">{{ $lowStockAlerts ?? 3 }}</p>
                     <p class="text-slate-400 text-xs mt-1 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-500' : '' }}">{{ $lowStockAlerts ?? 3 }} Items</p>
                         </div>
                         @include('icons.cart', ['class' => ($lowStockAlerts ?? 3) > 4 ? 'icon-cart text-red-500' : 'icon-cart'])
@@ -47,7 +47,7 @@
                             <p class="text-2xl  font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
                             <p class="text-slate-400 text-xs mt-1">Raw materials inventory value</p>
                         </div>
-                      @include('icons.cart', ['class' => 'icon-cart']) <!-- need fixing -->
+                      @include('icons.cart', ['class' => 'icon-cart']) 
                     </div>
                 </div>
                 
