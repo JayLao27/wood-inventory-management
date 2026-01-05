@@ -41,3 +41,4 @@ class CustomerController extends Controller
 		return redirect()->route('sales-orders.index')->with('success', 'Customer deleted.');
 	}
 }
+//coment
