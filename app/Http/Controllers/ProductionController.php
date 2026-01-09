@@ -11,7 +11,7 @@ class ProductionController extends Controller
     {
         // Get work orders with sample data
         $workOrders = WorkOrder::all();
-        
+        //yes
         // If no work orders exist, create sample data
         if ($workOrders->isEmpty()) {
             $sampleOrders = [
