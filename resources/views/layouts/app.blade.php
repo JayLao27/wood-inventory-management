@@ -19,7 +19,7 @@
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen bg-gray-100">
        
-
+@include('layouts.navigation')  
             <!-- Page Heading -->
             @if (isset($header))
                 <header c~lass="bg-white shadow">

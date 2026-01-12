@@ -207,7 +207,7 @@
                     <div class="p-8">
                         <div class="flex justify-between items-center mb-6">
                             <div>
-                                <h3 class="text-3xl font-bold text-gray-800 mb-2">New Work Orders</h3>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">New Work Orders</h3>
                                 <p class="text-gray-600 text-lg">New work order for a new production work order for furniture manufacturing.</p>
                             </div>
                             <button onclick="closeWorkOrderModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
@@ -221,7 +221,7 @@
                                 <div>z
                                     <label class="block text-gray-700 text-lg font-medium mb-3">Pending Orders</label>
                                     <select name="product_name" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
-                                        <option value="">Select Customer</option>
+                                        <option value="">Select Orders</option>
                                         <option value="Classic Oak Dining Chair">Classic Oak Dining Chair</option>
                                         <option value="Pine Coffee Table">Pine Coffee Table</option>
                                         <option value="Oak Kitchen Cabinet">Oak Kitchen Cabinet</option>

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\Product; 
 use App\Models\Material;
 use App\Models\Supplier;
 use App\Models\InventoryMovement;
@@ -20,7 +20,7 @@ class InventoryController extends Controller
         // Calculate metrics
         $totalItems = $products->count() + $materials->count();
         $lowStockAlerts = $products->where('current_stock', '<=', 'minimum_stock')->count() + 
-                         $materials->where('current_stock', '<=', 'minimum_stock')->count(); //w
+                         $materials->where('current_stock', '<=', 'minimum_stock')->count(); 
         $totalValue = $materials->sum(function($material) {
             return $material->current_stock * $material->unit_cost;
         });
@@ -81,7 +81,7 @@ class InventoryController extends Controller
                 'item_id' => $item->id,
                 'movement_type' => 'in',
                 'quantity' => $request->current_stock,
-                'reference_type' => 'i  nitial_stock',
+                'reference_type' => 'initial_stock',
                 'notes' => 'Initial stock entry'
             ]);
         }
