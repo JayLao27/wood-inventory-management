@@ -1,8 +1,332 @@
 @extends('layouts.system')
 
 @section('main-content')
+	@php
+		$typeBg = [
+			'Payment Made' => '#FFB74D',
+			'Payment Received' => '#64B5F6',
+			'Expense' => '#EF5350',
+			'Income' => '#81C784',
+		];
+	@endphp
+	<!-- Main Content -->
+	<div class="flex-1 flex flex-col overflow-hidden">
+		<!-- Header -->
+		<div class="bg-amber-50 p-8">
+			<div class="flex justify-between items-center">
+				<div>
+					<h1 class="text-4xl font-bold text-gray-800">Accounting & Finance</h1>
+					<p class="text-lg text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
+				</div>
+				<div class="flex space-x-3">
+					<button class="flex items-center space-x-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+						</svg>
+						<span>Export Reports</span>
+					</button>
+					<button class="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm text-white transition">
+						<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+						</svg>
+						<span>Add Transaction</span>
+					</button>
+				</div>
+			</div>
+		</div>
 
-<div>
-    <h1 class="text-2xl font-bold mb-4">Accounting Dashboard</h1>
-    <p>Welcome to the Accounting section of the RM WOOD WORKS Management System.</p>
-</div>
+		<!-- Dashboard Content -->
+		<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
+			<!-- Summary Cards -->
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+				<!-- Total Revenue Card -->
+				<div class="bg-slate-700 text-white p-6 rounded-xl">
+					<div class="flex justify-between items-start">
+						<div class="flex-1">
+							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
+							<p class="text-3xl font-bold mt-2">₱175,728.51</p>
+							<div class="flex items-center mt-2">
+								<svg class="w-4 h-4 text-green-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+								</svg>
+								<span class="text-green-400 text-sm">+12.5% from last month</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Total Expenses Card -->
+				<div class="bg-slate-700 text-white p-6 rounded-xl">
+					<div class="flex justify-between items-start">
+						<div class="flex-1">
+							<h3 class="text-sm font-medium text-slate-300">Total Expenses</h3>
+							<p class="text-3xl font-bold mt-2">₱602,487.06</p>
+							<div class="flex items-center mt-2">
+								<svg class="w-4 h-4 text-red-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+								</svg>
+								<span class="text-red-400 text-sm">-5.0% from last month</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Net Profit Card -->
+				<div class="bg-slate-700 text-white p-6 rounded-xl">
+					<div class="flex justify-between items-start">
+						<div class="flex-1">
+							<h3 class="text-sm font-medium text-slate-300">Net Profit</h3>
+							<p class="text-3xl font-bold mt-2 text-red-400">-₱426,882.58</p>
+							<div class="flex items-center mt-2">
+								<svg class="w-4 h-4 text-green-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+								</svg>
+								<span class="text-green-400 text-sm">+18.7% from last month</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Cash Flow Card -->
+				<div class="bg-slate-700 text-white p-6 rounded-xl">
+					<div class="flex justify-between items-start">
+						<div class="flex-1">
+							<h3 class="text-sm font-medium text-slate-300">Available cash</h3>
+							<p class="text-3xl font-bold mt-2">₱729,152.54</p>
+							<p class="text-slate-400 text-sm mt-2">Cash Flow</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Main Content Grid -->
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+				<!-- Financial Transactions Section (Left - 2 columns) -->
+				<div class="lg:col-span-2">
+					<div class="bg-slate-700 text-white p-6 rounded-xl">
+						<div class="mb-6">
+							<h2 class="text-xl font-semibold mb-1">Financial Transactions</h2>
+							<p class="text-slate-300 text-sm">Track all income, expenses, and financial activities</p>
+						</div>
+
+						<!-- Search and Filters -->
+						<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+							<div class="flex-1 max-w-md">
+								<div class="relative">
+									<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+										<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+										</svg>
+									</div>
+									<input type="text" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+								</div>
+							</div>
+							<div class="flex gap-2">
+								<select class="bg-white text-gray-900 rounded-lg px-3 py-2 text-sm">
+									<option>All Status</option>
+									<option>Completed</option>
+									<option>Pending</option>
+								</select>
+								<select class="bg-white text-gray-900 rounded-lg px-3 py-2 text-sm">
+									<option>All Categories</option>
+									<option>Income</option>
+									<option>Expense</option>
+								</select>
+							</div>
+						</div>
+
+						<!-- Tabs -->
+						<div class="flex space-x-1 mb-6">
+							<button id="transactionTab" class="flex-1 px-4 py-2 rounded-lg bg-slate-600 text-white">Transaction</button>
+							<button id="reportsTab" class="flex-1 px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Reports</button>
+						</div>
+
+						<!-- Transactions Table -->
+						<div class="overflow-x-auto">
+							<table class="min-w-full border-collapse text-left text-sm">
+								<thead class="bg-slate-800 text-gray-300">
+									<tr>
+										<th class="px-4 py-3 font-medium">Transaction #</th>
+										<th class="px-4 py-3 font-medium">Date</th>
+										<th class="px-4 py-3 font-medium">Type</th>
+										<th class="px-4 py-3 font-medium">Category</th>
+										<th class="px-4 py-3 font-medium">Description</th>
+										<th class="px-4 py-3 font-medium">Amount</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-slate-600">
+									<tr class="hover:bg-slate-600">
+										<td class="px-4 py-3">TXN-2025-001</td>
+										<td class="px-4 py-3">Jan 15, 2025</td>
+										<td class="px-4 py-3">
+											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #FFB74D;">Payment Made</span>
+										</td>
+										<td class="px-4 py-3">Materials</td>
+										<td class="px-4 py-3">Payment for lumber purchase</td>
+										<td class="px-4 py-3">₱125,000.00</td>
+									</tr>
+									<tr class="hover:bg-slate-600">
+										<td class="px-4 py-3">TXN-2025-002</td>
+										<td class="px-4 py-3">Jan 14, 2025</td>
+										<td class="px-4 py-3">
+											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #64B5F6;">Payment Received</span>
+										</td>
+										<td class="px-4 py-3">Sales</td>
+										<td class="px-4 py-3">Deposit from customer order</td>
+										<td class="px-4 py-3">₱50,000.00</td>
+									</tr>
+									<tr class="hover:bg-slate-600">
+										<td class="px-4 py-3">TXN-2025-003</td>
+										<td class="px-4 py-3">Jan 13, 2025</td>
+										<td class="px-4 py-3">
+											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
+										</td>
+										<td class="px-4 py-3">Utilities</td>
+										<td class="px-4 py-3">Electricity bill - January</td>
+										<td class="px-4 py-3">₱15,500.00</td>
+									</tr>
+									<tr class="hover:bg-slate-600">
+										<td class="px-4 py-3">TXN-2025-004</td>
+										<td class="px-4 py-3">Jan 12, 2025</td>
+										<td class="px-4 py-3">
+											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
+										</td>
+										<td class="px-4 py-3">Labor</td>
+										<td class="px-4 py-3">Payroll - Week 2</td>
+										<td class="px-4 py-3">₱85,000.00</td>
+									</tr>
+									<tr class="hover:bg-slate-600">
+										<td class="px-4 py-3">TXN-2025-005</td>
+										<td class="px-4 py-3">Jan 10, 2025</td>
+										<td class="px-4 py-3">
+											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
+										</td>
+										<td class="px-4 py-3">Rent</td>
+										<td class="px-4 py-3">Warehouse rent - January</td>
+										<td class="px-4 py-3">₱25,000.00</td>
+									</tr>
+									<tr class="hover:bg-slate-600">
+										<td class="px-4 py-3">TXN-2025-006</td>
+										<td class="px-4 py-3">Jan 8, 2025</td>
+										<td class="px-4 py-3">
+											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #81C784;">Income</span>
+										</td>
+										<td class="px-4 py-3">Sales</td>
+										<td class="px-4 py-3">Payment for completed order</td>
+										<td class="px-4 py-3">₱75,000.00</td>
+									</tr>
+									<tr class="hover:bg-slate-600">
+										<td class="px-4 py-3">TXN-2025-007</td>
+										<td class="px-4 py-3">Jan 5, 2025</td>
+										<td class="px-4 py-3">
+											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
+										</td>
+										<td class="px-4 py-3">Insurance</td>
+										<td class="px-4 py-3">Property insurance premium</td>
+										<td class="px-4 py-3">₱8,500.00</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<!-- Expense Breakdown Section (Right - 1 column) -->
+				<div class="lg:col-span-1">
+					<div class="bg-slate-700 text-white p-6 rounded-xl">
+						<div class="flex items-center space-x-2 mb-6">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+							</svg>
+							<h2 class="text-xl font-semibold">Expense Breakdown</h2>
+						</div>
+
+						<div class="space-y-6">
+							<!-- Materials -->
+							<div>
+								<div class="flex justify-between items-center mb-2">
+									<span class="text-sm font-medium">Materials</span>
+									<span class="text-sm">₱891,988.32</span>
+								</div>
+								<div class="w-full bg-slate-600 rounded-full h-3">
+									<div class="bg-red-700 h-3 rounded-full" style="width: 53.5%"></div>
+								</div>
+								<p class="text-xs text-slate-400 mt-1">53.5% of total expenses</p>
+							</div>
+
+							<!-- Labor -->
+							<div>
+								<div class="flex justify-between items-center mb-2">
+									<span class="text-sm font-medium">Labor</span>
+									<span class="text-sm">₱492,044.50</span>
+								</div>
+								<div class="w-full bg-slate-600 rounded-full h-3">
+									<div class="bg-red-700 h-3 rounded-full" style="width: 29.5%"></div>
+								</div>
+								<p class="text-xs text-slate-400 mt-1">29.5% of total expenses</p>
+							</div>
+
+							<!-- Rent -->
+							<div>
+								<div class="flex justify-between items-center mb-2">
+									<span class="text-sm font-medium">Rent</span>
+									<span class="text-sm">₱205,018.54</span>
+								</div>
+								<div class="w-full bg-slate-600 rounded-full h-3">
+									<div class="bg-red-700 h-3 rounded-full" style="width: 12.3%"></div>
+								</div>
+								<p class="text-xs text-slate-400 mt-1">12.3% of total expenses</p>
+							</div>
+
+							<!-- Utilities -->
+							<div>
+								<div class="flex justify-between items-center mb-2">
+									<span class="text-sm font-medium">Utilities</span>
+									<span class="text-sm">₱52,791.69</span>
+								</div>
+								<div class="w-full bg-slate-600 rounded-full h-3">
+									<div class="bg-red-700 h-3 rounded-full" style="width: 3.2%"></div>
+								</div>
+								<p class="text-xs text-slate-400 mt-1">3.2% of total expenses</p>
+							</div>
+
+							<!-- Insurance -->
+							<div>
+								<div class="flex justify-between items-center mb-2">
+									<span class="text-sm font-medium">Insurance</span>
+									<span class="text-sm">₱24,636.12</span>
+								</div>
+								<div class="w-full bg-slate-600 rounded-full h-3">
+									<div class="bg-red-700 h-3 rounded-full" style="width: 1.5%"></div>
+								</div>
+								<p class="text-xs text-slate-400 mt-1">1.5% of total expenses</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Tab functionality
+		const transactionTab = document.getElementById('transactionTab');
+		const reportsTab = document.getElementById('reportsTab');
+
+		if (transactionTab && reportsTab) {
+			transactionTab.addEventListener('click', function() {
+				transactionTab.classList.remove('bg-slate-800', 'text-slate-300');
+				transactionTab.classList.add('bg-slate-600', 'text-white');
+				reportsTab.classList.remove('bg-slate-600', 'text-white');
+				reportsTab.classList.add('bg-slate-800', 'text-slate-300');
+			});
+
+			reportsTab.addEventListener('click', function() {
+				reportsTab.classList.remove('bg-slate-800', 'text-slate-300');
+				reportsTab.classList.add('bg-slate-600', 'text-white');
+				transactionTab.classList.remove('bg-slate-600', 'text-white');
+				transactionTab.classList.add('bg-slate-800', 'text-slate-300');
+			});
+		}
+	</script>
+@endsection
