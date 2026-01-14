@@ -26,7 +26,7 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li>
+              <li>
                 <a href="{{ route('inventory') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('inventory') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
