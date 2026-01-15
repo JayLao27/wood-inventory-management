@@ -155,76 +155,7 @@
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-slate-600">
-									<tr class="hover:bg-slate-600">
-										<td class="px-4 py-3">TXN-2025-001</td>
-										<td class="px-4 py-3">Jan 15, 2025</td>
-										<td class="px-4 py-3">
-											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #FFB74D;">Payment Made</span>
-										</td>
-										<td class="px-4 py-3">Materials</td>
-										<td class="px-4 py-3">Payment for lumber purchase</td>
-										<td class="px-4 py-3">₱125,000.00</td>
-									</tr>
-									<tr class="hover:bg-slate-600">
-										<td class="px-4 py-3">TXN-2025-002</td>
-										<td class="px-4 py-3">Jan 14, 2025</td>
-										<td class="px-4 py-3">
-											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #64B5F6;">Payment Received</span>
-										</td>
-										<td class="px-4 py-3">Sales</td>
-										<td class="px-4 py-3">Deposit from customer order</td>
-										<td class="px-4 py-3">₱50,000.00</td>
-									</tr>
-									<tr class="hover:bg-slate-600">
-										<td class="px-4 py-3">TXN-2025-003</td>
-										<td class="px-4 py-3">Jan 13, 2025</td>
-										<td class="px-4 py-3">
-											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
-										</td>
-										<td class="px-4 py-3">Utilities</td>
-										<td class="px-4 py-3">Electricity bill - January</td>
-										<td class="px-4 py-3">₱15,500.00</td>
-									</tr>
-									<tr class="hover:bg-slate-600">
-										<td class="px-4 py-3">TXN-2025-004</td>
-										<td class="px-4 py-3">Jan 12, 2025</td>
-										<td class="px-4 py-3">
-											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
-										</td>
-										<td class="px-4 py-3">Labor</td>
-										<td class="px-4 py-3">Payroll - Week 2</td>
-										<td class="px-4 py-3">₱85,000.00</td>
-									</tr>
-									<tr class="hover:bg-slate-600">
-										<td class="px-4 py-3">TXN-2025-005</td>
-										<td class="px-4 py-3">Jan 10, 2025</td>
-										<td class="px-4 py-3">
-											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
-										</td>
-										<td class="px-4 py-3">Rent</td>
-										<td class="px-4 py-3">Warehouse rent - January</td>
-										<td class="px-4 py-3">₱25,000.00</td>
-									</tr>
-									<tr class="hover:bg-slate-600">
-										<td class="px-4 py-3">TXN-2025-006</td>
-										<td class="px-4 py-3">Jan 8, 2025</td>
-										<td class="px-4 py-3">
-											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #81C784;">Income</span>
-										</td>
-										<td class="px-4 py-3">Sales</td>
-										<td class="px-4 py-3">Payment for completed order</td>
-										<td class="px-4 py-3">₱75,000.00</td>
-									</tr>
-									<tr class="hover:bg-slate-600">
-										<td class="px-4 py-3">TXN-2025-007</td>
-										<td class="px-4 py-3">Jan 5, 2025</td>
-										<td class="px-4 py-3">
-											<span class="px-2 py-1 rounded text-xs text-white" style="background-color: #EF5350;">Expense</span>
-										</td>
-										<td class="px-4 py-3">Insurance</td>
-										<td class="px-4 py-3">Property insurance premium</td>
-										<td class="px-4 py-3">₱8,500.00</td>
-									</tr>
+									
 								</tbody>
 							</table>
 						</div>
