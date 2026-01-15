@@ -25,7 +25,7 @@
 						</svg>
 						<span>Export Reports</span>
 					</button>
-					<button class="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm text-white transition">
+					<button class="flex items-center space-x-2  bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
 						<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
 						</svg>
