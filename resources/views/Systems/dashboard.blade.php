@@ -62,7 +62,7 @@
 								<p class="text-white text-sm mt-1">Require immediate attention</p>
 							</div>
 							<div >
-								@include('components.icons.error', ['class' => 'icon-error'])
+								@include('components.icons.alert', ['class' => 'icon-alert'])
 							</div>
 						</div>
 					</div>
