@@ -68,7 +68,7 @@
                             <p class="text-slate-400 text-xs mt-1">Requires attention</p>
                         </div>
                         <div >
-                           @include('components.icons.error', ['class' => 'icon-time'])
+                           @include('components.icons.alert', ['class' => 'icon-alert'])
                         </div>
                     </div>
                 </div>
