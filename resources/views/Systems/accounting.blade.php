@@ -46,9 +46,7 @@
 							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
 							<p class="text-3xl font-bold mt-2">₱175,728.51</p>
 							<div class="flex items-center mt-2">
-								<svg class="w-4 h-4 text-green-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-								</svg>
+							
 								<span class="text-green-400 text-sm">+12.5% from last month</span>
 							</div>
 						</div>
@@ -62,9 +60,6 @@
 							<h3 class="text-sm font-medium text-slate-300">Total Expenses</h3>
 							<p class="text-3xl font-bold mt-2">₱602,487.06</p>
 							<div class="flex items-center mt-2">
-								<svg class="w-4 h-4 text-red-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-								</svg>
 								<span class="text-red-400 text-sm">-5.0% from last month</span>
 							</div>
 						</div>
@@ -78,9 +73,6 @@
 							<h3 class="text-sm font-medium text-slate-300">Net Profit</h3>
 							<p class="text-3xl font-bold mt-2 text-red-400">-₱426,882.58</p>
 							<div class="flex items-center mt-2">
-								<svg class="w-4 h-4 text-green-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-								</svg>
 								<span class="text-green-400 text-sm">+18.7% from last month</span>
 							</div>
 						</div>
