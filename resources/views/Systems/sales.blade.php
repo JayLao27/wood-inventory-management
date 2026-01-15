@@ -109,7 +109,7 @@
 							<h2 class="text-xl font-semibold">Sales Management</h2>
 							<p class="text-gray-300">Manage customer orders and track sales performance</p>
 						</div>
-						<button id="headerBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onclick="openModal('newOrderModal')">+ New Order</button>
+						<button id="headerBtn" class="px-4 py-2  bg-white text-[#374151] rounded-lg hover:bg-[#DEE4EF]" onclick="openModal('newOrderModal')">+ New Order</button>
 					</header>
 
 					<!-- Search + Filters -->
