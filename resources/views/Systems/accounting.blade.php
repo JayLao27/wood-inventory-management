@@ -46,10 +46,12 @@
 							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
 							<p class="text-3xl font-bold mt-2">₱175,728.51</p>
 							<div class="flex items-center mt-2">
-							
 								<span class="text-green-400 text-sm">+12.5% from last month</span>
 							</div>
 						</div>
+					<div >
+						@include('components.icons.dollar', ['class' => 'icon-dollar'])
+				</div>
 					</div>
 				</div>
 
@@ -63,6 +65,9 @@
 								<span class="text-red-400 text-sm">-5.0% from last month</span>
 							</div>
 						</div>
+						<div >
+							@include('components.icons.dollar', ['class' => 'icon-dollar'])
+					</div>
 					</div>
 				</div>
 
@@ -76,6 +81,9 @@
 								<span class="text-green-400 text-sm">+18.7% from last month</span>
 							</div>
 						</div>
+								<div >
+							@include('components.icons.dollar', ['class' => 'icon-dollar'])
+					</div>
 					</div>
 				</div>
 
@@ -87,7 +95,11 @@
 							<p class="text-3xl font-bold mt-2">₱729,152.54</p>
 							<p class="text-slate-400 text-sm mt-2">Cash Flow</p>
 						</div>
+				<div >
+					@include('components.icons.dollar', ['class' => 'icon-dollar'])
+				</div>
 					</div>
+					
 				</div>
 			</div>
 
