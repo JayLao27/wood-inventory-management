@@ -44,7 +44,7 @@
 								<p class="text-slate-300 text-sm mt-1">All time sales</p>
 							</div>
 							<div>
-							@include('components.icons.package', ['class' => 'icon-time'])
+							@include('components.icons.package', ['class' => 'icon-package'])
 							</div>
 						</div>
 					</div>
@@ -58,7 +58,7 @@
 								<p class="text-slate-300 text-sm mt-1">Paid orders</p>
 							</div>
 							<div >
-							
+							@include('components.icons.dollar', ['class' => 'icon-dollar'])
 							</div>
 						</div>
 					</div>
