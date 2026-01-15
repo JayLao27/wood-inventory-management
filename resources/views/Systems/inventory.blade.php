@@ -23,7 +23,7 @@
                             <p class="text-3xl font-bold mt-2">{{ $totalItems ?? 10 }}</p>
                             <p class="text-slate-400 text-xs mt-1">{{ $totalItems ?? 10 }} Items</p>
                         </div>
-                        @include('icons.package', ['class' => 'icon-package'])
+                        @include('components.icons.package', ['class' => 'icon-package'])
                     </div>
                 </div>
 
@@ -47,7 +47,7 @@
                             <p class="text-2xl  font-bold mt-2">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
                             <p class="text-slate-400 text-xs mt-1">Raw materials inventory value</p>
                         </div>
-                      @include('icons.cart', ['class' => 'icon-cart']) 
+                      @include('components.icons.cart', ['class' => 'icon-cart']) 
                     </div>
                 </div>
                 
@@ -60,7 +60,7 @@
                             <p class="text-3xl font-bold mt-2">{{ $newOrders ?? 2 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Finished products inventory value</p>
                         </div>
-                    @include('icons.cart', ['class' => 'icon-cart'])
+                    @include('components.icons.cart', ['class' => 'icon-cart'])
                     </div>
                 </div>
 
@@ -73,7 +73,7 @@
                             <p class="text-slate-400 text-xs mt-1">Purchase orders awaiting delivery</p>
                             <p class="text-slate-400 text-xs">View auto-requests</p>
                         </div>
-                         @include('icons.cart', ['class' => 'icon-cart'])
+                         @include('components.icons.cart', ['class' => 'icon-cart'])
                     </div>
                 </div>
             </div>

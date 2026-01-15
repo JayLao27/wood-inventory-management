@@ -14,7 +14,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Sidebar Menu -->
     <nav class="flex-1 p-4">
         <ul class="space-y-2">
@@ -44,7 +44,7 @@
             </li>
             <li>
                 <a href="{{ route('sales-orders.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('sales-orders.*') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
-                   @include('icons.cart', ['class' => 'w-5 h-5'])
+                   @include('components.icons.cart', ['class' => 'w-5 h-5'])
                     <span>Sales & Orders</span>
                 </a>
             </li>
