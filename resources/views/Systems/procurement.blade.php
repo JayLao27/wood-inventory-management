@@ -114,7 +114,7 @@
                     <p class="text-slate-300 text-sm mt-1">Manage purchase orders and supplier relationships</p>
                 </div>
                 <div id="purchaseOrdersButton" class="flex space-x-3">
-                    <button onclick="openAddPurchaseOrderModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                    <button onclick="openAddPurchaseOrderModal()" class="px-4 py-2  bg-white text-[#374151] rounded-lg hover:bg-[#DEE4EF] transition flex items-center space-x-2">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                         </svg>
