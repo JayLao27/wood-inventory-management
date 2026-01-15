@@ -35,7 +35,7 @@
     <!--changing red when lowstocks--><p class="text-3xl font-bold text-white mt-2 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-500' : '' }}">{{ $lowStockAlerts ?? 3 }}</p>
                     <p class="text-slate-400 text-xs mt-1 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-500' : '' }}">{{ $lowStockAlerts ?? 3 }} Items</p>
                         </div>
-                        @include('icons.cart', ['class' => ($lowStockAlerts ?? 3) > 4 ? 'icon-cart text-red-500' : 'icon-cart'])
+                        @include('components.icons.cart', ['class' => ($lowStockAlerts ?? 3) > 4 ? 'icon-cart text-red-500' : 'icon-cart'])
                     </div>
                 </div>
 
