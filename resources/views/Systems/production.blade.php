@@ -74,6 +74,8 @@
                 </div>
             </div>
 
+            
+            <!-- Production Workflow Section -->
             <div class="bg-slate-700 rounded-lg p-6">
                 <div class="flex justify-between items-center mb-6">
                     <div>
