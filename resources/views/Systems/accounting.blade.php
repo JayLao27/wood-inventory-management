@@ -44,7 +44,7 @@
 					<div class="flex justify-between items-start">
 						<div class="flex-1">
 							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
-							<p class="text-3xl font-bold mt-2">₱175,728.51</p>
+							<p class="text-3xl font-bold mt-2">fetch</p>
 							<div class="flex items-center mt-2">
 								<span class="text-green-400 text-sm">+12.5% from last month</span>
 							</div>
@@ -205,7 +205,8 @@
 							<div>
 								<div class="flex justify-between items-center mb-2">
 									<span class="text-sm font-medium">Rent</span>
-									<span class="text-sm">₱205,018.54</span>
+							
+							<!-- backend -->
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
 									<div class="bg-red-700 h-3 rounded-full" style="width: 12.3%"></div>
@@ -222,7 +223,7 @@
 								<div class="w-full bg-slate-600 rounded-full h-3">
 									<div class="bg-red-700 h-3 rounded-full" style="width: 3.2%"></div>
 								</div>
-								<p class="text-xs text-slate-400 mt-1">3.2% of total expenses</p>
+								<p class="text-xs text-slate-400 mt-1">backend</p>
 							</div>
 
 							<!-- Insurance -->
