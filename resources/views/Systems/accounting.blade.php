@@ -181,19 +181,19 @@
 							<div>
 								<div class="flex justify-between items-center mb-2">
 									<span class="text-sm font-medium">Materials</span>
-									<span class="text-sm">₱891,988.32</span>
+									<span class="text-sm">Backend materials</span>
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
 									<div class="bg-red-700 h-3 rounded-full" style="width: 53.5%"></div>
 								</div>
-								<p class="text-xs text-slate-400 mt-1">53.5% of total expenses</p>
+								<p class="text-xs text-slate-400 mt-1">backend</p>
 							</div>
 
 							<!-- Labor -->
 							<div>
 								<div class="flex justify-between items-center mb-2">
 									<span class="text-sm font-medium">Labor</span>
-									<span class="text-sm">₱492,044.50</span>
+									<span class="text-sm">backend</span>
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
 									<div class="bg-red-700 h-3 rounded-full" style="width: 29.5%"></div>
@@ -205,8 +205,7 @@
 							<div>
 								<div class="flex justify-between items-center mb-2">
 									<span class="text-sm font-medium">Rent</span>
-							
-							<!-- backend -->
+						
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
 									<div class="bg-red-700 h-3 rounded-full" style="width: 12.3%"></div>
