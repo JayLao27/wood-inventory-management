@@ -24,9 +24,9 @@ class AccountingController extends Controller
         // Fetch financial data based on the date range
         // This is a placeholder; actual implementation would involve querying relevant models
         $financialData = [
-            'total_revenue' => 100000, // Example data
-            'total_expenses' => 50000, // Example data
-            'net_profit' => 50000, // Example data
+            'total_revenue' => 0,
+            'total_expenses' => 0,
+            'net_profit' => 0,
         ];
 
         return view('Systems.accounting_report', compact('financialData', 'startDate', 'endDate'));
