@@ -44,7 +44,7 @@
 					<div class="flex justify-between items-start">
 						<div class="flex-1">
 							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
-							<p class="text-3xl font-bold mt-2">fetch</p>
+						<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->sum('total_amount'), 2) }}</p>
 							<div class="flex items-center mt-2">
 								<span class="text-green-400 text-sm">+12.5% from last month</span>
 							</div>
