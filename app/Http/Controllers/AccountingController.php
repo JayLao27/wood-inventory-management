@@ -21,8 +21,7 @@ class AccountingController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-        // Fetch financial data based on the date range
-        // This is a placeholder; actual implementation would involve querying relevant models
+       
         $financialData = [
             'total_revenue' => 0,
             'total_expenses' => 0,
