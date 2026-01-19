@@ -69,9 +69,9 @@
             <div class="bg-slate-700 rounded-lg p-6 text-white">
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-sm font-medium text-slate-300">Active Suppliers</h3>
+                        <h3 class="text-sm font-medium text-slate-300">Suppliers</h3>
                         <p class="text-3xl font-bold mt-2">{{ $activeSuppliers }}</p>
-                        <p class="text-slate-300 text-sm mt-1">Verified suppliers</p>
+                        <p class="text-slate-300 text-sm mt-1">Suppliers</p>
                     </div>
                     <div>
                       @include('components.icons.cart', ['class' => 'icon-cart'])
