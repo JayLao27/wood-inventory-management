@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use App\Models\SalesOrder;
-use App\Models\SalesOrderItem;  
 use Illuminate\Http\Request;
 
 class AccountingController extends Controller
