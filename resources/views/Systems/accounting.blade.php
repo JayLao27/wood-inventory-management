@@ -14,7 +14,7 @@
 		<!-- Header -->
 		<div class="bg-amber-50 p-8">
 			<div class="flex justify-between items-center">
-				<div>
+				<div
 					<h1 class="text-4xl font-bold text-gray-800">Accounting & Finance</h1>
 					<p class="text-lg text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
 				</div>
@@ -44,11 +44,11 @@
 					<div class="flex justify-between items-start">
 						<div class="flex-1">
 							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
-						<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->sum('total_amount'), 2) }}</p>
+							<p class="text-3xl font-bold mt-2">₱{{ number_format($totalRevenue, 2) }}</p>
 							<div class="flex items-center mt-2">
 								<span class="text-green-400 text-sm">+12.5% from last month</span>
 							</div>
-						</div>
+						</div>	
 					<div >
 						@include('components.icons.dollar', ['class' => 'icon-dollar'])
 				</div>
@@ -91,9 +91,9 @@
 				<div class="bg-slate-700 text-white p-6 rounded-xl">
 					<div class="flex justify-between items-start">
 						<div class="flex-1">
-							<h3 class="text-sm font-medium text-slate-300">Available cash</h3>
-							<p class="text-3xl font-bold mt-2">₱729,152.54</p>
-							<p class="text-slate-400 text-sm mt-2">Cash Flow</p>
+							<h3 class="text-sm font-medium text-slate-300">Cash Flow</h3>
+							<p class="text-3xl font-bold mt-2">₱10000</p>
+							<p class="text-slate-400 text-sm mt-2">Cash</p>
 						</div>
 				<div >
 					@include('components.icons.dollar', ['class' => 'icon-dollar'])

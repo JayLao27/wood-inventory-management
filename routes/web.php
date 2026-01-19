@@ -35,7 +35,7 @@ Route::get('/', function () {
     Route::post('/procurement/purchase-orders', [ProcurementController::class, 'storePurchaseOrder'])->name('procurement.purchase-order.store');
     Route::put('/procurement/suppliers/{id}', [ProcurementController::class, 'updateSupplier'])->name('procurement.supplier.update');
     Route::put('/procurement/purchase-orders/{id}', [ProcurementController::class, 'updatePurchaseOrder'])->name('procurement.purchase-order.update');
-    Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'destroySupplier'])->name('procurement.supplier.destroy');
+    Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'removeSupplier'])->name('procurement.supplier.destroy');
     Route::delete('/procurement/purchase-orders/{id}', [ProcurementController::class, 'destroyPurchaseOrder'])->name('procurement.purchase-order.destroy');
     // Production
     Route::get('/production', [ProductionController::class, 'index'])->name('production');
@@ -46,6 +46,7 @@ Route::get('/', function () {
 
     //Accounting
     Route::get('/accounting', [AccountingController::class, 'index'])->name('accounting');
+    
 
 
     // Profile

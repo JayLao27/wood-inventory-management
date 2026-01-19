@@ -1,14 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\SalesOrder;
+use App\Models\SalesOrderItem;  
 use Illuminate\Http\Request;
 
 class AccountingController extends Controller
 {
     public function index()
     {
-        return view('Systems.accounting');
+        $totalRevenue = SalesOrder::sum('total_amount');
+        
+        return view('Systems.accounting', compact('totalRevenue'));
     }
     
     public function generateFinancialReport(Request $request)
@@ -28,6 +31,14 @@ class AccountingController extends Controller
             'net_profit' => 0,
         ];
 
-        return view('Systems.accounting_report', compact('financialData', 'startDate', 'endDate'));
+        // Get total revenue from all sales orders within a date range
+        $totalRevenue = SalesOrder::whereBetween('order_date', [$startDate, $endDate])
+            ->sum('total_amount');
+
+        // Or get individual sales orders with their totals
+        $salesOrders = SalesOrder::whereBetween('order_date', [$startDate, $endDate])
+            ->get(['id', 'order_number', 'total_amount', 'order_date']);
+
+        return view('Systems.accounting_report', compact('financialData', 'startDate', 'endDate', 'totalRevenue', 'salesOrders'));
     }
 }

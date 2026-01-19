@@ -119,7 +119,7 @@ class ProcurementController extends Controller
         return redirect()->route('procurement')->with('success', 'Purchase order updated successfully!');
     }
 
-    public function removesupplier($id)
+    public function removeSupplier($id)
     {
         $supplier = Supplier::findOrFail($id);
         $supplier->delete();
