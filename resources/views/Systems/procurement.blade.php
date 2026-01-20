@@ -446,7 +446,7 @@
     </div>
 
     <script>
-        // Tab functionality
+        // Tab functions
         function showTab(tab) {
             const purchaseOrdersTab = document.getElementById('purchase-orders-tab');
             const suppliersTab = document.getElementById('suppliers-tab');

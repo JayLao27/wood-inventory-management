@@ -255,7 +255,7 @@
 				reportsTab.classList.remove('bg-slate-600', 'text-white');
 				reportsTab.classList.add('bg-slate-800', 'text-slate-300');
 			});
-
+xx
 			reportsTab.addEventListener('click', function() {
 				reportsTab.classList.remove('bg-slate-800', 'text-slate-300');
 				reportsTab.classList.add('bg-slate-600', 'text-white');
