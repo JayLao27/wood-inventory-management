@@ -613,5 +613,4 @@
         });
     </script>
 
-    //added comments
 @endsection

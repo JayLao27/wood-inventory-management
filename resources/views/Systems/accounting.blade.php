@@ -248,20 +248,31 @@
 		const transactionTab = document.getElementById('transactionTab');
 		const reportsTab = document.getElementById('reportsTab');
 
-		if (transactionTab && reportsTab) {
-			transactionTab.addEventListener('click', function() {
-				transactionTab.classList.remove('bg-slate-800', 'text-slate-300');
-				transactionTab.classList.add('bg-slate-600', 'text-white');
-				reportsTab.classList.remove('bg-slate-600', 'text-white');
-				reportsTab.classList.add('bg-slate-800', 'text-slate-300');
-			});
-xx
-			reportsTab.addEventListener('click', function() {
-				reportsTab.classList.remove('bg-slate-800', 'text-slate-300');
-				reportsTab.classList.add('bg-slate-600', 'text-white');
-				transactionTab.classList.remove('bg-slate-600', 'text-white');
-				transactionTab.classList.add('bg-slate-800', 'text-slate-300');
-			});
-		}
+		if (tab === 'transactionTab') {
+                purchaseOrdersTab.style.backgroundColor = '#FFF1DA';
+                purchaseOrdersTab.style.color = '#111827';
+                purchaseOrdersTab.style.border = 'none';
+                suppliersTab.style.backgroundColor = '#374151';
+                suppliersTab.style.color = '#FFFFFF';
+                suppliersTab.style.border = '1px solid #FFFFFF';
+                purchaseOrdersTable.classList.remove('hidden');
+                suppliersTable.classList.add('hidden');
+                purchaseOrdersButton.classList.remove('hidden');
+                suppliersButton.classList.add('hidden');
+            } else {
+                suppliersTab.style.backgroundColor = '#FFF1DA';
+                suppliersTab.style.color = '#111827';
+                suppliersTab.style.border = 'none';
+                purchaseOrdersTab.style.backgroundColor = '#374151';
+                purchaseOrdersTab.style.color = '#FFFFFF';
+                purchaseOrdersTab.style.border = '1px solid #FFFFFF';
+                suppliersTable.classList.remove('hidden');
+                purchaseOrdersTable.classList.add('hidden');
+                purchaseOrdersButton.classList.add('hidden');
+                suppliersButton.classList.remove('hidden');
+            }
+		transactionTab.addEventListener('click', () => {
+			transactionTab.classList.add('bg-slate-600', 'text-white');
+			reportsTab.classList.remove('bg-slate-600', 'text-white');		
 	</script>
 @endsection
