@@ -612,4 +612,6 @@
             suppliersTab.style.borderRadius = '10px';
         });
     </script>
+
+    //added comments
 @endsection
