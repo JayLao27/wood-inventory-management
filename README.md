@@ -1,2 +1,118 @@
-In Progress
+# Wood Inventory Management System
+
+## Overview
+
+Wood Inventory Management System is a comprehensive Laravel-based web application designed to manage the complete lifecycle of wood materials and products. It streamlines procurement, inventory tracking, sales operations, and manufacturing workflows for wood-based businesses.
+
+## Project Summary
+
+This system provides an integrated platform for:
+
+- **Inventory Management**: Track wood materials and finished products with real-time inventory movements
+- **Procurement**: Manage supplier relationships and purchase orders for raw materials
+- **Sales Operations**: Handle customer orders and sales order management
+- **Manufacturing**: Track work orders for material processing and product creation
+- **Supplier & Customer Management**: Centralized database for business partners
+- **Real-time Tracking**: Monitor inventory movements across different stages of operations
+
+## Key Features
+
+### Core Modules
+- **Materials Management**: Track raw wood materials from suppliers
+- **Products Management**: Manage finished products and their specifications
+- **Purchase Orders**: Streamlined procurement workflow with supplier tracking
+- **Sales Orders**: Efficient order management with item-level tracking
+- **Work Orders**: Production tracking and manufacturing management
+- **Inventory Movements**: Comprehensive logging of all inventory transactions
+- **Supplier Management**: Maintain supplier information and relationships
+- **Customer Management**: Track customer details and interactions
+- **User Management**: Role-based access control
+
+### Technology Stack
+- **Backend**: Laravel Framework
+- **Frontend**: Blade Templates with Tailwind CSS
+- **Build Tool**: Vite
+- **Database**: PostgreSQL/MySQL with migrations
+- **Package Manager**: Composer (PHP), NPM (Node.js)
+- **Testing**: PHPUnit
+
+## Project Structure
+
+```
+wood-inventory-management/
+├── app/
+│   ├── Http/
+│   │   └── Controllers/          # Application controllers
+│   ├── Models/                   # Eloquent models for database entities
+│   ├── Providers/                # Service providers
+│   └── View/
+│       └── Components/           # Reusable Blade components
+├── resources/
+│   ├── css/                      # Tailwind CSS stylesheets
+│   ├── js/                       # JavaScript files
+│   └── views/                    # Blade view templates
+├── routes/                       # Application routing
+├── database/
+│   ├── migrations/               # Database schema migrations
+│   ├── seeders/                  # Database seeders
+│   └── factories/                # Model factories for testing
+├── config/                       # Configuration files
+├── tests/                        # Unit and feature tests
+└── public/                       # Public assets and entry point
+```
+
+## Development Status
+
+**Status**: In Progress
+
+## Getting Started
+
+### Requirements
+- PHP 8.0+
+- Node.js 16+
+- Composer
+- npm or yarn
+- Database (PostgreSQL/MySQL)
+
+### Installation
+
+1. Clone the repository
+2. Install PHP dependencies: `composer install`
+3. Install Node.js dependencies: `npm install`
+4. Copy `.env.example` to `.env`
+5. Generate application key: `php artisan key:generate`
+6. Configure database connection in `.env`
+7. Run migrations: `php artisan migrate`
+8. Seed database (optional): `php artisan db:seed`
+9. Build frontend assets: `npm run build`
+10. Start development server: `php artisan serve`
+
+### Development
+
+- **Frontend development**: `npm run dev`
+- **Run tests**: `php artisan test` or `./vendor/bin/phpunit`
+- **Database reset**: `php artisan migrate:refresh`
+
+## Models & Relationships
+
+The system includes the following main entities:
+- **User**: System users with authentication
+- **Customer**: Customer information and details
+- **Supplier**: Supplier information and relationships
+- **Product**: Finished product catalog
+- **Material**: Raw material inventory
+- **PurchaseOrder**: Purchase order management
+- **PurchaseOrderItem**: Line items in purchase orders
+- **SalesOrder**: Sales order management
+- **SalesOrderItem**: Line items in sales orders
+- **WorkOrder**: Production/manufacturing orders
+- **InventoryMovement**: Audit trail of inventory transactions
+
+## Contributing
+
+Guidelines for contributing to this project should be added here.
+
+## License
+
+This project is proprietary software.
 
