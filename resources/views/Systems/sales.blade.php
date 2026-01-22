@@ -181,7 +181,7 @@
 														<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
 													</svg>
 												</button>
-												<form action="{{ route('sales-orders.delete', $order) }}" method="POST" class="inline-block" onsubmit="return confirm('Cancel this order?')">
+												<form action="{{ route('sales-orders.destroy', $order) }}" method="POST" class="inline-block" onsubmit="return confirm('Cancel this order?')">
 													@csrf
 													@method('DELETE')
 													<button type="submit" class="p-1 hover:bg-slate-500 rounded">
@@ -326,7 +326,7 @@
 														<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
 													</svg>
 												</button>
-												<form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this customer?')">
+												<form action="{{ route('customers.delete', $customer) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this customer?')">
 													@csrf
 													@method('DELETE')
 													<button type="submit" class="p-1 hover:bg-slate-500 rounded">
