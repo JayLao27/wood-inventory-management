@@ -90,10 +90,19 @@ class SalesOrderController extends Controller
         return redirect()->back()->with('success', 'Sales order updated.');
     }
 
-    public function delete(SalesOrder $sales_order)
+public function RemoveCustomer($id)
     {
-        $sales_order->delete();
-        return redirect()->back()->with('success', 'Sales order deleted.');
+        $Customer = Customer::findOrFail($id);
+        $Customer->delete();
+
+        return redirect()->route('sales')->with('success', 'Customer deleted successfully!');
+    }
+
+    public function destroy(SalesOrder $sales_order)
+    {
+         $salesOrder = SalesOrder::findOrFail($sales_order->id);
+        $salesOrder->delete();
+        return redirect()->back()->with('success', 'Order is Cancelled deleted.');
     }
 
     private function generateOrderNumber(): string
