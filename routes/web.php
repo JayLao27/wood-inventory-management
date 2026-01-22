@@ -21,14 +21,17 @@ Route::get('/', function () {
 
     // Protected
     Route::middleware('auth')->group(function () {
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     // Inventory    
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
     Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
     Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update');
     Route::delete('/inventory/{id}/{type}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
     Route::post('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('inventory.adjust-stock');
+
     // Procurement
     Route::get('/procurement', [ProcurementController::class, 'index'])->name('procurement');
     Route::post('/procurement/suppliers', [ProcurementController::class, 'storeSupplier'])->name('procurement.supplier.store');
@@ -37,10 +40,12 @@ Route::get('/', function () {
     Route::put('/procurement/purchase-orders/{id}', [ProcurementController::class, 'updatePurchaseOrder'])->name('procurement.purchase-order.update');
     Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'removeSupplier'])->name('procurement.supplier.destroy');
     Route::delete('/procurement/purchase-orders/{id}', [ProcurementController::class, 'destroyPurchaseOrder'])->name('procurement.purchase-order.destroy');
+
     // Production
     Route::get('/production', [ProductionController::class, 'index'])->name('production');
     Route::post('/production', [ProductionController::class, 'store'])->name('production.store');
     Route::put('/production/{workOrder}', [ProductionController::class, 'update'])->name('production.update');
+    
     // Sales
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
 
