@@ -47,9 +47,10 @@ Route::get('/', function () {
     Route::put('/production/{workOrder}', [ProductionController::class, 'update'])->name('production.update');
     
     // Sales
+    Route::resource('sales-orders', SalesOrderController::class);
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
     Route::delete('/sales/customers/{id}', [SalesOrderController::class, 'RemoveCustomer'])->name('customers.delete');
-    Route::delete('/sales/sales-orders/{id}', [SalesOrderController::class, 'delete'])->name('sales-orders.delete');
+    Route::delete('/sales/sales-orders/{id}', [SalesOrderController::class, 'delete'])->name('sales-orders.destroy');
 
     //Accounting
     Route::get('/accounting', [AccountingController::class, 'index'])->name('accounting');
@@ -66,6 +67,4 @@ Route::get('/', function () {
     // Customers CRUD
     Route::resource('customers', CustomerController::class);
 
-    // Sales Orders CRUD
-    Route::resource('sales-orders', SalesOrderController::class);
 });
