@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number')->unique();
+           
             $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
             $table->date('order_date');
             $table->date('expected_delivery')->nullable();

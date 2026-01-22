@@ -90,7 +90,7 @@ class SalesOrderController extends Controller
         return redirect()->back()->with('success', 'Sales order updated.');
     }
 
-    public function destroy(SalesOrder $sales_order)
+    public function delete(SalesOrder $sales_order)
     {
         $sales_order->delete();
         return redirect()->back()->with('success', 'Sales order deleted.');
