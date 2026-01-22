@@ -48,7 +48,7 @@ Route::get('/', function () {
     
     // Sales
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
-    
+    Route::delete('/sales/customers/{id}', [SalesOrderController::class, 'RemoveCustomer'])->name('customers.delete');
     Route::delete('/sales/sales-orders/{id}', [SalesOrderController::class, 'delete'])->name('sales-orders.delete');
 
     //Accounting
