@@ -11,7 +11,11 @@ return new class extends Migration
     {
         Schema::create('accounting', function (Blueprint $table) {
             $table->id();
+            $table->string('referenceID');
             $table->string('account_name');
+            $table->string('transaction_number');
+            $table->int('transaction_type');
+
         });
     }
 
