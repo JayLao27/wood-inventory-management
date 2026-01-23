@@ -14,8 +14,15 @@ return new class extends Migration
             $table->string('referenceID');
             $table->string('account_name');
             $table->string('transaction_number');
-            $table->int('transaction_type');
-
+            $table->integer('transaction_type');
+            $table->date('transaction_date')->nullable();
+            $table->date('category_date');
+            $table->integer('amount');
+            $table->string(column: 'description')->nullable();
+            $table->string('payment_method');
+            $table->string('reference_type')->nullable();
+            $table->string('reference_id')->nullable();
+            $table->string('payment_method')->nullable();
         });
     }
 
