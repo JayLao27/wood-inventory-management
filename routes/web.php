@@ -54,7 +54,7 @@ Route::get('/', function () {
 
     //Accounting
     Route::get('/accounting', [AccountingController::class, 'index'])->name('accounting');
-    
+        
 
     // Profile
     Route::get('/profile', function () {
