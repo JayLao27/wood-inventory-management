@@ -70,7 +70,14 @@
     </nav>
 
     <!-- Footer -->
-    <div class="p-4 border-t border-slate-600">
+    <div class="mt-auto p-4 border-t border-slate-600">
+        <!-- Logout Button -->
+        <form method="POST" action="{{ route('logout') }}" class="mb-3">
+            @csrf
+            <button type="submit" onclick="event.preventDefault(); this.closest('form').submit();" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-sm font-medium">
+                {{ __('Log Out') }}
+            </button>
+        </form>
         <p class="text-xs text-slate-400">© 2025 RM Woodworks</p>
     </div>
 </div>
