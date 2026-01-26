@@ -30,7 +30,7 @@
 							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
 						</svg>
 						<span>Add Transaction</span>
-					</button>
+					</button onclick="openAddTransaction()">
 				</div>
 			</div>
 		</div>
@@ -163,8 +163,12 @@
 								</tbody>
 							</table>
 						</div>
+						
 					</div>
 				</div>
+
+			
+
 
 				<!-- Expense Breakdown Section (Right - 1 column) -->
 				<div class="lg:col-span-1">
@@ -245,6 +249,7 @@
 
 	<script>
 		// Tab functionality
+		const openAddTransaction = document.getElementById('openAddTransaction');
 		const transactionTab = document.getElementById('transactionTab');
 		const reportsTab = document.getElementById('reportsTab');
 
@@ -271,8 +276,16 @@
                 purchaseOrdersButton.classList.add('hidden');
                 suppliersButton.classList.remove('hidden');
             }
+
+
 		transactionTab.addEventListener('click', () => {
 			transactionTab.classList.add('bg-slate-600', 'text-white');
-			reportsTab.classList.remove('bg-slate-600', 'text-white');		
+			reportsTab.classList.remove('bg-slate-600', 'text-white');
+			
+			function openAddTransaction() {
+		document.getElementById('openAddTransaction').classList.remove('hidden');
+}
+
+
 	</script>
 @endsection
