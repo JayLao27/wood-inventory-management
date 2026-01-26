@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Models\SalesOrder;
+use App\Models\Accounting;
+use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 
 class AccountingController extends Controller
@@ -13,6 +15,14 @@ class AccountingController extends Controller
         return view('Systems.accounting', compact('totalRevenue'));
     }
     
+    public function addTransaction()
+    {
+
+    
+
+        return view('Systems.add_transaction');
+    }
+
     public function generateFinancialReport(Request $request)
     {
         $request->validate([
