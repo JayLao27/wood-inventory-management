@@ -137,7 +137,6 @@
 									<th class="px-4 py-2">Customer</th>
 									<th class="px-4 py-2">Order Date</th>
 									<th class="px-4 py-2">Delivery Date</th>
-									<th class="px-4 py-2">Status</th>
 									<th class="px-4 py-2">Total Amount</th>
 									<th class="px-4 py-2">Payment Status</th>
 									<th class="px-4 py-2">Action</th>
@@ -158,7 +157,6 @@
 											$sb = $order->status === 'Pending' ? '#ffffff' : ($statusBg[$order->status] ?? '#e5e7eb');
 											$stText = $order->status === 'Pending' ? 'text-gray-900' : 'text-white';
 										@endphp
-										<td class="px-4 py-2"><span class="inline-block text-xs px-2 py-0.5 rounded {{ $stText }}" style="background: {{ $sb }};">{{ $order->status }}</span></td>
 										<td class="px-4 py-2">₱{{ number_format($order->total_amount, 2) }}</td>
 										@php
 											$pb = $paymentBg[$order->payment_status] ?? '#ffffff';
@@ -252,14 +250,7 @@
 														<input type="date" name="delivery_date" value="{{ $order->delivery_date }}" class="w-full border rounded px-2 py-1">
 													</div>
 													<div class="grid grid-cols-2 gap-3">
-														<div>
-															<label class="text-sm">Status</label>
-															<select name="status" class="w-full border rounded px-2 py-1">
-																@foreach(['In production','Pending','Delivered','Ready'] as $s)
-																	<option value="{{ $s }}" @selected($order->status==$s)>{{ $s }}</option>
-																@endforeach
-															</select>
-														</div>
+														
 														<div>
 															<label class="text-sm">Payment Status</label>
 															<select name="payment_status" class="w-full border rounded px-2 py-1">
@@ -434,10 +425,6 @@
 									<div>
 										<label class="text-sm">Delivery Date <span class="text-red-500">*</span></label>
 										<input type="date" name="delivery_date" class="w-full border rounded px-2 py-1" required>
-									</div>
-									<div>
-										<label class="text-sm">Status</label>
-										<input type="text" value="Pending" class="w-full border rounded px-2 py-1 bg-gray-100" disabled>
 									</div>
 								</div>
 								<div class="grid grid-cols-3 gap-3 items-end">
