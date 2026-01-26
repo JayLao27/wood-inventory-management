@@ -135,7 +135,6 @@
                         <thead>
                             <tr class="border-b border-slate-600">
                                 <th class="text-left py-3 px-4 font-medium">Name</th>
-                                <th class="text-left py-3 px-4 font-medium">Category</th>
                                 <th class="text-left py-3 px-4 font-medium">Current Stock</th>
                                 <th class="text-left py-3 px-4 font-medium">Min Stock</th>
                                 <th class="text-left py-3 px-4 font-medium">Unit Cost</th>
@@ -148,7 +147,6 @@
                             @forelse($materials ?? [] as $material)
                             <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('material', {{ $material->id }})">
                                 <td class="py-3 px-4">{{ $material->name }}</td>
-                                <td class="py-3 px-4">{{ $material->category }}</td>
                                 <td class="py-3 px-4">{{ $material->current_stock }} {{ $material->unit }}</td>
                                 <td class="py-3 px-4">{{ $material->minimum_stock }} {{ $material->unit }}</td>
                                 <td class="py-3 px-4">₱{{ number_format($material->unit_cost, 2) }}</td>
@@ -197,7 +195,6 @@
                         <thead>
                             <tr class="border-b border-slate-600">
                                 <th class="text-left py-3 px-4 font-medium">Name</th>
-                                <th class="text-left py-3 px-4 font-medium">Category</th>
                                 <th class="text-left py-3 px-4 font-medium">Production Cost</th>
                                 <th class="text-left py-3 px-4 font-medium">Selling Price</th>
                                 <th class="text-left py-3 px-4 font-medium">Action</th>
@@ -207,7 +204,6 @@
                             @forelse($products ?? [] as $product)
                             <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('product', {{ $product->id }})">
                                 <td class="py-3 px-4">{{ $product->product_name }}</td>
-                                <td class="py-3 px-4">{{ ucfirst($product->category) }}</td>
                                 <td class="py-3 px-4">₱{{ number_format($product->production_cost, 2) }}</td>
                                 <td class="py-3 px-4">₱{{ number_format($product->selling_price, 2) }}</td>
                                 <td class="py-3 px-4">
@@ -342,18 +338,6 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
                                     <input type="text" name="product_name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                                    <select name="category" id="productCategorySelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                        <option value="">Select Category</option>
-                                        <option value="chairs" data-production-cost="3000" data-selling-price="8000">Chairs</option>
-                                        <option value="tables" data-production-cost="4000" data-selling-price="9000">Tables</option>
-                                        <option value="cabinets" data-production-cost="7000" data-selling-price="14000">Cabinets</option>
-                                        <option value="storage" data-production-cost="2000" data-selling-price="7000">Storage</option>
-                                    </select>
-                                </div>
-                                
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
                                     <input type="text" name="unit" value="pieces" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
@@ -411,18 +395,6 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
                                     <input type="text" name="product_name" id="editProductName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                                    <select name="category" id="editCategory" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                        <option value="">Select Category</option>
-                                        <option value="chairs">Chairs</option>
-                                        <option value="tables">Tables</option>
-                                        <option value="cabinets">Cabinets</option>
-                                        <option value="storage">Storage</option>
-                                    </select>
-                                </div>
-                                
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
                                     <input type="text" name="unit" id="editUnit" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
