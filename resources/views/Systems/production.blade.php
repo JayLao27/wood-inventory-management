@@ -129,7 +129,6 @@
                                 <th class="text-left py-3 px-4 font-medium">Product</th>
                                 <th class="text-left py-3 px-4 font-medium">Quantity</th>
                                 <th class="text-left py-3 px-4 font-medium">Completion Quantity</th>
-                                <th class="text-left py-3 px-4 font-medium">Status</th>
                                 <th class="text-left py-3 px-4 font-medium">Due Date</th>
                                 <th class="text-left py-3 px-4 font-medium">Assigned To</th>
                                 <th class="text-left py-3 px-4 font-medium">Action</th>
@@ -142,11 +141,6 @@
                                 <td class="py-3 px-4">{{ $workOrder->product_name }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->quantity }} pcs</td>
                                 <td class="py-3 px-4">{{ $workOrder->completion_quantity }}</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 text-xs rounded-full {{ $workOrder->status_color }}">
-                                        {{ ucfirst(str_replace('_', ' ', $workOrder->status)) }}
-                                    </span>
-                                </td>
                                 <td class="py-3 px-4">{{ $workOrder->due_date->format('m/d/Y') }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->assigned_to }}</td>
                                 <td class="py-3 px-4">
