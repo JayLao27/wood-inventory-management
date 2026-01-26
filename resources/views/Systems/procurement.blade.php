@@ -160,7 +160,6 @@
                             <th class="text-left py-3 px-4 font-medium">Supplier</th>
                             <th class="text-left py-3 px-4 font-medium">Order Date</th>
                             <th class="text-left py-3 px-4 font-medium">Expected Delivery</th>
-                            <th class="text-left py-3 px-4 font-medium">Status</th>
                             <th class="text-left py-3 px-4 font-medium">Total Amount</th>
                             <th class="text-left py-3 px-4 font-medium">Payment Status</th>
                             <th class="text-left py-3 px-4 font-medium">Action</th>
@@ -173,17 +172,6 @@
                             <td class="py-3 px-4">{{ $order->supplier->name }}</td>
                             <td class="py-3 px-4">{{ $order->order_date->format('m/d/Y') }}</td>
                             <td class="py-3 px-4">{{ $order->expected_delivery->format('m/d/Y') }}</td>
-                            <td class="py-3 px-4">
-                                @if($order->status === 'Delivered')
-                                    <span class="text-green-400">{{ $order->status }}</span>
-                                @elseif($order->status === 'Confirmed')
-                                    <span class="text-blue-400">{{ $order->status }}</span>
-                                @elseif($order->status === 'Overdue')
-                                    <span class="text-red-400">{{ $order->status }}</span>
-                                @else
-                                    <span class="text-gray-300">{{ $order->status }}</span>
-                                @endif
-                            </td>
                             <td class="py-3 px-4">₱{{ number_format($order->total_amount, 2) }}</td>
                             <td class="py-3 px-4">
                                 @if($order->payment_status === 'Paid')
@@ -410,12 +398,12 @@
                                     
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
-                                        <input type="number" name="items[0][quantity]" step="0.01" min="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <input type="number" name="items[0][quantity]" step="1" min="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                     </div>
                                     
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Unit Price *</label>
-                                        <input type="number" name="items[0][unit_price]" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <input type="number" name="items[0][unit_price]" step="100" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                     </div>
                                     
                                     <div class="flex items-end">
