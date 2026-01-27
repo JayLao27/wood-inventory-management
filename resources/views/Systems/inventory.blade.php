@@ -2,7 +2,7 @@
 
 @section('main-content')
         <!-- Main Content -->
-        <div class="flex-1 p-8 bg-amber-50">
+        <div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
             <!-- Header Section -->
             <div class="mb-8">
                 <div class="flex justify-between items-start">
@@ -130,104 +130,101 @@
                 </div>
 
                 <!-- Materials Table -->
-                <div id="materials-table" class="overflow-x-auto overflow-y-auto" style="max-height:60vh;">
-                    <table class="w-full text-white">
-                        <thead>
-                            <tr class="border-b border-slate-600">
-                                <th class="text-left py-3 px-4 font-medium">Name</th>
-                                <th class="text-left py-3 px-4 font-medium">Current Stock</th>
-                                <th class="text-left py-3 px-4 font-medium">Min Stock</th>
-                                <th class="text-left py-3 px-4 font-medium">Unit Cost</th>
-                                <th class="text-left py-3 px-4 font-medium">Supplier</th>
-                                <th class="text-left py-3 px-4 font-medium">Status</th>
-                                <th class="text-left py-3 px-4 font-medium">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-600">
-                            @forelse($materials ?? [] as $material)
-                            <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('material', {{ $material->id }})">
-                                <td class="py-3 px-4">{{ $material->name }}</td>
-                                <td class="py-3 px-4">{{ $material->current_stock }} {{ $material->unit }}</td>
-                                <td class="py-3 px-4">{{ $material->minimum_stock }} {{ $material->unit }}</td>
-                                <td class="py-3 px-4">₱{{ number_format($material->unit_cost, 2) }}</td>
-                                <td class="py-3 px-4">{{ $material->supplier->name ?? 'N/A' }}</td>
-                                <td class="py-3 px-4">
-                                    @if($material->isLowStock())
-                                        <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-full">Low Stock</span>
-                                    @else
-                                        <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">In Stock</span>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-4">
-                                    <div class="flex space-x-2">
-                                        <button onclick="event.stopPropagation(); openEditModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                        <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="8" class="py-8 px-4 text-center text-slate-400">No materials found</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <div id="materials-table" class="space-y-3 overflow-y-auto" style="max-height:60vh;">
+                    @forelse($materials ?? [] as $material)
+                    <div onclick="openEditModal('material', {{ $material->id }})" class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 cursor-pointer transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-white">{{ $material->name }}</h3>
+                                <p class="text-sm text-slate-300">{{ $material->supplier->name ?? 'N/A' }} • {{ $material->unit }}</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                @if($material->isLowStock())
+                                    <span class="px-2 py-1 bg-red-500 text-white text-xs rounded-full">Low Stock</span>
+                                @else
+                                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">In Stock</span>
+                                @endif
+                                <span class="text-white font-semibold">₱{{ number_format($material->unit_cost, 2) }}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mt-3 text-sm">
+                            <div>
+                                <span class="text-slate-400">Current Stock</span>
+                                <p class="text-white font-medium">{{ $material->current_stock }} {{ $material->unit }}</p>
+                            </div>
+                            <div>
+                                <span class="text-slate-400">Min Stock</span>
+                                <p class="text-white font-medium">{{ $material->minimum_stock }} {{ $material->unit }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2 justify-end">
+                                <button onclick="event.stopPropagation(); openEditModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="Edit">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                    </svg>
+                                </button>
+                                <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="View Stock">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                                <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-8 px-4 text-center text-slate-400">
+                        <p>No materials found</p>
+                    </div>
+                    @endforelse
                 </div>
 
                 <!-- Products Table -->
-                <div id="products-table" class="overflow-x-auto overflow-y-auto hidden" style="max-height:60vh;">
-                    <table class="w-full text-white">
-                        <thead>
-                            <tr class="border-b border-slate-600">
-                                <th class="text-left py-3 px-4 font-medium">Name</th>
-                                <th class="text-left py-3 px-4 font-medium">Production Cost</th>
-                                <th class="text-left py-3 px-4 font-medium">Selling Price</th>
-                                <th class="text-left py-3 px-4 font-medium">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-600">
-                            @forelse($products ?? [] as $product)
-                            <tr class="hover:bg-slate-600 cursor-pointer" onclick="openEditModal('product', {{ $product->id }})">
-                                <td class="py-3 px-4">{{ $product->product_name }}</td>
-                                <td class="py-3 px-4">₱{{ number_format($product->production_cost, 2) }}</td>
-                                <td class="py-3 px-4">₱{{ number_format($product->selling_price, 2) }}</td>
-                                <td class="py-3 px-4">
-                                    <div class="flex space-x-2">
-                                        <button onclick="event.stopPropagation(); openEditModal('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="py-8 px-4 text-center text-slate-400">No products found</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <div id="products-table" class="space-y-3 overflow-y-auto hidden" style="max-height:60vh;">
+                    @forelse($products ?? [] as $product)
+                    <div onclick="openEditModal('product', {{ $product->id }})" class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 cursor-pointer transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-white">{{ $product->product_name }}</h3>
+                                <p class="text-sm text-slate-300">Finished Product</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-white font-semibold">₱{{ number_format($product->selling_price, 2) }}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-3 text-sm">
+                            <div>
+                                <span class="text-slate-400">Production Cost</span>
+                                <p class="text-white font-medium">₱{{ number_format($product->production_cost, 2) }}</p>
+                            </div>
+                            <div>
+                                <span class="text-slate-400">Selling Price</span>
+                                <p class="text-white font-medium">₱{{ number_format($product->selling_price, 2) }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 mt-3 justify-end">
+                            <button onclick="event.stopPropagation(); openEditModal('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded" title="Edit">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                </svg>
+                            </button>
+                            <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-8 px-4 text-center text-slate-400">
+                        <p>No products found</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
