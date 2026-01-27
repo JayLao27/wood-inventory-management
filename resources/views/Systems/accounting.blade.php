@@ -10,11 +10,11 @@
 		];
 	@endphp
 	<!-- Main Content -->
-	<div class="flex-1 flex flex-col overflow-hidden">
-		<!-- Header -->
-		<div class="bg-amber-50 p-8">
-			<div class="flex justify-between items-center">
-				<div
+		<div class="flex-1 flex flex-col overflow-hidden">
+			<!-- Header -->
+			<div class="bg-amber-50 p-8">
+				<div class="flex justify-between items-center">
+					<div>
 					<h1 class="text-4xl font-bold text-gray-800">Accounting & Finance</h1>
 					<p class="text-lg text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
 				</div>
@@ -46,7 +46,7 @@
 							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
 							<p class="text-3xl font-bold mt-2">₱{{ number_format($totalRevenue, 2) }}</p>
 							<div class="flex items-center mt-2">
-								<span class="text-green-400 text-sm">+12.5% from last month</span>
+								<span class="text-sm {{ $lastMonthRevenuePercentage >= 1 ? 'text-green-400' : 'text-white' }}">+{{ $lastMonthRevenuePercentage }}% from last month</span>
 							</div>
 						</div>	
 					<div >
@@ -62,7 +62,7 @@
 							<h3 class="text-sm font-medium text-slate-300">Total Expenses</h3>
 							<p class="text-3xl font-bold mt-2">₱{{ number_format($totalExpenses, 2) }}</p>
 							<div class="flex items-center mt-2">
-								<span class="text-red-400 text-sm">wowowow</span>
+								<span class="text-sm {{ $lastMonthExpensesPercentage >= 1 ? 'text-red-400' : 'text-white' }}">+{{ $lastMonthExpensesPercentage }}% from last month</span>
 							</div>
 						</div>
 						<div >
@@ -78,7 +78,7 @@
 							<h3 class="text-sm font-medium text-slate-300">Net Profit</h3>
 							<p class="text-3xl font-bold mt-2 text-white">₱{{ number_format($netProfit, 2) }}</p>
 							<div class="flex items-center mt-2">
-								<span class="text-green-400 text-sm">+18.7% from last month</span>
+								<span class="text-sm {{ $lastMonthNetProfitPercentage >= 1 ? 'text-green-400' : 'text-white' }}">+{{ $lastMonthNetProfitPercentage }}% from last month</span>
 							</div>
 						</div>
 								<div >
@@ -143,7 +143,40 @@
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-slate-600">
-									
+									@forelse($transactions as $transaction)
+										<tr class="hover:bg-slate-600">
+											<td class="px-4 py-3">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
+											<td class="px-4 py-3">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
+											<td class="px-4 py-3">
+												<span class="px-2 py-1 rounded-full text-xs {{ $transaction->transaction_type === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+													{{ $transaction->transaction_type }}
+												</span>
+											</td>
+											<td class="px-4 py-3">
+												@if($transaction->salesOrder)
+													{{ $transaction->salesOrder->customer->name ?? 'N/A' }}
+												@elseif($transaction->purchaseOrder)
+													{{ $transaction->purchaseOrder->supplier->name ?? 'N/A' }}
+												@else
+													N/A
+												@endif
+											</td>
+											<td class="px-4 py-3">
+												@if($transaction->salesOrder)
+													{{ $transaction->salesOrder->order_number }}
+												@elseif($transaction->purchaseOrder)
+													{{ $transaction->purchaseOrder->order_number }}
+												@else
+													{{ $transaction->description ?? 'N/A' }}
+												@endif
+											</td>
+											<td class="px-4 py-3 font-semibold">₱{{ number_format($transaction->amount, 2) }}</td>
+										</tr>
+									@empty
+										<tr>
+											<td colspan="6" class="px-4 py-8 text-center text-slate-400">No transactions found</td>
+										</tr>
+									@endforelse
 								</tbody>
 							</table>
 						</div>
@@ -247,64 +280,79 @@
 
 			<!-- Sales Orders List -->
 			<div id="salesOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto">
-				<!-- Sales Order 1 -->
-				<div onclick="selectTransaction('SO-001', 15000, '2025-01-20', 'Income')" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
-					<div class="flex justify-between items-start">
-						<div class="flex-1">
-							<h3 class="font-semibold text-gray-800">SO-001: Customer A</h3>
-							<p class="text-sm text-gray-600">Wood Furniture Order</p>
+				@forelse($salesOrders as $salesOrder)
+					<div onclick="selectTransaction('{{ $salesOrder->order_number }}', {{ $salesOrder->total_amount }}, '{{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}', 'Income', {{ $salesOrder->id }})" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
+						<div class="flex justify-between items-start">
+							<div class="flex-1">
+								<h3 class="font-semibold text-gray-800">{{ $salesOrder->order_number }}: {{ $salesOrder->customer->name ?? 'N/A' }}</h3>
+								<p class="text-sm text-gray-600">{{ $salesOrder->notes ?? 'Sales Order' }}</p>
+							</div>
+							<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($salesOrder->total_amount, 2) }}</span>
 						</div>
-						<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">₱15,000</span>
+						<p class="text-xs text-gray-500 mt-2">Date: {{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}</p>
 					</div>
-					<p class="text-xs text-gray-500 mt-2">Date: January 20, 2025</p>
-				</div>
+				@empty
+					<p class="text-center text-gray-500 py-4">No sales orders available</p>
+				@endforelse
 			</div>
 
 			<!-- Purchase Orders List -->
 			<div id="purchaseOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto hidden">
-				<!-- Purchase Order 1 -->
-				<div onclick="selectTransaction('PO-001', 5000, '2025-01-18', 'Expense')" class="p-4 border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-400 cursor-pointer transition">
-					<div class="flex justify-between items-start">
-						<div class="flex-1">
-							<h3 class="font-semibold text-gray-800">PO-001: Supplier A</h3>
-							<p class="text-sm text-gray-600">Wood Materials</p>
+				@forelse($purchaseOrders as $purchaseOrder)
+					<div onclick="selectTransaction('{{ $purchaseOrder->order_number }}', {{ $purchaseOrder->total_amount }}, '{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}', 'Expense', {{ $purchaseOrder->id }})" class="p-4 border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-400 cursor-pointer transition">
+						<div class="flex justify-between items-start">
+							<div class="flex-1">
+								<h3 class="font-semibold text-gray-800">{{ $purchaseOrder->order_number }}: {{ $purchaseOrder->supplier->name ?? 'N/A' }}</h3>
+								<p class="text-sm text-gray-600">{{ $purchaseOrder->notes ?? 'Purchase Order' }}</p>
+							</div>
+							<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($purchaseOrder->total_amount, 2) }}</span>
 						</div>
-						<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">₱5,000</span>
+						<p class="text-xs text-gray-500 mt-2">Date: {{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}</p>
 					</div>
-					<p class="text-xs text-gray-500 mt-2">Date: January 18, 2025</p>
-				</div>
+				@empty
+					<p class="text-center text-gray-500 py-4">No purchase orders available</p>
+				@endforelse
 			</div>
 
 			<!-- Confirmation Section -->
-			<div id="confirmationSection" class="hidden mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-				<h3 class="font-semibold text-gray-800 mb-3">Confirm Transaction</h3>
-				<div class="space-y-2 mb-4">
-					<div class="flex justify-between">
-						<span class="text-gray-600">Reference:</span>
-						<span id="confirmRef" class="font-semibold text-gray-800">-</span>
+			<form id="transactionForm" method="POST" action="{{ route('accounting.transaction.store') }}">
+				@csrf
+				<input type="hidden" name="reference" id="formRef">
+				<input type="hidden" name="amount" id="formAmount">
+				<input type="hidden" name="date" id="formDate">
+				<input type="hidden" name="transaction_type" id="formType">
+				<input type="hidden" name="order_id" id="formOrderId">
+				
+				<div id="confirmationSection" class="hidden mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+					<h3 class="font-semibold text-gray-800 mb-3">Confirm Transaction</h3>
+					<div class="space-y-2 mb-4">
+						<div class="flex justify-between">
+							<span class="text-gray-600">Reference:</span>
+							<span id="confirmRef" class="font-semibold text-gray-800">-</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-gray-600">Amount:</span>
+							<span id="confirmAmount" class="font-semibold text-gray-800">-</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-gray-600">Date:</span>
+							<span id="confirmDate" class="font-semibold text-gray-800">-</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-gray-600">Type:</span>
+							<span id="confirmType" class="font-semibold text-gray-800">-</span>
+						</div>
 					</div>
-					<div class="flex justify-between">
-						<span class="text-gray-600">Amount:</span>
-						<span id="confirmAmount" class="font-semibold text-gray-800">-</span>
-					</div>
-					<div class="flex justify-between">
-						<span class="text-gray-600">Date:</span>
-						<span id="confirmDate" class="font-semibold text-gray-800">-</span>
-					</div>
-					<div class="flex justify-between">
-						<span class="text-gray-600">Type:</span>
-						<span id="confirmType" class="font-semibold text-gray-800">-</span>
+					<div class="flex gap-3">
+						<button type="button" onclick="resetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
+							Back
+						</button>
+						<button type="submit" class="flex-1 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition">
+							Confirm
+						</button>
 					</div>
 				</div>
-				<div class="flex gap-3">
-					<button type="button" onclick="resetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
-						Back
-					</button>
-					<button type="button" onclick="confirmTransaction()" class="flex-1 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition">
-						Confirm
-					</button>
-				</div>
-			</div>
+			</form>
 		</div>
 	</div>
 
@@ -343,11 +391,18 @@
 		}
 
 		// Transaction selection
-		function selectTransaction(reference, amount, date, type) {
+		function selectTransaction(reference, amount, date, type, orderId) {
 			document.getElementById('confirmRef').textContent = reference;
 			document.getElementById('confirmAmount').textContent = '₱' + amount.toLocaleString();
 			document.getElementById('confirmDate').textContent = date;
 			document.getElementById('confirmType').textContent = type;
+			
+			// Set hidden form fields
+			document.getElementById('formRef').value = reference;
+			document.getElementById('formAmount').value = amount;
+			document.getElementById('formDate').value = date;
+			document.getElementById('formType').value = type;
+			document.getElementById('formOrderId').value = orderId;
 			
 			// Hide transaction list and show confirmation
 			document.getElementById('salesOrdersContainer').classList.add('hidden');
@@ -359,17 +414,6 @@
 			document.getElementById('confirmationSection').classList.add('hidden');
 			document.getElementById('salesOrdersContainer').classList.remove('hidden');
 			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
-		}
-
-		function confirmTransaction() {
-			const ref = document.getElementById('confirmRef').textContent;
-			const amount = document.getElementById('confirmAmount').textContent;
-			const date = document.getElementById('confirmDate').textContent;
-			const type = document.getElementById('confirmType').textContent;
-			
-			console.log('Transaction confirmed:', { ref, amount, date, type });
-			alert('Transaction ' + ref + ' has been added successfully!');
-			closeAddTransaction();
 		}
 
 		// Close modal when clicking outside

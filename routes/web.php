@@ -54,6 +54,7 @@ Route::get('/', function () {
 
     //Accounting
     Route::get('/accounting', [AccountingController::class, 'index'])->name('accounting');
+    Route::post('/accounting/transaction', [AccountingController::class, 'salesTransaction'])->name('accounting.transaction.store');
         
 
     // Profile

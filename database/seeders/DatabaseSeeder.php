@@ -40,5 +40,15 @@ User::updateOrCreate(
     ]
 );
 
+        // Run example seeders
+        $this->call([
+            CustomerSeeder::class,
+            ProductSeeder::class,
+            SupplierSeeder::class,
+            MaterialSeeder::class,
+            SalesOrderSeeder::class,
+            PurchaseOrderSeeder::class,
+            InventoryMovementSeeder::class,
+        ]);
     }
 }
