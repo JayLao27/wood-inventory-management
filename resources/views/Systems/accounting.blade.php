@@ -228,41 +228,7 @@
 								<p class="text-xs text-slate-400 mt-1">29.5% of total expenses</p>
 							</div>
 
-							<!-- Rent -->
-							<div>
-								<div class="flex justify-between items-center mb-2">
-									<span class="text-sm font-medium">Rent</span>
-						
-								</div>
-								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full" style="width: 12.3%"></div>
-								</div>
-								<p class="text-xs text-slate-400 mt-1">12.3% of total expenses</p>
-							</div>
 
-							<!-- Utilities -->
-							<div>
-								<div class="flex justify-between items-center mb-2">
-									<span class="text-sm font-medium">Utilities</span>
-									<span class="text-sm">₱52,791.69</span>
-								</div>
-								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full" style="width: 3.2%"></div>
-								</div>
-								<p class="text-xs text-slate-400 mt-1">backend</p>
-							</div>
-
-							<!-- Insurance -->
-							<div>
-								<div class="flex justify-between items-center mb-2">
-									<span class="text-sm font-medium">Insurance</span>
-									<span class="text-sm">₱24,636.12</span>
-								</div>
-								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full" style="width: 1.5%"></div>
-								</div>
-								<p class="text-xs text-slate-400 mt-1">1.5% of total expenses</p>
-							</div>
 						</div>
 					</div>
 				</div>
