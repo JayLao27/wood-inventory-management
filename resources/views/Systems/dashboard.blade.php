@@ -9,60 +9,10 @@
 
 			<!-- Main Content Area -->
 			<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
+			<div class="max-w-7xl mx-auto">
 				<!-- KPI Cards -->
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-					<!-- Total Revenue -->
-					<div class="bg-slate-700 text-white p-6 rounded-xl shadow-lg">
-						<div class="flex justify-between items-start">
-							<div class="min-w-0">
-								<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
-								<p class="text-2xl xl:text-3xl font-bold mt-2 truncate">₱{{ number_format($totalRevenue, 2) }}</p>
-								@if ($revenueChangePercent != 0)
-									<p class="text-sm mt-1 {{ $revenueChangePercent >= 0 ? 'text-green-400' : 'text-red-400' }}">
-										{{ $revenueChangePercent >= 0 ? '+' : '' }}{{ $revenueChangePercent }}% vs last month
-									</p>
-								@else
-									<p class="text-slate-400 text-sm mt-1">No change vs last month</p>
-								@endif
-							</div>
-							<div class="flex-shrink-0 ml-2">@include('components.icons.dollar', ['class' => 'w-9 h-9'])</div>
-						</div>
-					</div>
-
-					<!-- Income -->
-					<div class="bg-slate-700 text-white p-6 rounded-xl shadow-lg">
-						<div class="flex justify-between items-start">
-							<div class="min-w-0">
-								<h3 class="text-sm font-medium text-slate-300">Income</h3>
-								<p class="text-2xl xl:text-3xl font-bold mt-2 truncate">₱{{ number_format($income, 2) }}</p>
-								<p class="text-slate-400 text-sm mt-1">From sales</p>
-							</div>
-							<div class="flex-shrink-0 ml-2">@include('components.icons.dollar', ['class' => 'w-9 h-9'])</div>
-						</div>
-					</div>
-
-					<!-- Net Profit -->
-					<div class="bg-slate-700 text-white p-6 rounded-xl shadow-lg">
-						<div class="flex justify-between items-start">
-							<div class="min-w-0">
-								<h3 class="text-sm font-medium text-slate-300">Net Profit</h3>
-								<p class="text-2xl xl:text-3xl font-bold mt-2 truncate {{ $netProfit >= 0 ? 'text-green-400' : 'text-red-400' }}">
-									₱{{ number_format($netProfit, 2) }}
-								</p>
-								@if ($netProfitChangePercent != 0)
-									<p class="text-sm mt-1 {{ $netProfitChangePercent >= 0 ? 'text-green-400' : 'text-red-400' }}">
-										{{ $netProfitChangePercent >= 0 ? '+' : '' }}{{ $netProfitChangePercent }}% vs last month
-									</p>
-								@else
-									<p class="text-slate-400 text-sm mt-1">No change vs last month</p>
-								@endif
-							</div>
-							<div class="flex-shrink-0 ml-2">@include('components.icons.dollar', ['class' => 'w-9 h-9'])</div>
-						</div>
-					</div>
-
-					<!-- Active Orders -->
-					<div class="bg-slate-700 text-white p-6 rounded-xl shadow-lg">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+					<div class="bg-slate-700 text-white p-6 rounded-xl shadow-lg ">
 						<div class="flex justify-between items-start">
 							<div class="min-w-0">
 								<h3 class="text-sm font-medium text-slate-300">Active Orders</h3>
@@ -202,8 +152,9 @@
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 			<script>
 				document.addEventListener('DOMContentLoaded', function () {
 					const labels = @json($chartLabels);
