@@ -9,20 +9,15 @@ return new class extends Migration
  
     public function up(): void
     {
-        Schema::create('accounting', function (Blueprint $table) {
+        Schema::create('accountings', function (Blueprint $table) {
             $table->id();
-            $table->string('referenceID');
-            $table->string('account_name');
-            $table->string('transaction_number');
-            $table->integer('transaction_type');
-            $table->date('category_date');
-            $table->integer('amount');
-            $table->string('payment_method');
-            $table->string(column: 'description')->nullable();
-            $table->date('transaction_date')->nullable();
-            $table->string('reference_type')->nullable();
-            $table->string('reference_id')->nullable();
-            $table->string('payment_method')->nullable();
+            $table->enum('transaction_type', ['Income', 'Expense']);
+            $table->decimal('amount', 12, 2);
+            $table->date('date');
+            $table->text('description')->nullable();
+            $table->foreignId('sales_order_id')->nullable()->constrained('sales_orders')->onDelete('cascade');
+            $table->foreignId('purchase_order_id')->nullable()->constrained('purchase_orders')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
@@ -31,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accounting');
+        Schema::dropIfExists('accountings');
     }
 };
