@@ -60,7 +60,7 @@
 					<div class="flex justify-between items-start">
 						<div class="flex-1">
 							<h3 class="text-sm font-medium text-slate-300">Total Expenses</h3>
-							<p class="text-3xl font-bold mt-2">₱0</p>
+							<p class="text-3xl font-bold mt-2">₱{{ number_format($totalExpenses, 2) }}</p>
 							<div class="flex items-center mt-2">
 								<span class="text-red-400 text-sm">wowowow</span>
 							</div>
