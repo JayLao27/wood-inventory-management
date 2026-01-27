@@ -11,15 +11,14 @@ class AccountingController extends Controller
     public function index()
     {
         $totalRevenue = SalesOrder::sum('total_amount');
+        $totalExpenses = PurchaseOrder::sum('total_amount');
         
-        return view('Systems.accounting', compact('totalRevenue'));
+        return view('Systems.accounting', compact('totalRevenue', 'totalExpenses'));
     }
     
     public function addTransaction()
     {
-
-    
-
+        
         return view('Systems.add_transaction');
     }
 
@@ -43,6 +42,9 @@ class AccountingController extends Controller
         // Get total revenue from all sales orders within a date range
         $totalRevenue = SalesOrder::whereBetween('order_date', [$startDate, $endDate])
             ->sum('total_amount');
+
+        $totalExpenses = PurchaseOrder::whereBetween('order_date', [$startDate, $endDate]) 
+             ->sum('total_amount');
 
         // Or get individual sales orders with their totals
         $salesOrders = SalesOrder::whereBetween('order_date', [$startDate, $endDate])
