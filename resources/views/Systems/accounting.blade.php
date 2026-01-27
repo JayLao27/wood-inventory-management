@@ -25,12 +25,12 @@
 						</svg>
 						<span>Export Reports</span>
 					</button>
-					<button class="flex items-center space-x-2  bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+					<button onclick="openAddTransaction()" class="flex items-center space-x-2  bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
 						<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
 						</svg>
 						<span>Add Transaction</span>
-					</button onclick="openAddTransaction()">
+					</button>
 				</div>
 			</div>
 		</div>
@@ -228,45 +228,156 @@
 		</div>
 	</div>
 
+	<!-- Add Transaction Modal -->
+	<div id="addTransactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+			<div class="flex justify-between items-center mb-6">
+				<h2 class="text-2xl font-bold text-gray-800">Add Transaction</h2>
+				<button onclick="closeAddTransaction()" class="text-gray-500 hover:text-gray-700">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+
+			<div class="flex gap-4 mb-6 border-b border-gray-200">
+				<button onclick="showSalesOrders()" id="salesOrdersTab" class="pb-2 px-4 font-semibold text-slate-600 border-b-2 border-slate-600">Sales Orders (Income)</button>
+				<button onclick="showPurchaseOrders()" id="purchaseOrdersTab" class="pb-2 px-4 font-semibold text-gray-500 hover:text-gray-700">Purchase Orders (Expense)</button>
+			</div>
+
+			<!-- Sales Orders List -->
+			<div id="salesOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto">
+				<!-- Sales Order 1 -->
+				<div onclick="selectTransaction('SO-001', 15000, '2025-01-20', 'Income')" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
+					<div class="flex justify-between items-start">
+						<div class="flex-1">
+							<h3 class="font-semibold text-gray-800">SO-001: Customer A</h3>
+							<p class="text-sm text-gray-600">Wood Furniture Order</p>
+						</div>
+						<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">₱15,000</span>
+					</div>
+					<p class="text-xs text-gray-500 mt-2">Date: January 20, 2025</p>
+				</div>
+			</div>
+
+			<!-- Purchase Orders List -->
+			<div id="purchaseOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto hidden">
+				<!-- Purchase Order 1 -->
+				<div onclick="selectTransaction('PO-001', 5000, '2025-01-18', 'Expense')" class="p-4 border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-400 cursor-pointer transition">
+					<div class="flex justify-between items-start">
+						<div class="flex-1">
+							<h3 class="font-semibold text-gray-800">PO-001: Supplier A</h3>
+							<p class="text-sm text-gray-600">Wood Materials</p>
+						</div>
+						<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">₱5,000</span>
+					</div>
+					<p class="text-xs text-gray-500 mt-2">Date: January 18, 2025</p>
+				</div>
+			</div>
+
+			<!-- Confirmation Section -->
+			<div id="confirmationSection" class="hidden mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+				<h3 class="font-semibold text-gray-800 mb-3">Confirm Transaction</h3>
+				<div class="space-y-2 mb-4">
+					<div class="flex justify-between">
+						<span class="text-gray-600">Reference:</span>
+						<span id="confirmRef" class="font-semibold text-gray-800">-</span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-gray-600">Amount:</span>
+						<span id="confirmAmount" class="font-semibold text-gray-800">-</span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-gray-600">Date:</span>
+						<span id="confirmDate" class="font-semibold text-gray-800">-</span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-gray-600">Type:</span>
+						<span id="confirmType" class="font-semibold text-gray-800">-</span>
+					</div>
+				</div>
+				<div class="flex gap-3">
+					<button type="button" onclick="resetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
+						Back
+					</button>
+					<button type="button" onclick="confirmTransaction()" class="flex-1 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition">
+						Confirm
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script>
-		// Tab functionality
-		const openAddTransaction = document.getElementById('openAddTransaction');
-		const transactionTab = document.getElementById('transactionTab');
-		const reportsTab = document.getElementById('reportsTab');
+		// Modal functions
+		function openAddTransaction() {
+			document.getElementById('addTransactionModal').classList.remove('hidden');
+			document.getElementById('confirmationSection').classList.add('hidden');
+			document.getElementById('salesOrdersContainer').classList.remove('hidden');
+		}
 
-		if (tab === 'transactionTab') {
-                purchaseOrdersTab.style.backgroundColor = '#FFF1DA';
-                purchaseOrdersTab.style.color = '#111827';
-                purchaseOrdersTab.style.border = 'none';
-                suppliersTab.style.backgroundColor = '#374151';
-                suppliersTab.style.color = '#FFFFFF';
-                suppliersTab.style.border = '1px solid #FFFFFF';
-                purchaseOrdersTable.classList.remove('hidden');
-                suppliersTable.classList.add('hidden');
-                purchaseOrdersButton.classList.remove('hidden');
-                suppliersButton.classList.add('hidden');
-            } else {
-                suppliersTab.style.backgroundColor = '#FFF1DA';
-                suppliersTab.style.color = '#111827';
-                suppliersTab.style.border = 'none';
-                purchaseOrdersTab.style.backgroundColor = '#374151';
-                purchaseOrdersTab.style.color = '#FFFFFF';
-                purchaseOrdersTab.style.border = '1px solid #FFFFFF';
-                suppliersTable.classList.remove('hidden');
-                purchaseOrdersTable.classList.add('hidden');
-                purchaseOrdersButton.classList.add('hidden');
-                suppliersButton.classList.remove('hidden');
-            }
+		function closeAddTransaction() {
+			document.getElementById('addTransactionModal').classList.add('hidden');
+			resetSelection();
+		}
 
+		// Tab switching
+		function showSalesOrders() {
+			document.getElementById('salesOrdersContainer').classList.remove('hidden');
+			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
+			document.getElementById('salesOrdersTab').classList.add('text-slate-600', 'border-b-2', 'border-slate-600');
+			document.getElementById('salesOrdersTab').classList.remove('text-gray-500');
+			document.getElementById('purchaseOrdersTab').classList.remove('text-slate-600', 'border-b-2', 'border-slate-600');
+			document.getElementById('purchaseOrdersTab').classList.add('text-gray-500');
+			document.getElementById('confirmationSection').classList.add('hidden');
+		}
 
-		transactionTab.addEventListener('click', () => {
-			transactionTab.classList.add('bg-slate-600', 'text-white');
-			reportsTab.classList.remove('bg-slate-600', 'text-white');
+		function showPurchaseOrders() {
+			document.getElementById('purchaseOrdersContainer').classList.remove('hidden');
+			document.getElementById('salesOrdersContainer').classList.add('hidden');
+			document.getElementById('purchaseOrdersTab').classList.add('text-slate-600', 'border-b-2', 'border-slate-600');
+			document.getElementById('purchaseOrdersTab').classList.remove('text-gray-500');
+			document.getElementById('salesOrdersTab').classList.remove('text-slate-600', 'border-b-2', 'border-slate-600');
+			document.getElementById('salesOrdersTab').classList.add('text-gray-500');
+			document.getElementById('confirmationSection').classList.add('hidden');
+		}
+
+		// Transaction selection
+		function selectTransaction(reference, amount, date, type) {
+			document.getElementById('confirmRef').textContent = reference;
+			document.getElementById('confirmAmount').textContent = '₱' + amount.toLocaleString();
+			document.getElementById('confirmDate').textContent = date;
+			document.getElementById('confirmType').textContent = type;
 			
-			function openAddTransaction() {
-		document.getElementById('openAddTransaction').classList.remove('hidden');
-}
+			// Hide transaction list and show confirmation
+			document.getElementById('salesOrdersContainer').classList.add('hidden');
+			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
+			document.getElementById('confirmationSection').classList.remove('hidden');
+		}
 
+		function resetSelection() {
+			document.getElementById('confirmationSection').classList.add('hidden');
+			document.getElementById('salesOrdersContainer').classList.remove('hidden');
+			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
+		}
 
+		function confirmTransaction() {
+			const ref = document.getElementById('confirmRef').textContent;
+			const amount = document.getElementById('confirmAmount').textContent;
+			const date = document.getElementById('confirmDate').textContent;
+			const type = document.getElementById('confirmType').textContent;
+			
+			console.log('Transaction confirmed:', { ref, amount, date, type });
+			alert('Transaction ' + ref + ' has been added successfully!');
+			closeAddTransaction();
+		}
+
+		// Close modal when clicking outside
+		document.getElementById('addTransactionModal').addEventListener('click', function(e) {
+			if (e.target === this) {
+				closeAddTransaction();
+			}
+		});
+	</script>
 	</script>
 @endsection
