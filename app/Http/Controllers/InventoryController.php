@@ -187,4 +187,3 @@ class InventoryController extends Controller
         return redirect()->route('inventory')->with('success', 'Stock adjusted successfully!');
     }
 }
-// add comment
