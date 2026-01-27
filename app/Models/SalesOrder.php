@@ -8,7 +8,7 @@ class SalesOrder extends Model
 {
     protected $fillable = [
         'order_number', 'customer_id', 'order_date',
-        'delivery_date', 'status', 'total_amount',
+        'delivery_date', 'total_amount',
         'paid_amount', 'payment_status', 'note'
     ];
 
