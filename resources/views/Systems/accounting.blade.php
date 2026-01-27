@@ -167,9 +167,6 @@
 					</div>
 				</div>
 
-			
-
-
 				<!-- Expense Breakdown Section (Right - 1 column) -->
 				<div class="lg:col-span-1">
 					<div class="bg-slate-700 text-white p-6 rounded-xl">
