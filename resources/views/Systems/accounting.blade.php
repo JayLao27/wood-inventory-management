@@ -130,9 +130,9 @@
 						</div>
 
 						<!-- Transactions Table -->
-						<div class="overflow-x-auto">
-							<table class="min-w-full border-collapse text-left text-sm">
-								<thead class="bg-slate-800 text-gray-300">
+						<div class="overflow-y-auto" style="max-height: 60vh;">
+							<table class="w-full border-collapse text-left text-sm text-white">
+								<thead class="bg-slate-800 text-slate-300 sticky top-0">
 									<tr>
 										<th class="px-4 py-3 font-medium">Transaction #</th>
 										<th class="px-4 py-3 font-medium">Date</th>
@@ -144,37 +144,46 @@
 								</thead>
 								<tbody class="divide-y divide-slate-600">
 									@forelse($transactions as $transaction)
-										<tr class="hover:bg-slate-600">
-											<td class="px-4 py-3">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
-											<td class="px-4 py-3">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
+										<tr class="hover:bg-slate-600 transition cursor-pointer">
+											<td class="px-4 py-3 font-mono text-slate-300">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
+											<td class="px-4 py-3 text-slate-300">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
 											<td class="px-4 py-3">
-												<span class="px-2 py-1 rounded-full text-xs {{ $transaction->transaction_type === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+												<span class="text-xs font-semibold {{ $transaction->transaction_type === 'Income' ? 'text-green-400' : 'text-red-400' }}">
 													{{ $transaction->transaction_type }}
 												</span>
 											</td>
-											<td class="px-4 py-3">
+											<td class="px-4 py-3 font-medium">
 												@if($transaction->salesOrder)
-													{{ $transaction->salesOrder->customer->name ?? 'N/A' }}
+													<span class="text-blue-300">{{ $transaction->salesOrder->customer->name ?? 'N/A' }}</span>
 												@elseif($transaction->purchaseOrder)
-													{{ $transaction->purchaseOrder->supplier->name ?? 'N/A' }}
+													<span class="text-purple-300">{{ $transaction->purchaseOrder->supplier->name ?? 'N/A' }}</span>
 												@else
-													N/A
+													<span class="text-slate-400">N/A</span>
 												@endif
 											</td>
 											<td class="px-4 py-3">
 												@if($transaction->salesOrder)
-													{{ $transaction->salesOrder->order_number }}
+													<span class="text-slate-300">{{ $transaction->salesOrder->order_number }}</span>
 												@elseif($transaction->purchaseOrder)
-													{{ $transaction->purchaseOrder->order_number }}
+													<span class="text-slate-300">{{ $transaction->purchaseOrder->order_number }}</span>
 												@else
-													{{ $transaction->description ?? 'N/A' }}
+													<span class="text-slate-400 italic">{{ $transaction->description ?? '-' }}</span>
 												@endif
 											</td>
-											<td class="px-4 py-3 font-semibold">₱{{ number_format($transaction->amount, 2) }}</td>
+											<td class="px-4 py-3 font-bold text-right">
+												<span class="text-{{ $transaction->transaction_type === 'Income' ? 'green' : 'orange' }}-300">₱{{ number_format($transaction->amount, 2) }}</span>
+											</td>
 										</tr>
 									@empty
 										<tr>
-											<td colspan="6" class="px-4 py-8 text-center text-slate-400">No transactions found</td>
+											<td colspan="6" class="px-4 py-12 text-center text-slate-400">
+												<div class="flex flex-col items-center space-y-2">
+													<svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+													</svg>
+													<p>No transactions found</p>
+												</div>
+											</td>
 										</tr>
 									@endforelse
 								</tbody>
@@ -318,10 +327,10 @@
 			<form id="transactionForm" method="POST" action="{{ route('accounting.transaction.store') }}">
 				@csrf
 				<input type="hidden" name="reference" id="formRef">
-				<input type="hidden" name="amount" id="formAmount">
 				<input type="hidden" name="date" id="formDate">
 				<input type="hidden" name="transaction_type" id="formType">
 				<input type="hidden" name="order_id" id="formOrderId">
+				<input type="hidden" name="total_amount" id="formTotalAmount">
 				
 				<div id="confirmationSection" class="hidden mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
 					<h3 class="font-semibold text-gray-800 mb-3">Confirm Transaction</h3>
@@ -331,7 +340,7 @@
 							<span id="confirmRef" class="font-semibold text-gray-800">-</span>
 						</div>
 						<div class="flex justify-between">
-							<span class="text-gray-600">Amount:</span>
+							<span class="text-gray-600">Total Amount:</span>
 							<span id="confirmAmount" class="font-semibold text-gray-800">-</span>
 						</div>
 						<div class="flex justify-between">
@@ -343,8 +352,12 @@
 							<span id="confirmType" class="font-semibold text-gray-800">-</span>
 						</div>
 					</div>
-					<div class="flex gap-3">
-						<button type="button" onclick="resetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
+					<div class="mb-4">
+						<label class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
+						<input type="text" id="paymentAmount" name="amount" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter payment amount" required>
+						<p class="text-xs text-gray-500 mt-1">Max: <span id="maxAmount" class="font-semibold text-gray-700">-</span></p>
+					</div>
+					<div class="flex gap-3">ResetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
 							Back
 						</button>
 						<button type="submit" class="flex-1 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition">
@@ -357,6 +370,8 @@
 	</div>
 
 	<script>
+		let maxPaymentAmount = 0;
+
 		// Modal functions
 		function openAddTransaction() {
 			document.getElementById('addTransactionModal').classList.remove('hidden');
@@ -393,22 +408,52 @@
 		// Transaction selection
 		function selectTransaction(reference, amount, date, type, orderId) {
 			document.getElementById('confirmRef').textContent = reference;
-			document.getElementById('confirmAmount').textContent = '₱' + amount.toLocaleString();
+			document.getElementById('confirmAmount').textContent = '₱' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 			document.getElementById('confirmDate').textContent = date;
 			document.getElementById('confirmType').textContent = type;
 			
+			// Store max amount for validation
+			maxPaymentAmount = amount;
+			
 			// Set hidden form fields
 			document.getElementById('formRef').value = reference;
-			document.getElementById('formAmount').value = amount;
+			document.getElementById('formTotalAmount').value = amount;
 			document.getElementById('formDate').value = date;
 			document.getElementById('formType').value = type;
 			document.getElementById('formOrderId').value = orderId;
+			document.getElementById('paymentAmount').value = amount.toLocaleString('en-US');
+			
+			// Display max amount with formatting
+			document.getElementById('maxAmount').textContent = '₱' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 			
 			// Hide transaction list and show confirmation
 			document.getElementById('salesOrdersContainer').classList.add('hidden');
 			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
 			document.getElementById('confirmationSection').classList.remove('hidden');
 		}
+
+		// Format payment amount input with commas and enforce max limit
+		document.getElementById('paymentAmount').addEventListener('input', function(e) {
+			let value = this.value.replace(/,/g, '');
+			let numValue = parseInt(value) || 0;
+			
+			// Enforce max limit
+			if (numValue > maxPaymentAmount) {
+				numValue = maxPaymentAmount;
+			}
+			
+			if (numValue > 0) {
+				this.value = numValue.toLocaleString('en-US');
+			} else {
+				this.value = '';
+			}
+		});
+
+		// Handle form submission - remove commas before sending
+		document.getElementById('transactionForm').addEventListener('submit', function(e) {
+			let paymentAmount = document.getElementById('paymentAmount').value.replace(/,/g, '');
+			document.getElementById('paymentAmount').value = paymentAmount;
+		});
 
 		function resetSelection() {
 			document.getElementById('confirmationSection').classList.add('hidden');
