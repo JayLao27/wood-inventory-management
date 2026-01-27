@@ -12,8 +12,9 @@ class AccountingController extends Controller
     {
         $totalRevenue = SalesOrder::sum('total_amount');
         $totalExpenses = PurchaseOrder::sum('total_amount');
+        $netProfit = $totalRevenue - $totalExpenses;
         
-        return view('Systems.accounting', compact('totalRevenue', 'totalExpenses'));
+        return view('Systems.accounting', compact('totalRevenue', 'totalExpenses', 'netProfit'));
     }
     
     public function addTransaction()
@@ -45,6 +46,8 @@ class AccountingController extends Controller
 
         $totalExpenses = PurchaseOrder::whereBetween('order_date', [$startDate, $endDate]) 
              ->sum('total_amount');
+
+        $financialData['total_revenue'] = $totalRevenue;
 
         // Or get individual sales orders with their totals
         $salesOrders = SalesOrder::whereBetween('order_date', [$startDate, $endDate])
