@@ -38,7 +38,7 @@
 		<!-- Dashboard Content -->
 		<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
 			<!-- Summary Cards -->
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 				<!-- Total Revenue Card -->
 				<div class="bg-slate-700 text-white p-6 rounded-xl">
 					<div class="flex justify-between items-start">
@@ -76,7 +76,7 @@
 					<div class="flex justify-between items-start">
 						<div class="flex-1">
 							<h3 class="text-sm font-medium text-slate-300">Net Profit</h3>
-							<p class="text-3xl font-bold mt-2 text-red-400">-₱426,882.58</p>
+							<p class="text-3xl font-bold mt-2 text-white">₱{{ number_format($netProfit, 2) }}</p>
 							<div class="flex items-center mt-2">
 								<span class="text-green-400 text-sm">+18.7% from last month</span>
 							</div>
@@ -86,23 +86,7 @@
 					</div>
 					</div>
 				</div>
-
-				<!-- Cash Flow Card -->
-				<div class="bg-slate-700 text-white p-6 rounded-xl">
-					<div class="flex justify-between items-start">
-						<div class="flex-1">
-							<h3 class="text-sm font-medium text-slate-300">Cash Flow</h3>
-							<p class="text-3xl font-bold mt-2">₱10000</p>
-							<p class="text-slate-400 text-sm mt-2">Cash</p>
-						</div>
-				<div >
-					@include('components.icons.dollar', ['class' => 'icon-dollar'])
-				</div>
-					</div>
-					
-				</div>
 			</div>
-
 			<!-- Main Content Grid -->
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<!-- Financial Transactions Section (Left - 2 columns) -->
