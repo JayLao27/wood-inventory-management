@@ -65,6 +65,24 @@ class AccountingController extends Controller
 
         if ($request->transaction_type === 'Expense') {
             Accounting::where('purchase_order_id', $request->order_id)->delete();
+            // Get purchase order and calculate payment status based on amount
+            $purchaseOrder = PurchaseOrder::findOrFail($request->order_id);
+            $amountToPay = $request->input('amount');
+            $totalAmount = $purchaseOrder->total_amount;
+            
+            // Validate that payment amount doesn't exceed total amount
+            if ($amountToPay > $totalAmount) {
+                return redirect()->back()->withErrors(['amount' => "Payment amount cannot exceed the total order amount of ₱" . number_format($totalAmount, 2)]);
+            }
+            
+            // Determine payment status - only Paid or Partial (no Pending)
+            if ($amountToPay >= $totalAmount) {
+                $paymentStatus = 'Paid';
+            } else {
+                $paymentStatus = 'Partial';
+            }
+            
+            $purchaseOrder->update(['payment_status' => $paymentStatus]);
         }
 
         Accounting::create([
