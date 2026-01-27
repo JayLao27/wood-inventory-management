@@ -130,7 +130,7 @@
                 </div>
 
                 <!-- Materials Table -->
-                <div id="materials-table" class="overflow-x-auto">
+                <div id="materials-table" class="overflow-x-auto overflow-y-auto" style="max-height:60vh;">
                     <table class="w-full text-white">
                         <thead>
                             <tr class="border-b border-slate-600">
@@ -186,11 +186,11 @@
                             </tr>
                             @endforelse
                         </tbody>
-                    </table>x`
+                    </table>
                 </div>
 
                 <!-- Products Table -->
-                <div id="products-table" class="overflow-x-auto hidden">
+                <div id="products-table" class="overflow-x-auto overflow-y-auto hidden" style="max-height:60vh;">
                     <table class="w-full text-white">
                         <thead>
                             <tr class="border-b border-slate-600">
