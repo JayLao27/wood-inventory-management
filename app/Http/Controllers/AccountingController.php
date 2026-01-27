@@ -11,16 +11,26 @@ class AccountingController extends Controller
 {
     public function index()
     {
-        $totalRevenue = SalesOrderItem::selectRaw('SUM(Quantity * unit_price) as total')->pluck('total')->first();
-        $totalExpenses = PurchaseOrder::sum('total_amount');
+        // Totals derived from existing accounting transactions
+        $totalRevenue = Accounting::where('transaction_type', 'Income')->sum('amount');
+        $totalExpenses = Accounting::where('transaction_type', 'Expense')->sum('amount');
         $netProfit = $totalRevenue - $totalExpenses;
         $lastMonthRevenuePercentage = $this->lastMonthRevenue($totalRevenue);
         $lastMonthNetProfitPercentage = $this->lastMonthNetprofit($netProfit);
         $lastMonthExpensesPercentage = $this->lastMonthTotalExpenses($totalExpenses);
         
         // Fetch sales orders and purchase orders for the transaction modal
-        $salesOrders = SalesOrder::with('customer')->orderBy('order_date', 'desc')->get();
-        $purchaseOrders = PurchaseOrder::with('supplier')->orderBy('order_date', 'desc')->get();
+        $existingSalesOrderIds = Accounting::whereNotNull('sales_order_id')->pluck('sales_order_id');
+        $existingPurchaseOrderIds = Accounting::whereNotNull('purchase_order_id')->pluck('purchase_order_id');
+
+        $salesOrders = SalesOrder::with('customer')
+            ->whereNotIn('id', $existingSalesOrderIds)
+            ->orderBy('order_date', 'desc')
+            ->get();
+        $purchaseOrders = PurchaseOrder::with('supplier')
+            ->whereNotIn('id', $existingPurchaseOrderIds)
+            ->orderBy('order_date', 'desc')
+            ->get();
         
         // Fetch accounting transactions for the table
         $transactions = Accounting::with(['salesOrder.customer', 'purchaseOrder.supplier'])
@@ -49,6 +59,14 @@ class AccountingController extends Controller
             'description' => 'nullable|string|max:500',
         ]);
 
+        if ($request->transaction_type === 'Income') {
+            Accounting::where('sales_order_id', $request->order_id)->delete();
+        }
+
+        if ($request->transaction_type === 'Expense') {
+            Accounting::where('purchase_order_id', $request->order_id)->delete();
+        }
+
         Accounting::create([
             'transaction_type' => $request->input('transaction_type'),
             'amount' => $request->input('amount'),
@@ -69,16 +87,14 @@ class AccountingController extends Controller
         $lastMonthStart = now()->subMonth()->startOfMonth();
         $lastMonthEnd = now()->subMonth()->endOfMonth();
         
-        $lastMonthRevenue = SalesOrderItem::whereBetween(
-            SalesOrderItem::raw('DATE(created_at)'),
-            [$lastMonthStart, $lastMonthEnd]
-        )->selectRaw('SUM(Quantity * unit_price) as total')->pluck('total')->first();
+        $lastMonthRevenue = Accounting::where('transaction_type', 'Income')
+            ->whereBetween('date', [$lastMonthStart, $lastMonthEnd])
+            ->sum('amount');
         
         // Get last month's expenses
-        $lastMonthExpenses = PurchaseOrder::whereBetween(
-            PurchaseOrder::raw('DATE(order_date)'),
-            [$lastMonthStart, $lastMonthEnd]
-        )->sum('total_amount');
+        $lastMonthExpenses = Accounting::where('transaction_type', 'Expense')
+            ->whereBetween('date', [$lastMonthStart, $lastMonthEnd])
+            ->sum('amount');
         
         // Calculate last month's net profit
         $lastMonthNetProfit = $lastMonthRevenue - $lastMonthExpenses;
@@ -95,10 +111,9 @@ class AccountingController extends Controller
         $lastMonthStart = now()->subMonth()->startOfMonth();
         $lastMonthEnd = now()->subMonth()->endOfMonth();
         
-        $lastMonthExpenses = PurchaseOrder::whereBetween(
-            PurchaseOrder::raw('DATE(order_date)'),
-            [$lastMonthStart, $lastMonthEnd]
-        )->sum('total_amount');
+        $lastMonthExpenses = Accounting::where('transaction_type', 'Expense')
+            ->whereBetween('date', [$lastMonthStart, $lastMonthEnd])
+            ->sum('amount');
         
         // Calculate percentage
         $expensesPercentage = $totalExpenses > 0 ? ($lastMonthExpenses / $totalExpenses) * 100 : 0;
@@ -107,13 +122,12 @@ class AccountingController extends Controller
     }
     Public function lastMonthRevenue( $totalRevenue )
      {
-            // Get last month's revenue
+            // Get last month's revenue from transactions
             $lastMonthStart = now()->subMonth()->startOfMonth();
             $lastMonthEnd = now()->subMonth()->endOfMonth();
-            $lastMonthRevenue = SalesOrderItem::whereBetween(
-            SalesOrderItem::raw('DATE(created_at)'),
-            [$lastMonthStart, $lastMonthEnd]
-            )->selectRaw('SUM(Quantity * unit_price) as total')->pluck('total')->first();
+            $lastMonthRevenue = Accounting::where('transaction_type', 'Income')
+                ->whereBetween('date', [$lastMonthStart, $lastMonthEnd])
+                ->sum('amount');
             // Calculate percentage
             $revenuePercentage = $totalRevenue > 0 ? ($lastMonthRevenue / $totalRevenue) * 100 : 0;
             return round($revenuePercentage, 2);
