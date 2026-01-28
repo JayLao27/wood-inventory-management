@@ -158,9 +158,8 @@ class InventoryController extends Controller
             $item = Material::with('inventoryMovements')->findOrFail($id);
         }
 
-        $movements = $item->inventoryMovements()
-            ->orderBy('created_at', 'desc')
-            ->get()
+        $movements = $item->inventoryMovements
+            ->sortByDesc('created_at')
             ->map(function($movement) {
                 return [
                     'movement_type' => $movement->movement_type,
@@ -168,10 +167,17 @@ class InventoryController extends Controller
                     'notes' => $movement->notes,
                     'created_at' => $movement->created_at,
                 ];
-            });
+            })
+            ->values();
 
         return response()->json([
-            'item' => $item,
+            'item' => [
+                'name' => $item->name ?? $item->product_name,
+                'current_stock' => $item->current_stock,
+                'minimum_stock' => $item->minimum_stock,
+                'unit_cost' => $item->unit_cost,
+                'unit' => $item->unit,
+            ],
             'movements' => $movements
         ]);
     }
