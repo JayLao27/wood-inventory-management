@@ -323,9 +323,10 @@
 						<input type="text" id="paymentAmount" name="amount" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter payment amount" required>
 						<p class="text-xs text-gray-500 mt-1">Max: <span id="maxAmount" class="font-semibold text-gray-700">-</span></p>
 					</div>
-					<div class="flex gap-3">ResetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
-							Back
-						</button>
+					<div class="flex gap-3">
+					<button onclick="resetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
+						Back
+					</button>
 						<button type="submit" class="flex-1 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition">
 							Confirm
 						</button>
