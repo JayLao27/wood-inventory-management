@@ -132,7 +132,7 @@
                 <!-- Materials Table -->
                 <div id="materials-table" class="space-y-3 overflow-y-auto" style="max-height:60vh;">
                     @forelse($materials ?? [] as $material)
-                    <div onclick="openEditModal('material', {{ $material->id }})" class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 cursor-pointer transition">
+                    <div class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 transition">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-semibold text-white">{{ $material->name }}</h3>
@@ -157,16 +157,12 @@
                                 <p class="text-white font-medium">{{ $material->minimum_stock }} {{ $material->unit }}</p>
                             </div>
                             <div class="flex items-center space-x-2 justify-end">
-                                <button onclick="event.stopPropagation(); openEditModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="Edit">
-                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                    </svg>
-                                </button>
-                                <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="View Stock">
+                                <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded flex items-center space-x-1" title="View Items">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                         <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                                     </svg>
+                                    <span class="text-xs">View</span>
                                 </button>
                                 <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -187,7 +183,7 @@
                 <!-- Products Table -->
                 <div id="products-table" class="space-y-3 overflow-y-auto hidden" style="max-height:60vh;">
                     @forelse($products ?? [] as $product)
-                    <div onclick="openEditModal('product', {{ $product->id }})" class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 cursor-pointer transition">
+                    <div class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 transition">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-semibold text-white">{{ $product->product_name }}</h3>
@@ -208,11 +204,6 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 mt-3 justify-end">
-                            <button onclick="event.stopPropagation(); openEditModal('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded" title="Edit">
-                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                </svg>
-                            </button>
                             <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -370,63 +361,6 @@
             </div>
         </div>
 
-        <!-- Edit Item Modal -->
-        <div id="editItemModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-900">Edit Item</h3>
-                            <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <form id="editItemForm" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
-                                    <input type="text" name="product_name" id="editProductName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
-                                    <input type="text" name="unit" id="editUnit" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost *</label>
-                                    <input type="number" name="production_cost" id="editProductionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
-                                    <input type="number" name="selling_price" id="editSellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                    <textarea name="description" id="editDescription" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-end space-x-3 mt-6">
-                                <button type="button" onclick="closeEditModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                    Update Item
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Stock Adjustment Modal -->
         <div id="stockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
@@ -535,16 +469,6 @@
                 document.getElementById('addProductForm').reset();
             }
 
-            function openEditModal(type, id) {
-                // This would typically fetch item data via AJAX
-                document.getElementById('editItemModal').classList.remove('hidden');
-                document.getElementById('editItemForm').action = `/inventory/${id}`;
-            }
-
-            function closeEditModal() {
-                document.getElementById('editItemModal').classList.add('hidden');
-            }
-
             function openStockModal(type, id) {
                 document.getElementById('stockModal').classList.remove('hidden');
                 document.getElementById('stockForm').action = `/inventory/${id}/adjust-stock`;
@@ -598,7 +522,6 @@
                 if (e.target.classList.contains('fixed')) {
                     closeAddItemModal();
                     closeAddProductModal();
-                    closeEditModal();
                     closeStockModal();
                 }
             });
