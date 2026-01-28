@@ -42,10 +42,12 @@ Route::get('/', function () {
     Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'removeSupplier'])->name('procurement.supplier.destroy');
     Route::delete('/procurement/purchase-orders/{id}', [ProcurementController::class, 'destroyPurchaseOrder'])->name('procurement.purchase-order.destroy');
 
-    // Production
+    // Production & Work Orders
     Route::get('/production', [ProductionController::class, 'index'])->name('production');
     Route::post('/production', [ProductionController::class, 'store'])->name('production.store');
     Route::put('/production/{workOrder}', [ProductionController::class, 'update'])->name('production.update');
+    Route::post('/production/{workOrder}/start', [ProductionController::class, 'start'])->name('production.start');
+    Route::post('/production/{workOrder}/complete', [ProductionController::class, 'complete'])->name('production.complete');
     
     // Sales
     Route::resource('sales-orders', SalesOrderController::class);

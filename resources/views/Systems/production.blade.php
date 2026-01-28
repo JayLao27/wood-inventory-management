@@ -189,43 +189,57 @@
         </div>
 
         <!-- Add Work Order Modal -->
-        <div id="workOrderModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-amber-50 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
-                    <div class="p-8">
-                        <div class="flex justify-between items-center mb-6">
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-800 mb-2">New Work Orders</h3>
-                                <p class="text-gray-600 text-lg">New work order for a new production work order for furniture manufacturing.</p>
-                            </div>
-                            <button onclick="closeWorkOrderModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
-                                ×
-                            </button>
+        <div id="workOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50" onclick="if(event.target === this) closeWorkOrderModal()">
+            <div class="modal-content bg-amber-50 rounded-2xl max-w-2xl w-[92%] max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Create Work Order</h3>
+                            <p class="text-gray-600 text-base">Assign production work order to team from pending sales orders.</p>
                         </div>
+                        <button onclick="closeWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
                         
                         <form id="workOrderForm" method="POST" action="{{ route('production.store') }}">
                             @csrf
                             <div class="space-y-6">
-                                <div>z
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Pending Orders</label>
-                                    <select name="product_name" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
-                                        <option value="">Select Orders</option>
-                                        <option value="Classic Oak Dining Chair">Classic Oak Dining Chair</option>
-                                        <option value="Pine Coffee Table">Pine Coffee Table</option>
-                                        <option value="Oak Kitchen Cabinet">Oak Kitchen Cabinet</option>
-                                        <option value="Pine Bookshelf">Pine Bookshelf</option>
-                                        <option value="Oak Dining Table">Oak Dining Table</option>
+                                <div>
+                                    <label class="block text-gray-700 text-lg font-medium mb-3">Sales Order <span class="text-red-500">*</span></label>
+                                    <select name="sales_order_id" id="salesOrderSelect" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required onchange="loadOrderItems(this.value)">
+                                        <option value="">Select Sales Order</option>
+                                        @foreach($pendingSalesOrders ?? [] as $salesOrder)
+                                            <option value="{{ $salesOrder->id }}" 
+                                                data-customer="{{ $salesOrder->customer->name }}" 
+                                                data-delivery="{{ $salesOrder->delivery_date }}"
+                                                data-items='@json($salesOrder->items->map(function($item) {
+                                                    return [
+                                                        "id" => $item->product_id,
+                                                        "name" => $item->product->product_name ?? "Product",
+                                                        "quantity" => $item->quantity
+                                                    ];
+                                                }))'>
+                                                {{ $salesOrder->order_number }} - {{ $salesOrder->customer->name }} ({{ $salesOrder->items->count() }} items)
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div id="orderItemsSection" class="hidden">
+                                    <label class="block text-gray-700 text-lg font-medium mb-3">Product <span class="text-red-500">*</span></label>
+                                    <select name="product_id" id="productSelect" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
+                                        <option value="">Select Product</option>
                                     </select>
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Assign To</label>
+                                    <label class="block text-gray-700 text-lg font-medium mb-3">Assign To Team <span class="text-red-500">*</span></label>
                                     <select name="assigned_to" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
                                         <option value="">Select Team</option>
-                                        <option value="Workshop Team A">Workshop Team A</option>
-                                        <option value="Workshop Team B">Workshop Team B</option>
-                                        <option value="Finishing Team">Finishing Team</option>
-                                        <option value="Assembly Team">Assembly Team</option>
+                                        <option value="Team A">🔨 Team A</option>
+                                        <option value="Team B">🔨 Team B</option>
+                                        <option value="Team C">🔨 Team C</option>
                                     </select>
                                 </div>
                                 
@@ -257,9 +271,12 @@
                                 </div>
                             </div>
                             
-                            <div class="flex justify-end mt-8">
-                                <button type="submit" class="px-8 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition text-lg font-medium shadow-lg">
-                                    Assign
+                            <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-300">
+                                <button type="button" onclick="closeWorkOrderModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-base font-medium">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-8 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-200 text-base font-medium shadow-md hover:shadow-lg">
+                                    Create Work Order
                                 </button>
                             </div>
                         </form>
@@ -269,19 +286,18 @@
         </div>
 
         <!-- Edit Work Order Modal -->
-        <div id="editWorkOrderModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-amber-50 rounded-lg max-w-md w-full shadow-xl">
-                    <div class="p-8">
-                        <div class="flex justify-between items-center mb-6">
-                            <div>
-                                <h3 class="text-3xl font-bold text-gray-800 mb-2">Update Work Order</h3>
-                                <p class="text-gray-600 text-lg">Update the status and completion details for this work order.</p>
-                            </div>
-                            <button onclick="closeEditWorkOrderModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">
-                                ×
-                            </button>
+        <div id="editWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50" onclick="if(event.target === this) closeEditWorkOrderModal()">
+            <div class="modal-content bg-amber-50 rounded-2xl max-w-lg w-[92%] shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Update Work Order</h3>
+                            <p class="text-gray-600 text-base">Update the status and completion details.</p>
                         </div>
+                        <button onclick="closeEditWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
                         
                         <form id="editWorkOrderForm" method="POST">
                             @csrf
@@ -303,9 +319,12 @@
                                 </div>
                             </div>
                             
-                            <div class="flex justify-end mt-8">
-                                <button type="submit" class="px-8 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition text-lg font-medium shadow-lg">
-                                    Update
+                            <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-300">
+                                <button type="button" onclick="closeEditWorkOrderModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-base font-medium">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-8 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-200 text-base font-medium shadow-md hover:shadow-lg">
+                                    Update Work Order
                                 </button>
                             </div>
                         </form>
@@ -315,24 +334,125 @@
         </div>
 
         <script>
-            // Modal functions
+            // Modal functions with animations
             function openWorkOrderModal() {
-                document.getElementById('workOrderModal').classList.remove('hidden');
+                const modal = document.getElementById('workOrderModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => {
+                    const content = modal.querySelector('.modal-content');
+                    if (content) {
+                        content.style.opacity = '0';
+                        content.style.transform = 'scale(0.95) translateY(10px)';
+                        setTimeout(() => {
+                            content.style.transition = 'all 0.2s ease-out';
+                            content.style.opacity = '1';
+                            content.style.transform = 'scale(1) translateY(0)';
+                        }, 10);
+                    }
+                }, 10);
             }
 
             function closeWorkOrderModal() {
-                document.getElementById('workOrderModal').classList.add('hidden');
-                document.getElementById('workOrderForm').reset();
+                const modal = document.getElementById('workOrderModal');
+                const content = modal.querySelector('.modal-content');
+                if (content) {
+                    content.style.transition = 'all 0.15s ease-in';
+                    content.style.opacity = '0';
+                    content.style.transform = 'scale(0.95) translateY(10px)';
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                        document.getElementById('workOrderForm').reset();
+                        document.getElementById('orderItemsSection').classList.add('hidden');
+                    }, 150);
+                } else {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.getElementById('workOrderForm').reset();
+                }
             }
 
             function editWorkOrder(id) {
-                // This would typically fetch work order data via AJAX
-                document.getElementById('editWorkOrderModal').classList.remove('hidden');
+                const modal = document.getElementById('editWorkOrderModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
                 document.getElementById('editWorkOrderForm').action = `/production/${id}`;
+                setTimeout(() => {
+                    const content = modal.querySelector('.modal-content');
+                    if (content) {
+                        content.style.opacity = '0';
+                        content.style.transform = 'scale(0.95) translateY(10px)';
+                        setTimeout(() => {
+                            content.style.transition = 'all 0.2s ease-out';
+                            content.style.opacity = '1';
+                            content.style.transform = 'scale(1) translateY(0)';
+                        }, 10);
+                    }
+                }, 10);
             }
 
             function closeEditWorkOrderModal() {
-                document.getElementById('editWorkOrderModal').classList.add('hidden');
+                const modal = document.getElementById('editWorkOrderModal');
+                const content = modal.querySelector('.modal-content');
+                if (content) {
+                    content.style.transition = 'all 0.15s ease-in';
+                    content.style.opacity = '0';
+                    content.style.transform = 'scale(0.95) translateY(10px)';
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 150);
+                } else {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            }
+
+            // Load order items when sales order is selected
+            function loadOrderItems(salesOrderId) {
+                const orderItemsSection = document.getElementById('orderItemsSection');
+                const productSelect = document.getElementById('productSelect');
+                const quantityInput = document.querySelector('input[name="quantity"]');
+                const dueDateInput = document.querySelector('input[name="due_date"]');
+                
+                if (!salesOrderId) {
+                    orderItemsSection.classList.add('hidden');
+                    productSelect.innerHTML = '<option value="">Select Product</option>';
+                    return;
+                }
+
+                // Get selected option data
+                const selectedOption = document.querySelector(`#salesOrderSelect option[value="${salesOrderId}"]`);
+                const items = JSON.parse(selectedOption.getAttribute('data-items') || '[]');
+                const deliveryDate = selectedOption.getAttribute('data-delivery');
+                
+                // Clear and populate product dropdown
+                productSelect.innerHTML = '<option value="">Select Product</option>';
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = `${item.name} (Qty: ${item.quantity})`;
+                    option.setAttribute('data-quantity', item.quantity);
+                    productSelect.appendChild(option);
+                });
+                
+                // Auto-fill due date with delivery date
+                if (deliveryDate) {
+                    dueDateInput.value = deliveryDate;
+                }
+                
+                // Show product section
+                orderItemsSection.classList.remove('hidden');
+                
+                // Auto-fill quantity when product is selected
+                productSelect.addEventListener('change', function() {
+                    const selectedProduct = this.options[this.selectedIndex];
+                    const qty = selectedProduct.getAttribute('data-quantity');
+                    if (qty && quantityInput) {
+                        quantityInput.value = qty;
+                    }
+                }, { once: false });
             }
 
             function viewWorkOrder(id) {

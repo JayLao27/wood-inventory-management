@@ -11,7 +11,9 @@ return new class extends Migration
         Schema::create('work_orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number')->unique();
-            $table->string('product_name');
+            $table->foreignId('sales_order_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('product_name')->nullable(); // Kept for flexibility
             $table->integer('quantity');
             $table->integer('completion_quantity')->default(0);
             $table->enum('status', ['pending', 'in_progress', 'quality_check', 'completed', 'overdue'])->default('pending');
