@@ -190,97 +190,124 @@
 
         <!-- Add Work Order Modal -->
         <div id="workOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50" onclick="if(event.target === this) closeWorkOrderModal()">
-            <div class="modal-content bg-amber-50 rounded-2xl max-w-2xl w-[92%] max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+            <div class="modal-content bg-amber-50 rounded-2xl max-w-2xl w-[92%] shadow-2xl transform transition-all" onclick="event.stopPropagation()">
                 <div class="p-8">
                     <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300">
                         <div>
                             <h3 class="text-2xl font-bold text-gray-800 mb-2">Create Work Order</h3>
-                            <p class="text-gray-600 text-base">Assign production work order to team from pending sales orders.</p>
+                            <p class="text-gray-600 text-base">Select a sales order to create production work order.</p>
                         </div>
                         <button onclick="closeWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                        
-                        <form id="workOrderForm" method="POST" action="{{ route('production.store') }}">
-                            @csrf
-                            <div class="space-y-6">
-                                <div>
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Sales Order <span class="text-red-500">*</span></label>
-                                    <select name="sales_order_id" id="salesOrderSelect" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required onchange="loadOrderItems(this.value)">
-                                        <option value="">Select Sales Order</option>
-                                        @foreach($pendingSalesOrders ?? [] as $salesOrder)
-                                            <option value="{{ $salesOrder->id }}" 
-                                                data-customer="{{ $salesOrder->customer->name }}" 
-                                                data-delivery="{{ $salesOrder->delivery_date }}"
-                                                data-items='@json($salesOrder->items->map(function($item) {
-                                                    return [
-                                                        "id" => $item->product_id,
-                                                        "name" => $item->product->product_name ?? "Product",
-                                                        "quantity" => $item->quantity
-                                                    ];
-                                                }))'>
-                                                {{ $salesOrder->order_number }} - {{ $salesOrder->customer->name }} ({{ $salesOrder->items->count() }} items)
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
 
-                                <div id="orderItemsSection" class="hidden">
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Product <span class="text-red-500">*</span></label>
-                                    <select name="product_id" id="productSelect" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
-                                        <option value="">Select Product</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Assign To Team <span class="text-red-500">*</span></label>
-                                    <select name="assigned_to" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
-                                        <option value="">Select Team</option>
-                                        <option value="Team A">🔨 Team A</option>
-                                        <option value="Team B">🔨 Team B</option>
-                                        <option value="Team C">🔨 Team C</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-gray-700 text-lg font-medium mb-3">Quantity</label>
-                                        <input type="number" name="quantity" min="1" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
+                    <!-- Sales Orders List -->
+                    <div id="salesOrdersListSection" class="space-y-3 max-h-64 overflow-y-auto mb-6">
+                        @forelse($pendingSalesOrders ?? [] as $salesOrder)
+                            <div onclick="selectSalesOrder('{{ $salesOrder->id }}', '{{ $salesOrder->order_number }}', '{{ $salesOrder->customer->name }}', '{{ $salesOrder->delivery_date }}')" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold text-gray-800">{{ $salesOrder->order_number }} - {{ $salesOrder->customer->name }}</h3>
+                                        <p class="text-sm text-gray-600 mt-1">Items: 
+                                            @foreach($salesOrder->items as $item)
+                                                {{ $item->product->product_name ?? 'Product' }} ({{ $item->quantity }}), 
+                                            @endforeach
+                                        </p>
                                     </div>
-                                    
-                                    <div>
-                                        <label class="block text-gray-700 text-lg font-medium mb-3">Due Date</label>
-                                        <input type="date" name="due_date" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
-                                    </div>
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">{{ $salesOrder->items->count() }} items</span>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Priority</label>
-                                    <select name="priority" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
-                                        <option value="">Select Priority</option>
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Notes</label>
-                                    <textarea name="notes" rows="3" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"></textarea>
-                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Delivery: {{ \Carbon\Carbon::parse($salesOrder->delivery_date)->format('M d, Y') }}</p>
                             </div>
-                            
-                            <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-300">
-                                <button type="button" onclick="closeWorkOrderModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-base font-medium">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="px-8 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-200 text-base font-medium shadow-md hover:shadow-lg">
-                                    Create Work Order
-                                </button>
-                            </div>
-                        </form>
+                        @empty
+                            <p class="text-center text-gray-500 py-4">No pending sales orders available</p>
+                        @endforelse
                     </div>
+
+                    <!-- Work Order Details Form (Hidden by default) -->
+                    <form id="workOrderForm" method="POST" action="{{ route('production.store') }}" class="hidden">
+                        @csrf
+                        <input type="hidden" name="sales_order_id" id="formSalesOrderId">
+                        
+                        <div class="space-y-6">
+                            <!-- Order Summary -->
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h3 class="font-semibold text-gray-800 mb-2">Selected Order</h3>
+                                <div class="space-y-1 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Order #:</span>
+                                        <span id="summaryOrderNumber" class="font-semibold text-gray-800">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Customer:</span>
+                                        <span id="summaryCustomer" class="font-semibold text-gray-800">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Delivery Date:</span>
+                                        <span id="summaryDelivery" class="font-semibold text-gray-800">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Product Selection -->
+                            <div>
+                                <label class="block text-gray-700 text-lg font-medium mb-3">Product <span class="text-red-500">*</span></label>
+                                <select name="product_id" id="productSelect" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required onchange="updateQuantity()">
+                                    <option value="">Select Product</option>
+                                </select>
+                            </div>
+
+                            <!-- Quantity (Auto-filled from order) -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-lg font-medium mb-3">Quantity</label>
+                                    <input type="number" name="quantity" id="quantityInput" min="1" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required readonly>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 text-lg font-medium mb-3">Due Date</label>
+                                    <input type="date" name="due_date" id="dueDateInput" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
+                                </div>
+                            </div>
+
+                            <!-- Team Assignment -->
+                            <div>
+                                <label class="block text-gray-700 text-lg font-medium mb-3">Assign To Team <span class="text-red-500">*</span></label>
+                                <select name="assigned_to" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
+                                    <option value="">Select Team</option>
+                                    <option value="Team A">🔨 Team A</option>
+                                    <option value="Team B">🔨 Team B</option>
+                                    <option value="Team C">🔨 Team C</option>
+                                </select>
+                            </div>
+
+                            <!-- Priority -->
+                            <div>
+                                <label class="block text-gray-700 text-lg font-medium mb-3">Priority</label>
+                                <select name="priority" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+
+                            <!-- Notes -->
+                            <div>
+                                <label class="block text-gray-700 text-lg font-medium mb-3">Notes</label>
+                                <textarea name="notes" rows="3" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-300">
+                            <button type="button" onclick="resetWorkOrderForm()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-base font-medium">
+                                Back
+                            </button>
+                            <button type="submit" class="px-8 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-200 text-base font-medium shadow-md hover:shadow-lg">
+                                Create Work Order
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -410,49 +437,85 @@
             }
 
             // Load order items when sales order is selected
-            function loadOrderItems(salesOrderId) {
-                const orderItemsSection = document.getElementById('orderItemsSection');
+            function selectSalesOrder(salesOrderId, orderNumber, customerName, deliveryDate) {
+                const listSection = document.getElementById('salesOrdersListSection');
+                const formSection = document.getElementById('workOrderForm');
                 const productSelect = document.getElementById('productSelect');
-                const quantityInput = document.querySelector('input[name="quantity"]');
-                const dueDateInput = document.querySelector('input[name="due_date"]');
+                const dueDateInput = document.getElementById('dueDateInput');
+                const quantityInput = document.getElementById('quantityInput');
                 
-                if (!salesOrderId) {
-                    orderItemsSection.classList.add('hidden');
-                    productSelect.innerHTML = '<option value="">Select Product</option>';
-                    return;
-                }
-
+                // Store sales order ID
+                document.getElementById('formSalesOrderId').value = salesOrderId;
+                
+                // Update summary
+                document.getElementById('summaryOrderNumber').textContent = orderNumber;
+                document.getElementById('summaryCustomer').textContent = customerName;
+                document.getElementById('summaryDelivery').textContent = new Date(deliveryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                
                 // Get selected option data
-                const selectedOption = document.querySelector(`#salesOrderSelect option[value="${salesOrderId}"]`);
-                const items = JSON.parse(selectedOption.getAttribute('data-items') || '[]');
-                const deliveryDate = selectedOption.getAttribute('data-delivery');
+                const selectedOption = document.querySelector(`#salesOrdersListSection div[onclick*="${salesOrderId}"]`);
+                const allOptions = Array.from(document.querySelectorAll('option')).filter(opt => opt.value === salesOrderId);
                 
-                // Clear and populate product dropdown
-                productSelect.innerHTML = '<option value="">Select Product</option>';
-                items.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = `${item.name} (Qty: ${item.quantity})`;
-                    option.setAttribute('data-quantity', item.quantity);
-                    productSelect.appendChild(option);
+                // Find products from the sales order - we need to get this from server data
+                // For now, fetch from the data attributes we embedded
+                const salesOrderElement = Array.from(document.querySelectorAll(`[onclick*="selectSalesOrder"]`)).find(el => 
+                    el.textContent.includes(orderNumber)
+                );
+                
+                // Get products from hidden data
+                const productOptions = Array.from(document.querySelectorAll('option')).filter(opt => {
+                    const itemsAttr = opt.getAttribute('data-items');
+                    return itemsAttr && opt.value === salesOrderId;
                 });
                 
-                // Auto-fill due date with delivery date
-                if (deliveryDate) {
-                    dueDateInput.value = deliveryDate;
+                if (productOptions.length > 0) {
+                    const itemsData = JSON.parse(productOptions[0].getAttribute('data-items') || '[]');
+                    productSelect.innerHTML = '<option value="">Select Product</option>';
+                    
+                    itemsData.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = `${item.name} (Qty: ${item.quantity})`;
+                        option.setAttribute('data-quantity', item.quantity);
+                        productSelect.appendChild(option);
+                    });
                 }
                 
-                // Show product section
-                orderItemsSection.classList.remove('hidden');
+                // Set delivery date
+                dueDateInput.value = deliveryDate;
                 
-                // Auto-fill quantity when product is selected
-                productSelect.addEventListener('change', function() {
-                    const selectedProduct = this.options[this.selectedIndex];
-                    const qty = selectedProduct.getAttribute('data-quantity');
-                    if (qty && quantityInput) {
+                // Reset product selection
+                productSelect.value = '';
+                quantityInput.value = '';
+                
+                // Show form, hide list
+                listSection.classList.add('hidden');
+                formSection.classList.remove('hidden');
+            }
+            
+            function resetWorkOrderForm() {
+                const listSection = document.getElementById('salesOrdersListSection');
+                const formSection = document.getElementById('workOrderForm');
+                
+                // Reset form
+                document.getElementById('workOrderForm').reset();
+                
+                // Show list, hide form
+                listSection.classList.remove('hidden');
+                formSection.classList.add('hidden');
+            }
+            
+            function updateQuantity() {
+                const productSelect = document.getElementById('productSelect');
+                const quantityInput = document.getElementById('quantityInput');
+                
+                if (productSelect.value) {
+                    const selectedOption = productSelect.options[productSelect.selectedIndex];
+                    const qty = selectedOption.getAttribute('data-quantity');
+                    if (qty) {
                         quantityInput.value = qty;
                     }
-                }, { once: false });
+                }
             }
 
             function viewWorkOrder(id) {

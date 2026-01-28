@@ -2,25 +2,25 @@
 
 @section('main-content')
         <!-- Main Content -->
-        <div class="flex-1 p-4 md:p-6 lg:p-8 bg-amber-50 overflow-y-auto">
+        <div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
             <!-- Header Section -->
-            <div class="mb-6 md:mb-8">
-                <div class="flex justify-between items-start flex-col md:flex-row gap-4">
+            <div class="mb-8">
+                <div class="flex justify-between items-start">
                     <div>
-                        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Inventory Management</h1>
-                        <p class="text-sm md:text-base text-gray-600 mt-2">Track and manage raw materials and finished products</p>
+                        <h1 class="text-3xl font-bold text-gray-900">Inventory Management</h1>
+                        <p class="text-gray-600 mt-2">Track and manage raw materials and finished products</p>
                     </div>
                 </div>
             </div>
 
             <!-- Metrics Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 lg:gap-6 mb-6 md:mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <!-- Total Items Card -->
-                <div class="bg-slate-700 rounded-lg p-4 md:p-6 text-white">
+                <div class="bg-slate-700 rounded-lg p-6 text-white">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-slate-300 text-xs md:text-sm">Total Items</p>
-                            <p class="text-2xl md:text-3xl font-bold mt-2">{{ $totalItems ?? 10 }}</p>
+                            <p class="text-slate-300 text-sm">Total Items</p>
+                            <p class="text-3xl font-bold mt-2">{{ $totalItems ?? 10 }}</p>
                             <p class="text-slate-400 text-xs mt-1">{{ $totalItems ?? 10 }} Items</p>
                         </div>
                         @include('components.icons.package', ['class' => 'icon-package'])
@@ -79,11 +79,11 @@
             </div>
 
             <!-- Inventory Items Section -->
-            <div class="bg-slate-700 rounded-lg p-4 md:p-6 ">
-                <div class="flex justify-between items-center mb-4 md:mb-6 flex-col md:flex-row gap-3 md:gap-0">
+            <div class="bg-slate-700 rounded-lg p-6 ">
+                <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-lg md:text-xl font-bold text-white">Inventory Items</h2>
-                        <p class="text-slate-300 text-xs md:text-sm mt-1">Manage raw materials from suppliers and finished products from production</p>
+                        <h2 class="text-xl font-bold text-white">Inventory Items</h2>
+                        <p class="text-slate-300 text-sm mt-1">Manage raw materials from suppliers and finished products from production</p>
                     </div>
                     <div id="materialsButton" class="flex space-x-3">
                         <button onclick="openAddItemModal()" class="px-4 py-2 bg-white text-[#374151] rounded-lg hover:bg-[#DEE4EF] flex items-center space-x-2">
@@ -104,33 +104,33 @@
                 </div>
 
                 <!-- Search and Filter Bar -->
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
-                    <div class=\"flex-1 w-full md:max-w-md\">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex-1 max-w-md">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                             </div>
-                            <input type="text" placeholder="Search items....." class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <input type="text" placeholder="Search items....." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                     </div>
-                    <button class="flex items-center space-x-2 px-3 md:px-4 py-2 text-sm bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition whitespace-nowrap\">
+                    <button class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 3a1 1 0 000 2h11.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 6H19a1 1 0 100-2H3zM3 11a1 1 0 100 2h11.586l-1.293-1.293a1 1 0 111.414-1.414L16.414 14H19a1 1 0 100-2H3z"/>
                         </svg>
-                        <span class=\"hidden sm:inline\">All Categories</span>
+                        <span>All Categories</span>
                     </button>
                 </div>
 
                 <!-- Tabs -->
-                <div class="flex space-x-1 w-full mb-4 md:mb-6 overflow-x-auto\">
-                    <button onclick="showTab('materials')" id="materials-tab" class="flex-auto px-3 md:px-4 py-2 text-sm md:text-base rounded-lg whitespace-nowrap\" style="background-color: #FFF1DA; color: #111827;\">Materials</button>
-                    <button onclick="showTab('products')" id="products-tab" class="flex-auto px-3 md:px-4 py-2 text-sm md:text-base rounded-lg border whitespace-nowrap\" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;\">Products</button>
+                <div class="flex space-x-1 w-full mb-6">
+                    <button onclick="showTab('materials')" id="materials-tab" class="flex-auto px-[255px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Materials</button>
+                    <button onclick="showTab('products')" id="products-tab" class="flex-auto px-[255px] py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Products</button>
                 </div>
 
                 <!-- Materials Table -->
-                <div id=\"materials-table\" class=\"space-y-2 md:space-y-3 overflow-y-auto\" style=\"max-height:60vh;\">
+                <div id="materials-table" class="space-y-3 overflow-y-auto" style="max-height:60vh;">
                     @forelse($materials ?? [] as $material)
                     <div class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 transition">
                         <div class="flex justify-between items-start">
@@ -418,7 +418,43 @@
                             </div>
                         </div>
 
-
+                        <!-- Add Adjustment Section -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">Add Stock Adjustment</h4>
+                            <form id="stockForm" method="POST">
+                                @csrf
+                                <input type="hidden" name="type" id="stockItemType">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Movement Type *</label>
+                                        <select name="movement_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                            <option value="">Select Movement Type</option>
+                                            <option value="in">Stock In</option>
+                                            <option value="out">Stock Out</option>
+                                            <option value="adjustment">Adjustment</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                                        <input type="number" name="quantity" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                        <input type="text" name="notes" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Optional notes">
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3 mt-4">
+                                    <button type="button" onclick="closeStockModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                        Close
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Add Adjustment
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
