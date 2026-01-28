@@ -361,54 +361,101 @@
             </div>
         </div>
 
-        <!-- Stock Adjustment Modal -->
+        <!-- Stock View Modal -->
         <div id="stockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white rounded-lg max-w-md w-full">
+                <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-900">Adjust Stock</h3>
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">Item Details & Movement History</h3>
+                                <p id="itemName" class="text-sm text-gray-600 mt-1"></p>
+                            </div>
                             <button onclick="closeStockModal()" class="text-gray-400 hover:text-gray-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                             </button>
                         </div>
-                        
-                        <form id="stockForm" method="POST">
-                            @csrf
-                            <input type="hidden" name="type" id="stockItemType">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Movement Type *</label>
-                                    <select name="movement_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                        <option value="">Select Movement Type</option>
-                                        <option value="in">Stock In</option>
-                                        <option value="out">Stock Out</option>
-                                        <option value="adjustment">Adjustment</option>
-                                    </select>
+
+                        <!-- Item Info Cards -->
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-600">Current Stock</p>
+                                <p id="currentStock" class="text-2xl font-bold text-blue-600 mt-1">-</p>
+                            </div>
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-600">Minimum Stock</p>
+                                <p id="minimumStock" class="text-2xl font-bold text-yellow-600 mt-1">-</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-600">Unit Cost</p>
+                                <p id="unitCost" class="text-2xl font-bold text-green-600 mt-1">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Movements Table -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">Movement History</h4>
+                            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-100 border-b border-gray-200">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-700">Date</th>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-700">Type</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-700">Quantity</th>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-700">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="movementTableBody" class="divide-y divide-gray-200">
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                                Loading movements...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Add Adjustment Section -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">Add Stock Adjustment</h4>
+                            <form id="stockForm" method="POST">
+                                @csrf
+                                <input type="hidden" name="type" id="stockItemType">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Movement Type *</label>
+                                        <select name="movement_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                            <option value="">Select Movement Type</option>
+                                            <option value="in">Stock In</option>
+                                            <option value="out">Stock Out</option>
+                                            <option value="adjustment">Adjustment</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                                        <input type="number" name="quantity" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                        <input type="text" name="notes" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Optional notes">
+                                    </div>
                                 </div>
                                 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
-                                    <input type="number" name="quantity" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                <div class="flex justify-end space-x-3 mt-4">
+                                    <button type="button" onclick="closeStockModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                        Close
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Add Adjustment
+                                    </button>
                                 </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                                    <textarea name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-end space-x-3 mt-6">
-                                <button type="button" onclick="closeStockModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                    Adjust Stock
-                                </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -473,6 +520,44 @@
                 document.getElementById('stockModal').classList.remove('hidden');
                 document.getElementById('stockForm').action = `/inventory/${id}/adjust-stock`;
                 document.getElementById('stockItemType').value = type;
+                
+                // Fetch item details and movements
+                fetch(`/inventory/${id}/details?type=${type}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate item info
+                        document.getElementById('itemName').textContent = data.item.name || data.item.product_name || 'Item';
+                        document.getElementById('currentStock').textContent = data.item.current_stock + ' ' + (data.item.unit || '');
+                        document.getElementById('minimumStock').textContent = data.item.minimum_stock || '-';
+                        document.getElementById('unitCost').textContent = data.item.unit_cost ? '₱' + parseFloat(data.item.unit_cost).toFixed(2) : 'N/A';
+                        
+                        // Populate movements table
+                        const tbody = document.getElementById('movementTableBody');
+                        if (data.movements && data.movements.length > 0) {
+                            tbody.innerHTML = data.movements.map(movement => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3 text-gray-900">${new Date(movement.created_at).toLocaleDateString()}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                            movement.movement_type === 'in' ? 'bg-green-100 text-green-800' :
+                                            movement.movement_type === 'out' ? 'bg-red-100 text-red-800' :
+                                            'bg-blue-100 text-blue-800'
+                                        }">
+                                            ${movement.movement_type.charAt(0).toUpperCase() + movement.movement_type.slice(1)}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-right font-medium text-gray-900">${movement.quantity}</td>
+                                    <td class="px-4 py-3 text-gray-600">${movement.notes || '-'}</td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">No movements recorded yet</td></tr>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching item details:', error);
+                        document.getElementById('movementTableBody').innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Error loading data</td></tr>';
+                    });
             }
 
             function closeStockModal() {
