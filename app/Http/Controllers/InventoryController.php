@@ -154,8 +154,10 @@ class InventoryController extends Controller
         
         if ($type === 'product') {
             $item = Product::with('inventoryMovements')->findOrFail($id);
+            $cost = $item->production_cost; // For products, show production cost
         } else {
             $item = Material::with('inventoryMovements')->findOrFail($id);
+            $cost = $item->unit_cost; // For materials, show unit cost
         }
 
         $movements = $item->inventoryMovements
@@ -174,8 +176,8 @@ class InventoryController extends Controller
             'item' => [
                 'name' => $item->name ?? $item->product_name,
                 'current_stock' => $item->current_stock,
-                'minimum_stock' => $item->minimum_stock,
-                'unit_cost' => $item->unit_cost,
+                'minimum_stock' => $item->minimum_stock ?? 0,
+                'unit_cost' => $cost ?? 0,
                 'unit' => $item->unit,
             ],
             'movements' => $movements

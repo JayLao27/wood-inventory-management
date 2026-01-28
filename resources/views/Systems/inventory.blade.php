@@ -164,9 +164,10 @@
                                     </svg>
                                     <span class="text-xs">View</span>
                                 </button>
-                                <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }}, '{{ $material->name }}')" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+                                <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
                                 </button>
                             </div>
@@ -203,7 +204,7 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 mt-3 justify-end">
-                            <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }}, '{{ $product->product_name }}')" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+                            <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                 </svg>
@@ -417,46 +418,15 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end mt-6">
-                            <button onclick="closeStockModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-                                Close
-                            </button>
+
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Delete Confirmation Modal -->
-        <div id="deleteConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0-6a9 9 0 110-18 9 9 0 010 18zm0-4v2m0-6V7m0 4v2"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-medium text-gray-900">Delete Item</h3>
-                        <p class="mt-2 text-sm text-gray-600">Are you sure you want to delete <span id="deleteItemName" class="font-semibold"></span>? This action cannot be undone.</p>
-                    </div>
-                </div>
-                
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button onclick="closeDeleteModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-                        Cancel
-                    </button>
-                    <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
-                        Delete
-                    </button>
                 </div>
             </div>
         </div>
         
 
         <script>
-            let deleteItemData = { type: null, id: null, name: null };
-
             // Tab functionality
             function showTab(tab) {
                 const materialsTab = document.getElementById('materials-tab');
@@ -511,44 +481,22 @@
             }
 
             function openStockModal(type, id) {
-                console.log('Opening modal for', type, 'with ID', id);
                 document.getElementById('stockModal').classList.remove('hidden');
+                document.getElementById('stockForm').action = `/inventory/${id}/adjust-stock`;
                 document.getElementById('stockItemType').value = type;
                 
                 // Fetch item details and movements
-                const url = `/inventory/${id}/details?type=${type}`;
-                console.log('Fetching from URL:', url);
-                
-                fetch(url)
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
+                fetch(`/inventory/${id}/details?type=${type}`)
+                    .then(response => response.json())
                     .then(data => {
-                        console.log('Full data received:', data);
-                        
                         // Populate item info
-                        if (data.item) {
-                            console.log('Setting item name:', data.item.name);
-                            console.log('Setting current stock:', data.item.current_stock, data.item.unit);
-                            console.log('Setting minimum stock:', data.item.minimum_stock);
-                            console.log('Setting unit cost:', data.item.unit_cost);
-                            
-                            document.getElementById('itemName').textContent = data.item.name || 'Item Details';
-                            document.getElementById('currentStock').textContent = (data.item.current_stock !== undefined ? data.item.current_stock : 0) + ' ' + (data.item.unit || '');
-                            document.getElementById('minimumStock').textContent = (data.item.minimum_stock !== undefined ? data.item.minimum_stock : 0);
-                            document.getElementById('unitCost').textContent = data.item.unit_cost ? '₱' + parseFloat(data.item.unit_cost).toFixed(2) : 'N/A';
-                        } else {
-                            console.error('No item data in response');
-                        }
+                        document.getElementById('itemName').textContent = data.item.name || data.item.product_name || 'Item';
+                        document.getElementById('currentStock').textContent = data.item.current_stock + ' ' + (data.item.unit || '');
+                        document.getElementById('minimumStock').textContent = data.item.minimum_stock || '-';
+                        document.getElementById('unitCost').textContent = data.item.unit_cost ? '₱' + parseFloat(data.item.unit_cost).toFixed(2) : 'N/A';
                         
                         // Populate movements table
                         const tbody = document.getElementById('movementTableBody');
-                        console.log('Movements data:', data.movements);
-                        
                         if (data.movements && data.movements.length > 0) {
                             tbody.innerHTML = data.movements.map(movement => `
                                 <tr class="hover:bg-gray-50">
@@ -572,7 +520,7 @@
                     })
                     .catch(error => {
                         console.error('Error fetching item details:', error);
-                        document.getElementById('movementTableBody').innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Error loading data: ' + error.message + '</td></tr>';
+                        document.getElementById('movementTableBody').innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Error loading data</td></tr>';
                     });
             }
 
@@ -580,25 +528,11 @@
                 document.getElementById('stockModal').classList.add('hidden');
             }
 
-            function deleteItem(type, id, name) {
-                deleteItemData.type = type;
-                deleteItemData.id = id;
-                deleteItemData.name = name || (type === 'product' ? 'this product' : 'this material');
-                
-                document.getElementById('deleteItemName').textContent = deleteItemData.name;
-                document.getElementById('deleteConfirmModal').classList.remove('hidden');
-            }
-
-            function closeDeleteModal() {
-                document.getElementById('deleteConfirmModal').classList.add('hidden');
-                deleteItemData = { type: null, id: null, name: null };
-            }
-
-            function confirmDelete() {
-                if (deleteItemData.id && deleteItemData.type) {
+            function deleteItem(type, id) {
+                if (confirm('Are you sure you want to delete this item?')) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/inventory/${deleteItemData.id}/${deleteItemData.type}`;
+                    form.action = `/inventory/${id}/${type}`;
                     
                     const methodInput = document.createElement('input');
                     methodInput.type = 'hidden';
