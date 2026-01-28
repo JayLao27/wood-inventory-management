@@ -164,7 +164,7 @@
                                     </svg>
                                     <span class="text-xs">View</span>
                                 </button>
-                                <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+                                <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }}, '{{ $material->name }}')" class="p-1 hover:bg-slate-500 rounded" title="Delete">
                                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                     </svg>
@@ -203,7 +203,7 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 mt-3 justify-end">
-                            <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+                            <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }}, '{{ $product->product_name }}')" class="p-1 hover:bg-slate-500 rounded" title="Delete">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                 </svg>
@@ -426,9 +426,37 @@
                 </div>
             </div>
         </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0-6a9 9 0 110-18 9 9 0 010 18zm0-4v2m0-6V7m0 4v2"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">Delete Item</h3>
+                        <p class="mt-2 text-sm text-gray-600">Are you sure you want to delete <span id="deleteItemName" class="font-semibold"></span>? This action cannot be undone.</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeDeleteModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+                        Cancel
+                    </button>
+                    <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
         
 
         <script>
+            let deleteItemData = { type: null, id: null, name: null };
+
             // Tab functionality
             function showTab(tab) {
                 const materialsTab = document.getElementById('materials-tab');
@@ -552,11 +580,25 @@
                 document.getElementById('stockModal').classList.add('hidden');
             }
 
-            function deleteItem(type, id) {
-                if (confirm('Are you sure you want to delete this item?')) {
+            function deleteItem(type, id, name) {
+                deleteItemData.type = type;
+                deleteItemData.id = id;
+                deleteItemData.name = name || (type === 'product' ? 'this product' : 'this material');
+                
+                document.getElementById('deleteItemName').textContent = deleteItemData.name;
+                document.getElementById('deleteConfirmModal').classList.remove('hidden');
+            }
+
+            function closeDeleteModal() {
+                document.getElementById('deleteConfirmModal').classList.add('hidden');
+                deleteItemData = { type: null, id: null, name: null };
+            }
+
+            function confirmDelete() {
+                if (deleteItemData.id && deleteItemData.type) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/inventory/${id}/${type}`;
+                    form.action = `/inventory/${deleteItemData.id}/${deleteItemData.type}`;
                     
                     const methodInput = document.createElement('input');
                     methodInput.type = 'hidden';
