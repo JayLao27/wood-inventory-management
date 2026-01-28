@@ -148,6 +148,34 @@ class InventoryController extends Controller
         return redirect()->route('inventory')->with('success', $itemType . ' deleted successfully!');
     }
 
+    public function getDetails(Request $request, $id)
+    {
+        $type = $request->query('type');
+        
+        if ($type === 'product') {
+            $item = Product::with('inventoryMovements')->findOrFail($id);
+        } else {
+            $item = Material::with('inventoryMovements')->findOrFail($id);
+        }
+
+        $movements = $item->inventoryMovements()
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function($movement) {
+                return [
+                    'movement_type' => $movement->movement_type,
+                    'quantity' => $movement->quantity,
+                    'notes' => $movement->notes,
+                    'created_at' => $movement->created_at,
+                ];
+            });
+
+        return response()->json([
+            'item' => $item,
+            'movements' => $movements
+        ]);
+    }
+
     public function adjustStock(Request $request, $id)
     {
         $request->validate([
