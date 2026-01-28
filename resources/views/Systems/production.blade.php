@@ -195,7 +195,7 @@
                     <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300">
                         <div>
                             <h3 class="text-2xl font-bold text-gray-800 mb-2">Create Work Order</h3>
-                            <p class="text-gray-600 text-base">Select a sales order to create production work order.</p>
+                            <p class="text-gray-600 text-base">Select a sales order to assign to a team.</p>
                         </div>
                         <button onclick="closeWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -205,7 +205,7 @@
                     <!-- Sales Orders List -->
                     <div id="salesOrdersListSection" class="space-y-3 max-h-64 overflow-y-auto mb-6">
                         @forelse($pendingSalesOrders ?? [] as $salesOrder)
-                            <div onclick="selectSalesOrder('{{ $salesOrder->id }}', '{{ $salesOrder->order_number }}', '{{ $salesOrder->customer->name }}', '{{ $salesOrder->delivery_date }}')" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
+                            <div onclick="selectSalesOrder('{{ $salesOrder->id }}', '{{ $salesOrder->order_number }}', '{{ $salesOrder->customer->name }}', '{{ $salesOrder->delivery_date }}', '{{ json_encode($salesOrder->items->map(function($item) { return ['id' => $item->product_id, 'name' => $item->product->product_name ?? 'Product', 'quantity' => $item->quantity]; })) }}')" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <h3 class="font-semibold text-gray-800">{{ $salesOrder->order_number }} - {{ $salesOrder->customer->name }}</h3>
@@ -224,16 +224,20 @@
                         @endforelse
                     </div>
 
-                    <!-- Work Order Details Form (Hidden by default) -->
+                    <!-- Team Assignment Form (Hidden by default) -->
                     <form id="workOrderForm" method="POST" action="{{ route('production.store') }}" class="hidden">
                         @csrf
                         <input type="hidden" name="sales_order_id" id="formSalesOrderId">
+                        <input type="hidden" name="product_id" id="formProductId">
+                        <input type="hidden" name="quantity" id="formQuantity">
+                        <input type="hidden" name="due_date" id="formDueDate">
+                        <input type="hidden" name="priority" value="medium">
                         
                         <div class="space-y-6">
                             <!-- Order Summary -->
                             <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h3 class="font-semibold text-gray-800 mb-2">Selected Order</h3>
-                                <div class="space-y-1 text-sm">
+                                <h3 class="font-semibold text-gray-800 mb-3">Order Summary</h3>
+                                <div class="space-y-2 text-sm">
                                     <div class="flex justify-between">
                                         <span class="text-gray-600">Order #:</span>
                                         <span id="summaryOrderNumber" class="font-semibold text-gray-800">-</span>
@@ -243,30 +247,13 @@
                                         <span id="summaryCustomer" class="font-semibold text-gray-800">-</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Delivery Date:</span>
-                                        <span id="summaryDelivery" class="font-semibold text-gray-800">-</span>
+                                        <span class="text-gray-600">Product:</span>
+                                        <span id="summaryProduct" class="font-semibold text-gray-800">-</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Product Selection -->
-                            <div>
-                                <label class="block text-gray-700 text-lg font-medium mb-3">Product <span class="text-red-500">*</span></label>
-                                <select name="product_id" id="productSelect" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required onchange="updateQuantity()">
-                                    <option value="">Select Product</option>
-                                </select>
-                            </div>
-
-                            <!-- Quantity (Auto-filled from order) -->
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Quantity</label>
-                                    <input type="number" name="quantity" id="quantityInput" min="1" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required readonly>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 text-lg font-medium mb-3">Due Date</label>
-                                    <input type="date" name="due_date" id="dueDateInput" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Quantity:</span>
+                                        <span id="summaryQuantity" class="font-semibold text-gray-800">-</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -279,23 +266,6 @@
                                     <option value="Team B">🔨 Team B</option>
                                     <option value="Team C">🔨 Team C</option>
                                 </select>
-                            </div>
-
-                            <!-- Priority -->
-                            <div>
-                                <label class="block text-gray-700 text-lg font-medium mb-3">Priority</label>
-                                <select name="priority" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
-                                    <option value="">Select Priority</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-
-                            <!-- Notes -->
-                            <div>
-                                <label class="block text-gray-700 text-lg font-medium mb-3">Notes</label>
-                                <textarea name="notes" rows="3" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"></textarea>
                             </div>
                         </div>
 
@@ -437,56 +407,25 @@
             }
 
             // Load order items when sales order is selected
-            function selectSalesOrder(salesOrderId, orderNumber, customerName, deliveryDate) {
+            function selectSalesOrder(salesOrderId, orderNumber, customerName, deliveryDate, itemsJson) {
                 const listSection = document.getElementById('salesOrdersListSection');
                 const formSection = document.getElementById('workOrderForm');
-                const productSelect = document.getElementById('productSelect');
-                const dueDateInput = document.getElementById('dueDateInput');
-                const quantityInput = document.getElementById('quantityInput');
                 
-                // Store sales order ID
+                // Parse items data
+                const items = JSON.parse(itemsJson);
+                const firstItem = items[0]; // Get first item
+                
+                // Store sales order ID and first item details
                 document.getElementById('formSalesOrderId').value = salesOrderId;
+                document.getElementById('formProductId').value = firstItem.id;
+                document.getElementById('formQuantity').value = firstItem.quantity;
+                document.getElementById('formDueDate').value = deliveryDate;
                 
                 // Update summary
                 document.getElementById('summaryOrderNumber').textContent = orderNumber;
                 document.getElementById('summaryCustomer').textContent = customerName;
-                document.getElementById('summaryDelivery').textContent = new Date(deliveryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                
-                // Get selected option data
-                const selectedOption = document.querySelector(`#salesOrdersListSection div[onclick*="${salesOrderId}"]`);
-                const allOptions = Array.from(document.querySelectorAll('option')).filter(opt => opt.value === salesOrderId);
-                
-                // Find products from the sales order - we need to get this from server data
-                // For now, fetch from the data attributes we embedded
-                const salesOrderElement = Array.from(document.querySelectorAll(`[onclick*="selectSalesOrder"]`)).find(el => 
-                    el.textContent.includes(orderNumber)
-                );
-                
-                // Get products from hidden data
-                const productOptions = Array.from(document.querySelectorAll('option')).filter(opt => {
-                    const itemsAttr = opt.getAttribute('data-items');
-                    return itemsAttr && opt.value === salesOrderId;
-                });
-                
-                if (productOptions.length > 0) {
-                    const itemsData = JSON.parse(productOptions[0].getAttribute('data-items') || '[]');
-                    productSelect.innerHTML = '<option value="">Select Product</option>';
-                    
-                    itemsData.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = `${item.name} (Qty: ${item.quantity})`;
-                        option.setAttribute('data-quantity', item.quantity);
-                        productSelect.appendChild(option);
-                    });
-                }
-                
-                // Set delivery date
-                dueDateInput.value = deliveryDate;
-                
-                // Reset product selection
-                productSelect.value = '';
-                quantityInput.value = '';
+                document.getElementById('summaryProduct').textContent = `${firstItem.name}`;
+                document.getElementById('summaryQuantity').textContent = `${firstItem.quantity}`;
                 
                 // Show form, hide list
                 listSection.classList.add('hidden');
@@ -503,19 +442,6 @@
                 // Show list, hide form
                 listSection.classList.remove('hidden');
                 formSection.classList.add('hidden');
-            }
-            
-            function updateQuantity() {
-                const productSelect = document.getElementById('productSelect');
-                const quantityInput = document.getElementById('quantityInput');
-                
-                if (productSelect.value) {
-                    const selectedOption = productSelect.options[productSelect.selectedIndex];
-                    const qty = selectedOption.getAttribute('data-quantity');
-                    if (qty) {
-                        quantityInput.value = qty;
-                    }
-                }
             }
 
             function viewWorkOrder(id) {
