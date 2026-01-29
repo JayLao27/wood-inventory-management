@@ -823,6 +823,137 @@
             document.getElementById('viewOrderItemsModal').classList.add('hidden');
         }
 
+        // Received Stock Reports Modal Functions
+        function openReceivedStockReportsModal() {
+            document.getElementById('receivedStockReportsModal').classList.remove('hidden');
+            loadReceivedStockReports();
+        }
+
+        function closeReceivedStockReportsModal() {
+            document.getElementById('receivedStockReportsModal').classList.add('hidden');
+        }
+
+        async function loadReceivedStockReports() {
+            const tbody = document.getElementById('receivedStockTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
+
+            try {
+                const response = await fetch('/procurement/received-stock-reports');
+                const data = await response.json();
+
+                if (data.success && data.movements && data.movements.length > 0) {
+                    let totalReceived = 0;
+                    let totalDefects = 0;
+
+                    tbody.innerHTML = data.movements.map(movement => {
+                        const receivedQty = parseFloat(movement.quantity || 0);
+                        const defectQty = parseFloat(movement.defect_quantity || 0);
+                        totalReceived += receivedQty;
+                        totalDefects += defectQty;
+
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-gray-700">${movement.date}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.po_number || 'N/A'}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.material_name}</td>
+                                <td class="px-4 py-3 text-gray-700">${receivedQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-red-600">${defectQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.supplier_name || 'N/A'}</td>
+                                <td class="px-4 py-3">
+                                    <span class="text-xs font-semibold ${
+                                        movement.status === 'completed' ? 'text-green-600' : 
+                                        movement.status === 'pending' ? 'text-orange-600' : 'text-red-600'
+                                    }">${movement.status || 'N/A'}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    // Update summary
+                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
+                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
+                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
+
+                    // Populate material filter
+                    const materialSelect = document.getElementById('filterMaterial');
+                    const uniqueMaterials = [...new Set(data.movements.map(m => m.material_name))];
+                    materialSelect.innerHTML = '<option value="">All Materials</option>' + 
+                        uniqueMaterials.map(material => `<option value="${material}">${material}</option>`).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No received stock records found</td></tr>';
+                    document.getElementById('totalReceived').textContent = '0';
+                    document.getElementById('totalDefects').textContent = '0';
+                    document.getElementById('netQuantity').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error loading received stock reports:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
+            }
+        }
+
+        async function filterReceivedStock() {
+            const dateFrom = document.getElementById('filterDateFrom').value;
+            const dateTo = document.getElementById('filterDateTo').value;
+            const material = document.getElementById('filterMaterial').value;
+
+            const params = new URLSearchParams();
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo) params.append('date_to', dateTo);
+            if (material) params.append('material', material);
+
+            const tbody = document.getElementById('receivedStockTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
+
+            try {
+                const response = await fetch(`/procurement/received-stock-reports?${params.toString()}`);
+                const data = await response.json();
+
+                if (data.success && data.movements && data.movements.length > 0) {
+                    let totalReceived = 0;
+                    let totalDefects = 0;
+
+                    tbody.innerHTML = data.movements.map(movement => {
+                        const receivedQty = parseFloat(movement.quantity || 0);
+                        const defectQty = parseFloat(movement.defect_quantity || 0);
+                        totalReceived += receivedQty;
+                        totalDefects += defectQty;
+
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-gray-700">${movement.date}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.po_number || 'N/A'}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.material_name}</td>
+                                <td class="px-4 py-3 text-gray-700">${receivedQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-red-600">${defectQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.supplier_name || 'N/A'}</td>
+                                <td class="px-4 py-3">
+                                    <span class="text-xs font-semibold ${
+                                        movement.status === 'completed' ? 'text-green-600' : 
+                                        movement.status === 'pending' ? 'text-orange-600' : 'text-red-600'
+                                    }">${movement.status || 'N/A'}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    // Update summary
+                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
+                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
+                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No records found matching the filters</td></tr>';
+                    document.getElementById('totalReceived').textContent = '0';
+                    document.getElementById('totalDefects').textContent = '0';
+                    document.getElementById('netQuantity').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error filtering received stock:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
+            }
+        }
+
         // Purchase Order Item Management
         let itemCount = 1;
 
