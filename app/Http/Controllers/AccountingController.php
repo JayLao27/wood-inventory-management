@@ -77,25 +77,22 @@ class AccountingController extends Controller
         }
 
         if ($request->transaction_type === 'Expense') {
-            Accounting::where('purchase_order_id', $request->order_id)->delete();
-            // Get purchase order and calculate payment status based on amount
+            // Get purchase order and calculate payment status based on total payments
             $purchaseOrder = PurchaseOrder::findOrFail($request->order_id);
-            $amountToPay = $request->input('amount');
-            $totalAmount = $purchaseOrder->total_amount;
-            
+            $amountToPay = (float) $request->input('amount');
+            $totalAmount = (float) $purchaseOrder->total_amount;
+
+            $existingPaid = (float) Accounting::where('purchase_order_id', $request->order_id)
+                ->where('transaction_type', 'Expense')
+                ->sum('amount');
+            $newTotalPaid = $existingPaid + $amountToPay;
+
             // Validate that payment amount doesn't exceed total amount
-            if ($amountToPay > $totalAmount) {
-                return redirect()->back()->withErrors(['amount' => "Payment amount cannot exceed the total order amount of ₱" . number_format($totalAmount, 2)]);
+            if ($newTotalPaid > $totalAmount) {
+                return redirect()->back()->withErrors([
+                    'amount' => "Payment amount exceeds the remaining balance of ₱" . number_format(max($totalAmount - $existingPaid, 0), 2)
+                ]);
             }
-            
-            // Determine payment status - only Paid or Partial (no Pending)
-            if ($amountToPay >= $totalAmount) {
-                $paymentStatus = 'Paid';
-            } else {
-                $paymentStatus = 'Partial';
-            }
-            
-            $purchaseOrder->update(['payment_status' => $paymentStatus]);
         }
 
         Accounting::create([
@@ -106,6 +103,17 @@ class AccountingController extends Controller
             'sales_order_id' => $request->transaction_type === 'Income' ? $request->order_id : null,
             'purchase_order_id' => $request->transaction_type === 'Expense' ? $request->order_id : null,
         ]);
+
+        if ($request->transaction_type === 'Expense') {
+            $purchaseOrder = PurchaseOrder::findOrFail($request->order_id);
+            $totalAmount = (float) $purchaseOrder->total_amount;
+            $totalPaid = (float) Accounting::where('purchase_order_id', $request->order_id)
+                ->where('transaction_type', 'Expense')
+                ->sum('amount');
+
+            $paymentStatus = $totalPaid >= $totalAmount ? 'Paid' : 'Partial';
+            $purchaseOrder->update(['payment_status' => $paymentStatus]);
+        }
 
         return redirect()->route('accounting')->with('success', 'Transaction added successfully!');
     }

@@ -9,6 +9,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Material;
 use App\Models\InventoryMovement;
+use App\Models\Accounting;
 
 class ProcurementController extends Controller
 {
@@ -19,10 +20,26 @@ class ProcurementController extends Controller
         $materials = Material::all();
         
         $totalSpent = PurchaseOrder::sum('total_amount');
-        $paymentsMade = PurchaseOrder::where('payment_status', 'Paid')->sum('total_amount');
-        $pendingPayments = PurchaseOrder::whereIn('payment_status', ['Pending', 'Partial'])->sum('total_amount');
         $activeSuppliers = Supplier::where('status', 'active')->count();
         $lowStockAlerts = Material::whereRaw('current_stock <= minimum_stock')->count();
+
+        // Sync payment status from accounting transactions
+        $purchaseOrders->each(function ($order) {
+            $totalPaid = (float) Accounting::where('purchase_order_id', $order->id)
+                ->where('transaction_type', 'Expense')
+                ->sum('amount');
+
+            if ($totalPaid > 0) {
+                $newStatus = $totalPaid >= (float) $order->total_amount ? 'Paid' : 'Partial';
+                if ($order->payment_status !== $newStatus) {
+                    $order->payment_status = $newStatus;
+                    $order->save();
+                }
+            }
+        });
+
+        $paymentsMade = $purchaseOrders->where('payment_status', 'Paid')->sum('total_amount');
+        $pendingPayments = $purchaseOrders->whereIn('payment_status', ['Pending', 'Partial'])->sum('total_amount');
 
         // Only show purchase orders that still have remaining quantity to receive
         // Filter out POs where ALL items have been fully received or status is 'received'
