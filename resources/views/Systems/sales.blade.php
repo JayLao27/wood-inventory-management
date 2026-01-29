@@ -129,44 +129,50 @@
 					</div>
 
 					<!-- Sales Orders Table -->
-					<div id="salesTable" class="overflow-x-auto">
-						<table class="min-w-full border-collapse text-left text-sm">
-							<thead class="bg-slate-800 text-gray-300">
+					<div id="salesTable" class="overflow-y-auto" style="max-height: 60vh;">
+						<table class="w-full border-collapse text-left text-sm text-white">
+							<thead class="bg-slate-800 text-slate-300 sticky top-0">
 								<tr>
-									<th class="px-4 py-2">Order #</th>
-									<th class="px-4 py-2">Customer</th>
-									<th class="px-4 py-2">Order Date</th>
-									<th class="px-4 py-2">Delivery Date</th>
-									<th class="px-4 py-2">Total Amount</th>
-									<th class="px-4 py-2">Payment Status</th>
-									<th class="px-4 py-2">Action</th>
+									<th class="px-4 py-3 font-medium">Order #</th>
+									<th class="px-4 py-3 font-medium">Customer</th>
+									<th class="px-4 py-3 font-medium">Order Date</th>
+									<th class="px-4 py-3 font-medium">Delivery Date</th>
+									<th class="px-4 py-3 font-medium">Total Amount</th>
+									<th class="px-4 py-3 font-medium">Payment Status</th>
+									<th class="px-4 py-3 font-medium">Action</th>
 								</tr>
 							</thead>
-							<tbody id="salesTbody">
+							<tbody id="salesTbody" class="divide-y divide-slate-600">
 								@forelse($salesOrders as $order)
-									<tr class="border-t border-slate-600 data-row" data-status="{{ $order->status }}" data-payment="{{ $order->payment_status }}">
-										<td class="px-4 py-2">{{ $order->order_number }}</td>
-										<td class="px-4 py-2">
-											<div class="font-medium">{{ $order->customer?->name }}</div>
+									<tr class="hover:bg-slate-600 transition cursor-pointer data-row" data-status="{{ $order->status }}" data-payment="{{ $order->payment_status }}">
+										<td class="px-4 py-3 font-mono text-slate-300">{{ $order->order_number }}</td>
+										<td class="px-4 py-3">
+											<div class="font-medium text-slate-300">{{ $order->customer?->name }}</div>
 											@php $ct = $order->customer?->customer_type; $ctBg = $customerTypeBg[$ct] ?? '#e5e7eb'; @endphp
-											<span class="mt-1 inline-block text-xs text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $ct }}</span>
+											<span class="mt-1 inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $ct }}</span>
 										</td>
-										<td class="px-4 py-2">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
-										<td class="px-4 py-2">{{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</td>
+										<td class="px-4 py-3 text-slate-300">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
+										<td class="px-4 py-3 text-slate-300">{{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</td>
 										@php
 											$sb = $order->status === 'Pending' ? '#ffffff' : ($statusBg[$order->status] ?? '#e5e7eb');
 											$stText = $order->status === 'Pending' ? 'text-gray-900' : 'text-white';
 										@endphp
-										<td class="px-4 py-2">₱{{ number_format($order->total_amount, 2) }}</td>
+										<td class="px-4 py-3 font-bold text-slate-300">₱{{ number_format($order->total_amount, 2) }}</td>
 										@php
 											$pb = $paymentBg[$order->payment_status] ?? '#ffffff';
 											$ptText = $order->payment_status === 'Pending' ? 'text-gray-900' : 'text-white';
 											$pendingBorder = $order->payment_status==='Pending' ? 'border border-gray-300' : '';
 										@endphp
-										<td class="px-4 py-2">
-											<span class="inline-block text-xs px-2 py-0.5 rounded {{ $ptText }} {{ $pendingBorder }}" style="background: {{ $pb }};">{{ $order->payment_status }}</span>
+										<td class="px-4 py-3">
+											@if($order->payment_status === 'Paid')
+												<span class="text-xs font-semibold text-green-400">{{ $order->payment_status }}</span>
+											@elseif($order->payment_status === 'Partial')
+												<span class="text-xs font-semibold text-yellow-400">{{ $order->payment_status }}</span>
+											@else
+												<span class="text-xs font-semibold text-slate-400">{{ $order->payment_status }}</span>
+											@endif
 										</td>
-										<td class="px-4 py-2">
+										<td class="px-4 py-3">
 											<div class="flex space-x-2">
 												<button onclick="openModal('viewOrderModal-{{ $order->id }}')" class="p-1 hover:bg-slate-500 rounded">
 													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -214,7 +220,15 @@
 													$vpb = $paymentBg[$order->payment_status] ?? '#ffffff';
 													$vptText = $order->payment_status === 'Pending' ? 'color: #111827;' : 'color: #ffffff;';
 												@endphp
-												<div><span class="font-semibold">Payment Status:</span> <span class="px-2 py-0.5 rounded" style="background: {{ $vpb }}; {{ $vptText }}">{{ $order->payment_status }}</span></div>
+												<div><span class="font-semibold">Payment Status:</span>
+											@if($order->payment_status === 'Paid')
+												<span class="text-green-400 font-semibold">{{ $order->payment_status }}</span>
+											@elseif($order->payment_status === 'Partial')
+												<span class="text-orange-400 font-semibold">{{ $order->payment_status }}</span>
+											@else
+												<span class="text-slate-400 font-semibold">{{ $order->payment_status }}</span>
+											@endif
+										</div>
 												<div><span class="font-semibold">Total Amount:</span> ₱{{ number_format($order->total_amount, 2) }}</div>
 												<div class="md:col-span-2"><span class="font-semibold">Notes:</span>
 													<div class="mt-1 whitespace-pre-wrap">{{ $order->note ?: '—' }}</div>
@@ -274,30 +288,30 @@
 					</div>
 
 					<!-- Customers Table -->
-					<div id="customerTable" class="hidden overflow-x-auto">
-						<table class="min-w-full border-collapse text-left text-sm">
-							<thead class="bg-slate-800 text-gray-300">
+					<div id="customerTable" class="hidden overflow-y-auto" style="max-height: 60vh;">
+						<table class="w-full border-collapse text-left text-sm text-white">
+							<thead class="bg-slate-800 text-slate-300 sticky top-0">
 								<tr>
-									<th class="px-4 py-2">Name</th>
-									<th class="px-4 py-2">Type</th>
-									<th class="px-4 py-2">Contact</th>
-									<th class="px-4 py-2">Email</th>
-									<th class="px-4 py-2">Total Orders</th>
-									<th class="px-4 py-2">Total Spent</th>
-									<th class="px-4 py-2">Action</th>
+									<th class="px-4 py-3 font-medium">Name</th>
+									<th class="px-4 py-3 font-medium">Type</th>
+									<th class="px-4 py-3 font-medium">Contact</th>
+									<th class="px-4 py-3 font-medium">Email</th>
+									<th class="px-4 py-3 font-medium">Total Orders</th>
+									<th class="px-4 py-3 font-medium">Total Spent</th>
+									<th class="px-4 py-3 font-medium">Action</th>
 								</tr>
 							</thead>
-							<tbody id="customersTbody">
+							<tbody id="customersTbody" class="divide-y divide-slate-600">
 								@forelse($customers as $customer)
-									<tr class="border-t border-slate-600 data-row">
-										<td class="px-4 py-2">{{ $customer->name }}</td>
+									<tr class="hover:bg-slate-600 transition cursor-pointer data-row">
+										<td class="px-4 py-3 font-medium text-slate-300">{{ $customer->name }}</td>
 										@php $ctBg = $customerTypeBg[$customer->customer_type] ?? '#e5e7eb'; @endphp
-										<td class="px-4 py-2"><span class="inline-block text-xs text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span></td>
-										<td class="px-4 py-2">{{ $customer->phone }}</td>
-										<td class="px-4 py-2">{{ $customer->email }}</td>
-										<td class="px-4 py-2">{{ $customer->totalOrders() }}</td>
-										<td class="px-4 py-2">₱{{ number_format($customer->totalSpent(), 2) }}</td>
-										<td class="px-4 py-2">
+										<td class="px-4 py-3"><span class="inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span></td>
+										<td class="px-4 py-3 text-slate-300">{{ $customer->phone }}</td>
+										<td class="px-4 py-3 text-slate-300">{{ $customer->email }}</td>
+										<td class="px-4 py-3 text-slate-300">{{ $customer->totalOrders() }}</td>
+										<td class="px-4 py-3 font-bold text-slate-300">₱{{ number_format($customer->totalSpent(), 2) }}</td>
+									<td class="px-4 py-3">
 											<div class="flex space-x-2">
 												<button onclick="openModal('viewCustomerModal-{{ $customer->id }}')" class="p-1 hover:bg-slate-500 rounded">
 													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
