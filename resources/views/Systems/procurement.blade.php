@@ -172,7 +172,7 @@
 
             <!-- Tabs -->
             <div class="flex space-x-1 mb-6">
-                <button onclick="showTab('purchase-orders')" id="purchase-orders-tab" class="flex-auto px-[240px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">PurchaseOrders</button>
+                <button onclick="showTab('purchase-orders')" id="purchase-orders-tab" class="flex-auto px-[240px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Orders</button>
                 <button onclick="showTab('suppliers')" id="suppliers-tab" class="flex-auto px-[240px] py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Suppliers</button>
             </div>
 
