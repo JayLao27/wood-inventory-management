@@ -162,7 +162,7 @@
                         <option value="all">All Status</option>
                         <option value="paid">Paid</option>
                         <option value="partial">Partial</option>
-                        <option value="unpaid">Pending</option>
+                        <option value="pending">Pending</option>
                     </select>
 
                     
