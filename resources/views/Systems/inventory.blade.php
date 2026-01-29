@@ -329,6 +329,11 @@
                                 </div>
                                 
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                    <input type="text" name="category" value="Products" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                                
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Production Cost *</label>
                                     <input type="number" name="production_cost" id="productProductionCost" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
