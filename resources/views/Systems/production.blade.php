@@ -20,7 +20,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Pending</p>
-                            <p class="text-3xl font-bold mt-2">{{ $statusCounts['pending'] ?? 0 }}</p>
+                            <p class="text-3xl font-bold mt-2">{{ $workOrders['pending'] ?? 0 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Awaiting start</p>
                         </div>
                         <div >
@@ -128,7 +128,6 @@
                                 <th class="text-left py-3 px-4 font-medium">Order #</th>
                                 <th class="text-left py-3 px-4 font-medium">Product</th>
                                 <th class="text-left py-3 px-4 font-medium">Quantity</th>
-                                <th class="text-left py-3 px-4 font-medium">Completion Quantity</th>
                                 <th class="text-left py-3 px-4 font-medium">Due Date</th>
                                 <th class="text-left py-3 px-4 font-medium">Assigned To</th>
                                 <th class="text-left py-3 px-4 font-medium">Action</th>
@@ -140,7 +139,6 @@
                                 <td class="py-3 px-4">{{ $workOrder->order_number }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->product_name }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->quantity }} pcs</td>
-                                <td class="py-3 px-4">{{ $workOrder->completion_quantity }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->due_date->format('m/d/Y') }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->assigned_to }}</td>
                                 <td class="py-3 px-4">
