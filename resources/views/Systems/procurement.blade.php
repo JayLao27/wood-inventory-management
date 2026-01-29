@@ -152,34 +152,34 @@
             </div>
 
             <!-- Purchase Orders Table -->
-            <div id="purchase-orders-table" class="overflow-x-auto">
-                <table class="w-full text-white">
-                    <thead>
-                        <tr class="border-b border-slate-600">
-                            <th class="text-left py-3 px-4 font-medium">Order #</th>
-                            <th class="text-left py-3 px-4 font-medium">Supplier</th>
-                            <th class="text-left py-3 px-4 font-medium">Order Date</th>
-                            <th class="text-left py-3 px-4 font-medium">Expected Delivery</th>
-                            <th class="text-left py-3 px-4 font-medium">Total Amount</th>
-                            <th class="text-left py-3 px-4 font-medium">Payment Status</th>
-                            <th class="text-left py-3 px-4 font-medium">Action</th>
+            <div id="purchase-orders-table" class="overflow-y-auto" style="max-height: 60vh;">
+                <table class="w-full border-collapse text-left text-sm text-white">
+                    <thead class="bg-slate-800 text-slate-300 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 font-medium">Order #</th>
+                            <th class="px-4 py-3 font-medium">Supplier</th>
+                            <th class="px-4 py-3 font-medium">Order Date</th>
+                            <th class="px-4 py-3 font-medium">Expected Delivery</th>
+                            <th class="px-4 py-3 font-medium">Total Amount</th>
+                            <th class="px-4 py-3 font-medium">Payment Status</th>
+                            <th class="px-4 py-3 font-medium">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-600">
                         @forelse($purchaseOrders ?? [] as $order)
-                        <tr class="hover:bg-slate-600 cursor-pointer">
-                            <td class="py-3 px-4">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
-                            <td class="py-3 px-4">{{ $order->supplier->name }}</td>
-                            <td class="py-3 px-4">{{ $order->order_date->format('m/d/Y') }}</td>
-                            <td class="py-3 px-4">{{ $order->expected_delivery->format('m/d/Y') }}</td>
-                            <td class="py-3 px-4">₱{{ number_format($order->total_amount, 2) }}</td>
-                            <td class="py-3 px-4">
+                        <tr class="hover:bg-slate-600 transition cursor-pointer">
+                            <td class="px-4 py-3 font-mono text-slate-300">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
+                            <td class="px-4 py-3 text-slate-300 font-medium">{{ $order->supplier->name }}</td>
+                            <td class="px-4 py-3 text-slate-300">{{ $order->order_date->format('M d, Y') }}</td>
+                            <td class="px-4 py-3 text-slate-300">{{ $order->expected_delivery->format('M d, Y') }}</td>
+                            <td class="px-4 py-3 font-bold text-slate-300">₱{{ number_format($order->total_amount, 2) }}</td>
+                            <td class="px-4 py-3">
                                 @if($order->payment_status === 'Paid')
-                                    <span class="text-green-400">{{ $order->payment_status }}</span>
+                                    <span class="text-xs font-semibold text-green-400">{{ $order->payment_status }}</span>
                                 @elseif($order->payment_status === 'Partial')
-                                    <span class="text-orange-400">{{ $order->payment_status }}</span>
+                                    <span class="text-xs font-semibold text-orange-400">{{ $order->payment_status }}</span>
                                 @else
-                                    <span class="text-gray-300">{{ $order->payment_status }}</span>
+                                    <span class="text-xs font-semibold text-slate-400">{{ $order->payment_status }}</span>
                                 @endif
                             </td>
                             <td class="py-3 px-4">
@@ -213,32 +213,32 @@
             </div>
 
             <!-- Suppliers Table -->
-            <div id="suppliers-table" class="overflow-x-auto hidden">
-                <table class="w-full text-white">
-                    <thead>
-                        <tr class="border-b border-slate-600">
-                            <th class="text-left py-3 px-4 font-medium">Name</th>
-                            <th class="text-left py-3 px-4 font-medium">Contact Person</th>
-                            <th class="text-left py-3 px-4 font-medium">Phone</th>
-                            <th class="text-left py-3 px-4 font-medium">Email</th>
-                            <th class="text-left py-3 px-4 font-medium">Payment Terms</th>
-                            <th class="text-left py-3 px-4 font-medium">Status</th>
-                            <th class="text-left py-3 px-4 font-medium">Action</th>
+            <div id="suppliers-table" class="overflow-y-auto hidden" style="max-height: 60vh;">
+                <table class="w-full border-collapse text-left text-sm text-white">
+                    <thead class="bg-slate-800 text-slate-300 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 font-medium">Name</th>
+                            <th class="px-4 py-3 font-medium">Contact Person</th>
+                            <th class="px-4 py-3 font-medium">Phone</th>
+                            <th class="px-4 py-3 font-medium">Email</th>
+                            <th class="px-4 py-3 font-medium">Payment Terms</th>
+                            <th class="px-4 py-3 font-medium">Status</th>
+                            <th class="px-4 py-3 font-medium">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-600">
                         @forelse($suppliers ?? [] as $supplier)
-                        <tr class="hover:bg-slate-600 cursor-pointer">
-                            <td class="py-3 px-4">{{ $supplier->name }}</td>
-                            <td class="py-3 px-4">{{ $supplier->contact_person }}</td>
-                            <td class="py-3 px-4">{{ $supplier->phone }}</td>
-                            <td class="py-3 px-4">{{ $supplier->email }}</td>
-                            <td class="py-3 px-4">{{ $supplier->payment_terms }}</td>
-                            <td class="py-3 px-4">
+                        <tr class="hover:bg-slate-600 transition cursor-pointer">
+                            <td class="px-4 py-3 font-medium text-slate-300">{{ $supplier->name }}</td>
+                            <td class="px-4 py-3 text-slate-300">{{ $supplier->contact_person }}</td>
+                            <td class="px-4 py-3 text-slate-300">{{ $supplier->phone }}</td>
+                            <td class="px-4 py-3 text-slate-300">{{ $supplier->email }}</td>
+                            <td class="px-4 py-3 text-slate-300">{{ $supplier->payment_terms }}</td>
+                            <td class="px-4 py-3">
                                 @if($supplier->status === 'active')
-                                    <span class="text-green-400">{{ ucfirst($supplier->status) }}</span>
+                                    <span class="text-xs font-semibold text-green-400">{{ ucfirst($supplier->status) }}</span>
                                 @else
-                                    <span class="text-red-400">{{ ucfirst($supplier->status) }}</span>
+                                    <span class="text-xs font-semibold text-red-400">{{ ucfirst($supplier->status) }}</span>
                                 @endif
                             </td>
                             <td class="py-3 px-4">
