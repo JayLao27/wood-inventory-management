@@ -5,6 +5,12 @@
         <div class="flex-1 p-8 bg-amber-50">
             <!-- Header Section -->
             <div class="mb-8">
+                @if(session('success'))
+                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg">{{ session('success') }}</div>
+                @endif
+                @if(session('error'))
+                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-800 rounded-lg">{{ session('error') }}</div>
+                @endif
                 <div class="flex justify-between items-start">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900">Production Management</h1>
@@ -20,7 +26,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-slate-300 text-sm">Pending</p>
-                            <p class="text-3xl font-bold mt-2">{{ $workOrders['pending'] ?? 0 }}</p>
+                            <p class="text-3xl font-bold mt-2">{{ $statusCounts['pending'] ?? 0 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Awaiting start</p>
                         </div>
                         <div >
@@ -203,7 +209,10 @@
                     <!-- Sales Orders List -->
                     <div id="salesOrdersListSection" class="space-y-3 max-h-64 overflow-y-auto mb-6">
                         @forelse($pendingSalesOrders ?? [] as $salesOrder)
-                            <div onclick="selectSalesOrder('{{ $salesOrder->id }}', '{{ $salesOrder->order_number }}', '{{ $salesOrder->customer->name }}', '{{ $salesOrder->delivery_date }}', '{{ json_encode($salesOrder->items->map(function($item) { return ['id' => $item->product_id, 'name' => $item->product->product_name ?? 'Product', 'quantity' => $item->quantity]; })) }}')" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
+                            @php
+                                $itemsData = $salesOrder->items->map(fn($item) => ['id' => $item->product_id, 'name' => addslashes($item->product->product_name ?? 'Product'), 'quantity' => $item->quantity]);
+                            @endphp
+                            <div onclick="selectSalesOrder({{ $salesOrder->id }}, '{{ addslashes($salesOrder->order_number) }}', '{{ addslashes($salesOrder->customer->name ?? '') }}', '{{ $salesOrder->delivery_date }}', {{ json_encode($itemsData) }})" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <h3 class="font-semibold text-gray-800">{{ $salesOrder->order_number }} - {{ $salesOrder->customer->name }}</h3>
@@ -232,6 +241,14 @@
                         <input type="hidden" name="priority" value="medium">
                         
                         <div class="space-y-6">
+                            <!-- Product line selector (when SO has multiple items) -->
+                            <div id="productLineSelector" class="hidden">
+                                <label class="block text-gray-700 text-lg font-medium mb-3">Select product line from this sales order <span class="text-red-500">*</span></label>
+                                <select id="productLineSelect" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg">
+                                    <option value="">Choose product...</option>
+                                </select>
+                            </div>
+
                             <!-- Order Summary -->
                             <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
                                 <h3 class="font-semibold text-gray-800 mb-3">Order Summary</h3>
@@ -303,6 +320,7 @@
                                     <select name="status" id="editStatus" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" required>
                                         <option value="pending">Pending</option>
                                         <option value="in_progress">In Progress</option>
+                                        <option value="quality_check">Quality Check</option>
                                         <option value="completed">Completed</option>
                                         <option value="overdue">Overdue</option>
                                     </select>
@@ -359,7 +377,8 @@
                         modal.classList.add('hidden');
                         modal.classList.remove('flex');
                         document.getElementById('workOrderForm').reset();
-                        document.getElementById('orderItemsSection').classList.add('hidden');
+                        document.getElementById('salesOrdersListSection').classList.remove('hidden');
+                        document.getElementById('productLineSelector').classList.add('hidden');
                     }, 150);
                 } else {
                     modal.classList.add('hidden');
@@ -368,7 +387,13 @@
                 }
             }
 
+            const workOrdersData = @json($workOrders ?? []);
             function editWorkOrder(id) {
+                const wo = workOrdersData.find(w => w.id === id);
+                if (wo) {
+                    document.getElementById('editStatus').value = wo.status;
+                    document.getElementById('editCompletionQuantity').value = wo.completion_quantity ?? 0;
+                }
                 const modal = document.getElementById('editWorkOrderModal');
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
@@ -404,40 +429,67 @@
                 }
             }
 
-            // Load order items when sales order is selected
-            function selectSalesOrder(salesOrderId, orderNumber, customerName, deliveryDate, itemsJson) {
+            // Store current items when sales order is selected (for product line dropdown)
+            let currentOrderItems = [];
+
+            function selectSalesOrder(salesOrderId, orderNumber, customerName, deliveryDate, items) {
                 const listSection = document.getElementById('salesOrdersListSection');
                 const formSection = document.getElementById('workOrderForm');
-                
-                // Parse items data
-                const items = JSON.parse(itemsJson);
-                const firstItem = items[0]; // Get first item
-                
-                // Store sales order ID and first item details
+                const productLineSelector = document.getElementById('productLineSelector');
+                const productLineSelect = document.getElementById('productLineSelect');
+
+                currentOrderItems = Array.isArray(items) ? items : JSON.parse(items);
                 document.getElementById('formSalesOrderId').value = salesOrderId;
-                document.getElementById('formProductId').value = firstItem.id;
-                document.getElementById('formQuantity').value = firstItem.quantity;
                 document.getElementById('formDueDate').value = deliveryDate;
-                
-                // Update summary
                 document.getElementById('summaryOrderNumber').textContent = orderNumber;
                 document.getElementById('summaryCustomer').textContent = customerName;
-                document.getElementById('summaryProduct').textContent = `${firstItem.name}`;
-                document.getElementById('summaryQuantity').textContent = `${firstItem.quantity}`;
-                
-                // Show form, hide list
+
+                productLineSelect.innerHTML = '<option value="">Choose product...</option>';
+                currentOrderItems.forEach((item, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = `${item.name} (Qty: ${item.quantity})`;
+                    productLineSelect.appendChild(opt);
+                });
+
+                if (currentOrderItems.length > 1) {
+                    productLineSelector.classList.remove('hidden');
+                    productLineSelect.required = true;
+                    document.getElementById('formProductId').value = '';
+                    document.getElementById('formQuantity').value = '';
+                    document.getElementById('summaryProduct').textContent = '-';
+                    document.getElementById('summaryQuantity').textContent = '-';
+                } else {
+                    productLineSelector.classList.add('hidden');
+                    productLineSelect.required = false;
+                    const first = currentOrderItems[0];
+                    document.getElementById('formProductId').value = first.id;
+                    document.getElementById('formQuantity').value = first.quantity;
+                    document.getElementById('summaryProduct').textContent = first.name;
+                    document.getElementById('summaryQuantity').textContent = first.quantity;
+                }
+
                 listSection.classList.add('hidden');
                 formSection.classList.remove('hidden');
             }
+
+            document.getElementById('productLineSelect')?.addEventListener('change', function() {
+                const idx = this.value;
+                if (idx === '' || !currentOrderItems.length) return;
+                const item = currentOrderItems[parseInt(idx, 10)];
+                if (item) {
+                    document.getElementById('formProductId').value = item.id;
+                    document.getElementById('formQuantity').value = item.quantity;
+                    document.getElementById('summaryProduct').textContent = item.name;
+                    document.getElementById('summaryQuantity').textContent = item.quantity;
+                }
+            });
             
             function resetWorkOrderForm() {
                 const listSection = document.getElementById('salesOrdersListSection');
                 const formSection = document.getElementById('workOrderForm');
-                
-                // Reset form
                 document.getElementById('workOrderForm').reset();
-                
-                // Show list, hide form
+                document.getElementById('productLineSelector').classList.add('hidden');
                 listSection.classList.remove('hidden');
                 formSection.classList.add('hidden');
             }
@@ -449,22 +501,44 @@
 
             function startWorkOrder(id) {
                 if (confirm('Start this work order?')) {
-                    // Implementation for starting work order
-                    console.log('Start work order:', id);
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/production/' + id + '/start';
+                    const csrf = document.createElement('input');
+                    csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}';
+                    form.appendChild(csrf);
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             }
 
             function pauseWorkOrder(id) {
                 if (confirm('Pause this work order?')) {
-                    // Implementation for pausing work order
-                    console.log('Pause work order:', id);
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/production/' + id;
+                    const csrf = document.createElement('input');
+                    csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}';
+                    const method = document.createElement('input');
+                    method.type = 'hidden'; method.name = '_method'; method.value = 'PUT';
+                    const status = document.createElement('input');
+                    status.type = 'hidden'; status.name = 'status'; status.value = 'in_progress';
+                    form.appendChild(csrf); form.appendChild(method); form.appendChild(status);
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             }
 
             function completeWorkOrder(id) {
                 if (confirm('Mark this work order as completed?')) {
-                    // Implementation for completing work order
-                    console.log('Complete work order:', id);
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/production/' + id + '/complete';
+                    const csrf = document.createElement('input');
+                    csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}';
+                    form.appendChild(csrf);
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             }
 

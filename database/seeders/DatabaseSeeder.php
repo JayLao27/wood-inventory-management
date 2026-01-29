@@ -46,6 +46,7 @@ User::updateOrCreate(
             ProductSeeder::class,
             SupplierSeeder::class,
             MaterialSeeder::class,
+            ProductMaterialSeeder::class, // BOM: materials needed per product
             SalesOrderSeeder::class,
             PurchaseOrderSeeder::class,
             InventoryMovementSeeder::class,
