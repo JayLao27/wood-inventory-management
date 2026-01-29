@@ -690,36 +690,43 @@
 
         function openViewOrderModal(orderId) {
             document.getElementById('viewOrderItemsModal').classList.remove('hidden');
-            // Find the order from the table
-            const rows = document.querySelectorAll('tbody tr');
-            rows.forEach(row => {
-                const firstCell = row.querySelector('td:first-child');
-                if (firstCell) {
-                    // Load sample data - in production, fetch from server
-                    document.getElementById('viewOrderNumber').textContent = firstCell.textContent;
-                    const supplierCell = row.querySelector('td:nth-child(2)');
-                    if (supplierCell) {
-                        document.getElementById('viewSupplierName').textContent = supplierCell.textContent;
-                    }
-                }
-            });
-            
-            // Generate sample items table
+
             const itemsTable = document.getElementById('viewOrderItemsTable');
-            itemsTable.innerHTML = `
-                <tr>
-                    <td class="px-4 py-3 text-gray-900">Material 1</td>
-                    <td class="px-4 py-3 text-right text-gray-900 font-medium">50</td>
-                    <td class="px-4 py-3 text-right text-gray-900">₱1,500.00</td>
-                    <td class="px-4 py-3 text-right text-gray-900 font-bold">₱75,000.00</td>
-                </tr>
-                <tr>
-                    <td class="px-4 py-3 text-gray-900">Material 2</td>
-                    <td class="px-4 py-3 text-right text-gray-900 font-medium">30</td>
-                    <td class="px-4 py-3 text-right text-gray-900">₱2,000.00</td>
-                    <td class="px-4 py-3 text-right text-gray-900 font-bold">₱60,000.00</td>
-                </tr>
-            `;
+            itemsTable.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Loading items...</td></tr>';
+
+            fetch(`/procurement/purchase-orders/${orderId}/items`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success || !data.items || data.items.length === 0) {
+                        itemsTable.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">No items found for this order.</td></tr>';
+                        return;
+                    }
+
+                    if (data.order) {
+                        document.getElementById('viewOrderNumber').textContent = data.order.order_number || '-';
+                        document.getElementById('viewSupplierName').textContent = data.order.supplier_name || '-';
+                    } else {
+                        const row = document.querySelector(`button[onclick="event.stopPropagation(); openViewOrderModal(${orderId})"]`)?.closest('tr');
+                        if (row) {
+                            const orderCell = row.querySelector('td:first-child');
+                            const supplierCell = row.querySelector('td:nth-child(2)');
+                            document.getElementById('viewOrderNumber').textContent = orderCell ? orderCell.textContent.trim() : '-';
+                            document.getElementById('viewSupplierName').textContent = supplierCell ? supplierCell.textContent.trim() : '-';
+                        }
+                    }
+
+                    itemsTable.innerHTML = data.items.map(item => `
+                        <tr>
+                            <td class="px-4 py-3 text-gray-900">${item.material_name || 'N/A'}</td>
+                            <td class="px-4 py-3 text-right text-gray-900 font-medium">${Number(item.ordered_quantity || 0).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-right text-gray-900">₱${Number(item.unit_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td class="px-4 py-3 text-right text-gray-900 font-bold">₱${Number(item.total_amount || (item.ordered_quantity || 0) * (item.unit_price || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(() => {
+                    itemsTable.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Failed to load items for this order.</td></tr>';
+                });
         }
 
         function closeViewOrderItemsModal() {
