@@ -10,12 +10,22 @@
                     <h1 class="text-3xl font-bold text-gray-900">Procurement Management</h1>
                     <p class="text-gray-600 mt-2">Manage suppliers, purchase orders, and material sourcing</p>
                 </div>
+                @php
+                    $receiveCount = is_countable($openPurchaseOrders ?? $purchaseOrders ?? [])
+                        ? count($openPurchaseOrders ?? $purchaseOrders ?? [])
+                        : 0;
+                @endphp
                 <div class="flex space-x-3">
                     <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
                         Reports
                     </button>
-                    <button onclick="openReceiveStockModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
+                    <button onclick="openReceiveStockModal()" class="relative px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
                         Receive Stock
+                        @if($receiveCount > 0)
+                            <span class="absolute -top-2 -right-2 min-w-[1.5rem] h-6 px-1 rounded-full border-2 border-red-500 text-red-600 bg-white text-xs font-bold flex items-center justify-center">
+                                {{ $receiveCount }}
+                            </span>
+                        @endif
                     </button>
                 </div>
             </div>
