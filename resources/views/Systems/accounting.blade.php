@@ -276,13 +276,20 @@
 			<!-- Purchase Orders List -->
 			<div id="purchaseOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto hidden">
 				@forelse($purchaseOrders as $purchaseOrder)
-					<div onclick="selectTransaction('{{ $purchaseOrder->order_number }}', {{ $purchaseOrder->total_amount }}, '{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}', 'Expense', {{ $purchaseOrder->id }})" class="p-4 border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-400 cursor-pointer transition">
+					<div onclick="selectTransaction('{{ $purchaseOrder->order_number }}', {{ $purchaseOrder->total_amount }}, '{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}', 'Expense', {{ $purchaseOrder->id }}, {{ $purchaseOrder->remaining_balance }})" class="p-4 border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-400 cursor-pointer transition">
 						<div class="flex justify-between items-start">
 							<div class="flex-1">
 								<h3 class="font-semibold text-gray-800">{{ $purchaseOrder->order_number }}: {{ $purchaseOrder->supplier->name ?? 'N/A' }}</h3>
 								<p class="text-sm text-gray-600">{{ $purchaseOrder->notes ?? 'Purchase Order' }}</p>
 							</div>
-							<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($purchaseOrder->total_amount, 2) }}</span>
+							<div class="flex flex-col items-end gap-1">
+								<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($purchaseOrder->total_amount, 2) }}</span>
+								@if($purchaseOrder->remaining_balance > 0)
+									<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">Remaining: ₱{{ number_format($purchaseOrder->remaining_balance, 2) }}</span>
+								@else
+									<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">Paid</span>
+								@endif
+							</div>
 						</div>
 						<p class="text-xs text-gray-500 mt-2">Date: {{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}</p>
 					</div>

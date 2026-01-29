@@ -42,4 +42,9 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(PurchaseOrderItem::class);
     }
+
+    public function accountingTransactions(): HasMany
+    {
+        return $this->hasMany(Accounting::class, 'purchase_order_id');
+    }
 }
