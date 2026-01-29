@@ -469,7 +469,7 @@
                                 <select name="purchase_order_id" id="purchaseOrderSelect" onchange="loadPurchaseOrderItems(this.value)" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                     <option value="">Select Purchase Order</option>
                                     @foreach($purchaseOrders ?? [] as $order)
-                                        <option value="{{ $order->id }}">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }} - {{ $order->supplier->name }}</option>
+                                        <option value="{{ $order->id }}" data-order-id="{{ $order->id }}">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }} - {{ $order->supplier->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -618,6 +618,41 @@
 
         function openReceiveStockModal() {
             document.getElementById('receiveStockModal').classList.remove('hidden');
+            filterPurchaseOrderDropdown();
+        }
+
+        async function filterPurchaseOrderDropdown() {
+            const select = document.getElementById('purchaseOrderSelect');
+            if (!select) return;
+
+            const options = Array.from(select.querySelectorAll('option[data-order-id]'));
+            
+            for (const option of options) {
+                const orderId = option.getAttribute('data-order-id');
+                if (!orderId) continue;
+
+                try {
+                    const response = await fetch(`/procurement/purchase-orders/${orderId}/items`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.items && data.items.length > 0) {
+                        const hasRemainingItems = data.items.some(item => Number(item.remaining_quantity || 0) > 0);
+                        if (!hasRemainingItems) {
+                            option.style.display = 'none';
+                            option.disabled = true;
+                        } else {
+                            option.style.display = '';
+                            option.disabled = false;
+                        }
+                    } else {
+                        option.style.display = 'none';
+                        option.disabled = true;
+                    }
+                } catch (error) {
+                    // Keep the option visible if there's an error checking
+                    console.error('Error checking order:', orderId, error);
+                }
+            }
         }
 
         function closeReceiveStockModal() {
@@ -644,7 +679,15 @@
                         return;
                     }
 
-                    const itemsHtml = data.items.map((item, index) => `
+                    // Filter out items that are fully received
+                    const itemsToReceive = data.items.filter(item => Number(item.remaining_quantity || 0) > 0);
+                    
+                    if (itemsToReceive.length === 0) {
+                        container.innerHTML = '<p class="text-gray-500 text-center py-8">All items have been fully received for this purchase order.</p>';
+                        return;
+                    }
+
+                    const itemsHtml = itemsToReceive.map((item, index) => `
                         <div class="bg-gray-50 p-4 rounded-lg mb-3">
                             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                                 <div>
