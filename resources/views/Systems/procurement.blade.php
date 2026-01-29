@@ -153,21 +153,20 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <input type="text" placeholder="Search order or suppliers....." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input id="searchInput" type="text" placeholder="Search orders or suppliers..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                 </div>
-                <button class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 3a1 1 0 000 2h11.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 6H19a1 1 0 100-2H3zM3 11a1 1 0 100 2h11.586l-1.293-1.293a1 1 0 111.414-1.414L16.414 14H19a1 1 0 100-2H3z"/>
-                    </svg>
-                    <span>All Status</span>
-                </button>
-                <button class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition ml-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 3a1 1 0 000 2h11.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 6H19a1 1 0 100-2H3zM3 11a1 1 0 100 2h11.586l-1.293-1.293a1 1 0 111.414-1.414L16.414 14H19a1 1 0 100-2H3z"/>
-                    </svg>
-                    <span>All Payments</span>
-                </button>
+
+                <div class="flex items-center space-x-2">
+                    <select id="statusFilter" class="px-3 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+                        <option value="all">All Status</option>
+                        <option value="paid">Paid</option>
+                        <option value="partial">Partial</option>
+                        <option value="unpaid">Unpaid</option>
+                    </select>
+
+                    
+                </div>
             </div>
 
             <!-- Tabs -->
@@ -1210,6 +1209,86 @@
             purchaseOrdersTab.style.borderRadius = '10px';
             const suppliersTab = document.getElementById('suppliers-tab');
             suppliersTab.style.borderRadius = '10px';
+
+            // Procurement search & filter logic
+            function applyProcurementFilters() {
+                const searchInput = document.getElementById('searchInput');
+                const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+                const statusFilter = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : 'all';
+                // Search and status filters handled client-side
+
+                const purchaseOrdersTable = document.getElementById('purchase-orders-table');
+                const suppliersTable = document.getElementById('suppliers-table');
+                const activeContainer = purchaseOrdersTable && !purchaseOrdersTable.classList.contains('hidden') ? purchaseOrdersTable : suppliersTable;
+
+                if (!activeContainer) return;
+
+                const rows = Array.from(activeContainer.querySelectorAll('tbody tr'));
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    // Collect searchable text depending on active table
+                    let text = (row.textContent || '').toLowerCase();
+
+                    // For purchase orders, filter additionally by payment status if selected
+                    if (activeContainer.id === 'purchase-orders-table' && statusFilter && statusFilter !== 'all') {
+                        const statusCell = row.querySelector('td:nth-child(6)');
+                        const statusText = statusCell ? (statusCell.textContent || '').toLowerCase() : '';
+                        if (!statusText.includes(statusFilter)) {
+                            row.style.display = 'none';
+                            return;
+                        }
+                    }
+
+                    // If query exists, match against row text
+                    if (query.length > 0) {
+                        if (text.includes(query)) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    } else {
+                        // no query, row already passed status filter
+                        row.style.display = '';
+                        visibleCount++;
+                    }
+                });
+
+                // Manage contextual no-results message inside active container
+                let noResultsEl = activeContainer.querySelector('#procurementNoResultsMessage');
+                if (!noResultsEl) {
+                    noResultsEl = document.createElement('div');
+                    noResultsEl.id = 'procurementNoResultsMessage';
+                    noResultsEl.className = 'py-8 px-4 text-center text-slate-400';
+                    noResultsEl.style.display = 'none';
+                    activeContainer.appendChild(noResultsEl);
+                }
+
+                if (visibleCount === 0) {
+                    noResultsEl.textContent = 'No items match your search/filter.';
+                    noResultsEl.style.display = '';
+                } else {
+                    noResultsEl.style.display = 'none';
+                }
+            }
+
+            // Attach listeners (guarded)
+            const searchEl = document.getElementById('searchInput');
+            if (searchEl) {
+                searchEl.addEventListener('input', function() {
+                    applyProcurementFilters();
+                });
+            }
+
+            const statusEl = document.getElementById('statusFilter');
+            if (statusEl) {
+                statusEl.addEventListener('change', function() {
+                    applyProcurementFilters();
+                });
+            }
+
+            // payment filter removed; no-op
 
             // Handle Receive Stock form submission (AJAX)
             const receiveStockForm = document.getElementById('receiveStockForm');
