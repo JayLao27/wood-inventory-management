@@ -468,7 +468,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Order *</label>
                                 <select name="purchase_order_id" id="purchaseOrderSelect" onchange="loadPurchaseOrderItems(this.value)" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                     <option value="">Select Purchase Order</option>
-                                    @foreach($purchaseOrders ?? [] as $order)
+                                    @foreach(($openPurchaseOrders ?? $purchaseOrders ?? []) as $order)
                                         <option value="{{ $order->id }}" data-order-id="{{ $order->id }}">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }} - {{ $order->supplier->name }}</option>
                                     @endforeach
                                 </select>
@@ -618,41 +618,6 @@
 
         function openReceiveStockModal() {
             document.getElementById('receiveStockModal').classList.remove('hidden');
-            filterPurchaseOrderDropdown();
-        }
-
-        async function filterPurchaseOrderDropdown() {
-            const select = document.getElementById('purchaseOrderSelect');
-            if (!select) return;
-
-            const options = Array.from(select.querySelectorAll('option[data-order-id]'));
-            
-            for (const option of options) {
-                const orderId = option.getAttribute('data-order-id');
-                if (!orderId) continue;
-
-                try {
-                    const response = await fetch(`/procurement/purchase-orders/${orderId}/items`);
-                    const data = await response.json();
-                    
-                    if (data.success && data.items && data.items.length > 0) {
-                        const hasRemainingItems = data.items.some(item => Number(item.remaining_quantity || 0) > 0);
-                        if (!hasRemainingItems) {
-                            option.style.display = 'none';
-                            option.disabled = true;
-                        } else {
-                            option.style.display = '';
-                            option.disabled = false;
-                        }
-                    } else {
-                        option.style.display = 'none';
-                        option.disabled = true;
-                    }
-                } catch (error) {
-                    // Keep the option visible if there's an error checking
-                    console.error('Error checking order:', orderId, error);
-                }
-            }
         }
 
         function closeReceiveStockModal() {
