@@ -25,6 +25,16 @@ class AuthController extends Controller
 
 		if (Auth::attempt($credentials, $request->boolean('remember'))) {
 			$request->session()->regenerate();
+			$user = Auth::user();
+
+			if (!$user || $user->email !== 'admin@rmwoodworks.com') {
+				Auth::logout();
+				$request->session()->invalidate();
+				$request->session()->regenerateToken();
+
+				return back()->withErrors(['email' => 'Only admin accounts can access this system.'])->onlyInput('email');
+			}
+
 			return redirect()->intended(route('dashboard'));
 		}
 
