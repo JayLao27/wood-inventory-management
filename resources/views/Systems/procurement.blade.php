@@ -637,7 +637,7 @@
             document.getElementById('receiveStockItems').innerHTML = `
                 <div class="space-y-4">
                     <div class="bg-gray-50 p-4 rounded-lg">
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Material</label>
                                 <p class="text-gray-900 font-medium">Loading...</p>
@@ -649,11 +649,6 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Already Received</label>
                                 <p class="text-gray-600">-</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Receive Qty *</label>
-                                <input type="number" name="items[0][quantity_received]" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., 30" required>
-                                <input type="hidden" name="items[0][purchase_order_item_id]" value="">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Defect Qty</label>
