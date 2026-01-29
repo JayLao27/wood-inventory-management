@@ -28,7 +28,12 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="text-sm font-medium text-slate-300">Total Spent</h3>
-                        <p class="text-3xl font-bold mt-2">₱{{ number_format($totalSpent, 2) }}</p>
+                        @php
+                            $totalSpentFormatted = number_format($totalSpent, 2);
+                            $totalSpentLength = strlen($totalSpentFormatted);
+                            $totalSpentSize = $totalSpentLength > 15 ? 'text-lg' : ($totalSpentLength > 12 ? 'text-xl' : 'text-2xl');
+                        @endphp
+                        <p class="{{ $totalSpentSize }} font-bold mt-2">₱{{ $totalSpentFormatted }}</p>
                         <p class="text-slate-300 text-sm mt-1">All purchase orders</p>
                     </div>
                     <div>
@@ -42,7 +47,12 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="text-sm font-medium text-slate-300">Payments Made</h3>
-                        <p class="text-3xl font-bold mt-2 text-green-400">₱{{ number_format($paymentsMade, 2) }}</p>
+                        @php
+                            $paymentsMadeFormatted = number_format($paymentsMade, 2);
+                            $paymentsMadeLength = strlen($paymentsMadeFormatted);
+                            $paymentsMadeSize = $paymentsMadeLength > 15 ? 'text-lg' : ($paymentsMadeLength > 12 ? 'text-xl' : 'text-2xl');
+                        @endphp
+                        <p class="{{ $paymentsMadeSize }} font-bold mt-2 text-green-400">₱{{ $paymentsMadeFormatted }}</p>
                         <p class="text-slate-300 text-sm mt-1">Paid to suppliers</p>
                     </div>
                     <div >
@@ -56,7 +66,12 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="text-sm font-medium text-slate-300">Pending Payments</h3>
-                        <p class="text-3xl font-bold mt-2 text-orange-400">₱{{ number_format($pendingPayments, 2) }}</p>
+                        @php
+                            $pendingPaymentsFormatted = number_format($pendingPayments, 2);
+                            $pendingPaymentsLength = strlen($pendingPaymentsFormatted);
+                            $pendingPaymentsSize = $pendingPaymentsLength > 15 ? 'text-lg' : ($pendingPaymentsLength > 12 ? 'text-xl' : 'text-2xl');
+                        @endphp
+                        <p class="{{ $pendingPaymentsSize }} font-bold mt-2 text-orange-400">₱{{ $pendingPaymentsFormatted }}</p>
                         <p class="text-slate-300 text-sm mt-1">Outstanding amount</p>
                     </div>
                     <div >
