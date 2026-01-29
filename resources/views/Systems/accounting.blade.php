@@ -258,13 +258,20 @@
 			<!-- Sales Orders List -->
 			<div id="salesOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto">
 				@forelse($salesOrders as $salesOrder)
-					<div onclick="selectTransaction('{{ $salesOrder->order_number }}', {{ $salesOrder->total_amount }}, '{{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}', 'Income', {{ $salesOrder->id }})" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
+					<div onclick="selectTransaction('{{ $salesOrder->order_number }}', {{ $salesOrder->total_amount }}, '{{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}', 'Income', {{ $salesOrder->id }}, {{ $salesOrder->remaining_balance }})" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
 						<div class="flex justify-between items-start">
 							<div class="flex-1">
 								<h3 class="font-semibold text-gray-800">{{ $salesOrder->order_number }}: {{ $salesOrder->customer->name ?? 'N/A' }}</h3>
 								<p class="text-sm text-gray-600">{{ $salesOrder->notes ?? 'Sales Order' }}</p>
 							</div>
-							<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($salesOrder->total_amount, 2) }}</span>
+							<div class="flex flex-col items-end gap-1">
+								<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($salesOrder->total_amount, 2) }}</span>
+								@if($salesOrder->remaining_balance > 0)
+									<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">Remaining: ₱{{ number_format($salesOrder->remaining_balance, 2) }}</span>
+								@else
+									<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">Paid</span>
+								@endif
+							</div>
 						</div>
 						<p class="text-xs text-gray-500 mt-2">Date: {{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}</p>
 					</div>
@@ -413,8 +420,8 @@
 			document.getElementById('confirmDate').textContent = date;
 			document.getElementById('confirmType').textContent = type;
 			
-			// For expenses (purchase orders), use remaining balance; for income, use full amount
-			const paymentCap = type === 'Expense' && remainingBalance !== null ? remainingBalance : amount;
+			// Use remaining balance for both Expense and Income types, fall back to full amount if not available
+			const paymentCap = remainingBalance !== null ? remainingBalance : amount;
 			
 			// Store max amount for validation
 			maxPaymentAmount = paymentCap;

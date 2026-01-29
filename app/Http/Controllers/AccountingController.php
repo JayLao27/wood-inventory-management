@@ -19,13 +19,22 @@ class AccountingController extends Controller
         $lastMonthNetProfitPercentage = $this->lastMonthNetprofit($netProfit);
         $lastMonthExpensesPercentage = $this->lastMonthTotalExpenses($totalExpenses);
         
-        // Fetch sales orders and purchase orders for the transaction modal
-        $existingSalesOrderIds = Accounting::whereNotNull('sales_order_id')->pluck('sales_order_id');
-
-        $salesOrders = SalesOrder::with('customer')
-            ->whereNotIn('id', $existingSalesOrderIds)
+        // Fetch sales orders with accounting transactions for partial payment tracking
+        $salesOrders = SalesOrder::with(['customer', 'accountingTransactions' => function($query) {
+            $query->where('transaction_type', 'Income');
+        }])
             ->orderBy('order_date', 'desc')
-            ->get();
+            ->get()
+            ->map(function($so) {
+                $totalPaid = $so->accountingTransactions->sum('amount');
+                $so->remaining_balance = $so->total_amount - $totalPaid;
+                $so->paid_amount_total = $totalPaid;
+                return $so;
+            })
+            ->filter(function($so) {
+                return $so->remaining_balance > 0;
+            })
+            ->values();
         
         // Show only purchase orders with remaining balance (not fully paid)
         $purchaseOrders = PurchaseOrder::with(['supplier', 'accountingTransactions' => function($query) {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SalesOrder extends Model
 {
@@ -25,6 +26,11 @@ class SalesOrder extends Model
     public function workOrders()
     {
         return $this->hasMany(WorkOrder::class);
+    }
+
+    public function accountingTransactions(): HasMany
+    {
+        return $this->hasMany(Accounting::class, 'sales_order_id');
     }
 
     public function hasWorkOrders()
