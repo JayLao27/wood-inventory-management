@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -34,6 +35,13 @@ class Product extends Model
     public function inventoryMovements(): HasMany
     {
         return $this->hasMany(InventoryMovement::class, 'item_id')->where('item_type', 'product');
+    }
+
+    public function materials(): BelongsToMany
+    {
+        return $this->belongsToMany(Material::class, 'product_materials')
+            ->withPivot('quantity_needed')
+            ->withTimestamps();
     }
 
     public function isLowStock(): bool

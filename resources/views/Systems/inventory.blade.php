@@ -200,6 +200,22 @@
                                 <p class="text-white font-medium">₱{{ number_format($product->selling_price, 2) }}</p>
                             </div>
                         </div>
+
+                        <!-- Materials Needed Section -->
+                        @if($product->materials->count() > 0)
+                        <div class="mt-3 pt-3 border-t border-slate-500">
+                            <span class="text-slate-400 text-xs font-semibold uppercase">Materials Needed:</span>
+                            <div class="mt-2 space-y-1">
+                                @foreach($product->materials as $material)
+                                <div class="text-sm text-slate-300 flex justify-between">
+                                    <span>• {{ $material->name }}</span>
+                                    <span class="font-medium text-white">{{ $material->pivot->quantity_needed }} {{ $material->unit }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="flex items-center space-x-2 mt-3 justify-end">
                             <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-1 hover:bg-slate-500 rounded" title="Delete">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -346,6 +362,20 @@
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
                                     <textarea name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Materials Section -->
+                            <div class="mt-6 pt-6 border-t border-gray-200">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-lg font-semibold text-gray-900">Materials Needed</h4>
+                                    <button type="button" onclick="addMaterialRow()" class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">
+                                        + Add Material
+                                    </button>
+                                </div>
+                                
+                                <div id="materialsContainer" class="space-y-3">
+                                    <!-- Material rows will be added here -->
                                 </div>
                             </div>
                             
@@ -547,11 +577,53 @@
 
             function openAddProductModal() {
                 document.getElementById('addProductModal').classList.remove('hidden');
+                document.getElementById('materialsContainer').innerHTML = ''; // Clear materials on modal open
             }
 
             function closeAddProductModal() {
                 document.getElementById('addProductModal').classList.add('hidden');
                 document.getElementById('addProductForm').reset();
+                document.getElementById('materialsContainer').innerHTML = '';
+            }
+
+            // Material row counter
+            let materialRowCount = 0;
+
+            function addMaterialRow() {
+                const materialsContainer = document.getElementById('materialsContainer');
+                const rowId = 'material-row-' + materialRowCount++;
+                
+                const row = document.createElement('div');
+                row.id = rowId;
+                row.className = 'flex gap-3 items-end bg-gray-50 p-3 rounded-lg';
+                
+                row.innerHTML = `
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Material *</label>
+                        <select name="materials[${materialRowCount-1}][material_id]" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            <option value="">Select a material...</option>
+                            @foreach($materials as $material)
+                                <option value="{{ $material->id }}">{{ $material->name }} ({{ $material->unit }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Quantity Needed *</label>
+                        <input type="number" name="materials[${materialRowCount-1}][quantity_needed]" step="0.01" min="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    </div>
+                    <button type="button" onclick="removeMaterialRow('${rowId}')" class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        Remove
+                    </button>
+                `;
+                
+                materialsContainer.appendChild(row);
+            }
+
+            function removeMaterialRow(rowId) {
+                const row = document.getElementById(rowId);
+                if (row) {
+                    row.remove();
+                }
             }
 
             // Ensure products tab stays active after adding product

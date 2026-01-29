@@ -13,7 +13,7 @@ class InventoryController extends Controller
 {
     public function index()
     {
-        $products = Product::with('inventoryMovements')->orderBy('product_name')->get();
+        $products = Product::with(['inventoryMovements', 'materials'])->orderBy('product_name')->get();
         $materials = Material::with(['supplier', 'inventoryMovements'])->orderBy('name')->get();
         $suppliers = Supplier::orderBy('name')->get();
         
@@ -47,7 +47,10 @@ class InventoryController extends Controller
             'unit_cost' => 'required_if:type,material|numeric|min:0',
             'supplier_id' => 'required_if:type,material|exists:suppliers,id',
             'selling_price' => 'required_if:type,product|numeric|min:0',
-            'production_cost' => 'required_if:type,product|numeric|min:0'
+            'production_cost' => 'required_if:type,product|numeric|min:0',
+            'materials' => 'nullable|array',
+            'materials.*.material_id' => 'required_with:materials|exists:materials,id',
+            'materials.*.quantity_needed' => 'required_with:materials|numeric|min:0.01'
         ]);
 
         if ($request->type === 'product') {
@@ -62,6 +65,15 @@ class InventoryController extends Controller
                 'production_cost' => $request->production_cost,
                 'status' => 'active'
             ]);
+
+            // Attach materials to product if provided
+            if ($request->has('materials') && is_array($request->materials)) {
+                foreach ($request->materials as $material) {
+                    $item->materials()->attach($material['material_id'], [
+                        'quantity_needed' => $material['quantity_needed']
+                    ]);
+                }
+            }
         } else {
             $item = Material::create([
                 'name' => $request->name,
