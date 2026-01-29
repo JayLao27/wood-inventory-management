@@ -102,6 +102,30 @@ class InventoryController extends Controller
         return redirect()->route('inventory')->with('success', $itemType . ' added successfully!');
     }
 
+    public function editProduct($id)
+    {
+        $product = Product::with('materials')->findOrFail($id);
+        
+        return response()->json([
+            'product_name' => $product->product_name,
+            'description' => $product->description,
+            'category' => $product->category,
+            'unit' => $product->unit,
+            'production_cost' => $product->production_cost,
+            'selling_price' => $product->selling_price,
+            'materials' => $product->materials->map(function($material) {
+                return [
+                    'id' => $material->id,
+                    'name' => $material->name,
+                    'unit' => $material->unit,
+                    'pivot' => [
+                        'quantity_needed' => $material->pivot->quantity_needed
+                    ]
+                ];
+            })
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -116,7 +140,10 @@ class InventoryController extends Controller
             'unit_cost' => 'required_if:type,material|numeric|min:0',
             'supplier_id' => 'required_if:type,material|exists:suppliers,id',
             'selling_price' => 'required_if:type,product|numeric|min:0',
-            'production_cost' => 'required_if:type,product|numeric|min:0'
+            'production_cost' => 'required_if:type,product|numeric|min:0',
+            'materials' => 'nullable|array',
+            'materials.*.material_id' => 'required_with:materials|exists:materials,id',
+            'materials.*.quantity_needed' => 'required_with:materials|numeric|min:0.01'
         ]);
 
         if ($request->type === 'product') {
@@ -129,6 +156,22 @@ class InventoryController extends Controller
                 'selling_price' => $request->selling_price,
                 'production_cost' => $request->production_cost
             ]);
+
+            // Update materials
+            if ($request->has('materials') && is_array($request->materials)) {
+                // Detach all existing materials
+                $item->materials()->detach();
+                
+                // Attach new materials
+                foreach ($request->materials as $material) {
+                    $item->materials()->attach($material['material_id'], [
+                        'quantity_needed' => $material['quantity_needed']
+                    ]);
+                }
+            } else {
+                // If no materials provided, detach all
+                $item->materials()->detach();
+            }
         } else {
             $item = Material::findOrFail($id);
             $item->update([
