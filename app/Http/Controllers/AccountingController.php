@@ -91,12 +91,45 @@ class AccountingController extends Controller
             'description' => 'nullable|string|max:500',
         ]);
 
+        // For Income (Sales Orders)
         if ($request->transaction_type === 'Income') {
-            Accounting::where('sales_order_id', $request->order_id)->delete();
-        }
+            $salesOrder = SalesOrder::findOrFail($request->order_id);
+            $amountToPay = (float) $request->input('amount');
+            $totalAmount = (float) $salesOrder->total_amount;
 
-        if ($request->transaction_type === 'Expense') {
-            // Get purchase order and calculate payment status based on total payments
+            // Check existing payments
+            $existingPaid = (float) Accounting::where('sales_order_id', $request->order_id)
+                ->where('transaction_type', 'Income')
+                ->sum('amount');
+            $newTotalPaid = $existingPaid + $amountToPay;
+
+            // Validate that payment amount doesn't exceed total amount
+            if ($newTotalPaid > $totalAmount) {
+                return redirect()->back()->withErrors([
+                    'amount' => "Payment amount exceeds the remaining balance of ₱" . number_format(max($totalAmount - $existingPaid, 0), 2)
+                ]);
+            }
+
+            // Create the transaction (don't delete previous ones!)
+            Accounting::create([
+                'transaction_type' => 'Income',
+                'amount' => $amountToPay,
+                'date' => $request->input('date'),
+                'description' => $request->input('description'),
+                'sales_order_id' => $request->order_id,
+                'purchase_order_id' => null,
+            ]);
+
+            // Update payment status for sales order
+            $totalPaid = (float) Accounting::where('sales_order_id', $request->order_id)
+                ->where('transaction_type', 'Income')
+                ->sum('amount');
+
+            $paymentStatus = $totalPaid >= $totalAmount ? 'Paid' : 'Partial';
+            $salesOrder->update(['payment_status' => $paymentStatus]);
+        }
+        // For Expense (Purchase Orders)
+        elseif ($request->transaction_type === 'Expense') {
             $purchaseOrder = PurchaseOrder::findOrFail($request->order_id);
             $amountToPay = (float) $request->input('amount');
             $totalAmount = (float) $purchaseOrder->total_amount;
@@ -112,20 +145,18 @@ class AccountingController extends Controller
                     'amount' => "Payment amount exceeds the remaining balance of ₱" . number_format(max($totalAmount - $existingPaid, 0), 2)
                 ]);
             }
-        }
 
-        Accounting::create([
-            'transaction_type' => $request->input('transaction_type'),
-            'amount' => $request->input('amount'),
-            'date' => $request->input('date'),
-            'description' => $request->input('description'),
-            'sales_order_id' => $request->transaction_type === 'Income' ? $request->order_id : null,
-            'purchase_order_id' => $request->transaction_type === 'Expense' ? $request->order_id : null,
-        ]);
+            // Create the transaction
+            Accounting::create([
+                'transaction_type' => 'Expense',
+                'amount' => $amountToPay,
+                'date' => $request->input('date'),
+                'description' => $request->input('description'),
+                'sales_order_id' => null,
+                'purchase_order_id' => $request->order_id,
+            ]);
 
-        if ($request->transaction_type === 'Expense') {
-            $purchaseOrder = PurchaseOrder::findOrFail($request->order_id);
-            $totalAmount = (float) $purchaseOrder->total_amount;
+            // Update payment status for purchase order
             $totalPaid = (float) Accounting::where('purchase_order_id', $request->order_id)
                 ->where('transaction_type', 'Expense')
                 ->sum('amount');
