@@ -11,7 +11,7 @@
                     <p class="text-gray-600 mt-2">Manage suppliers, purchase orders, and material sourcing</p>
                 </div>
                 <div class="flex space-x-3">
-                    <button class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
+                    <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
                         Reports
                     </button>
                     <button onclick="openReceiveStockModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
@@ -562,6 +562,88 @@
         </div>
     </div>
 
+    <!-- Received Stock Reports Modal -->
+    <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Received Stock Reports</h3>
+                        <button onclick="closeReceivedStockReportsModal()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Filter Section -->
+                    <div class="mb-4 flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date From</label>
+                            <input type="date" id="filterDateFrom" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date To</label>
+                            <input type="date" id="filterDateTo" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Material</label>
+                            <select id="filterMaterial" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">All Materials</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="filterReceivedStock()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reports Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse text-left text-sm">
+                            <thead class="bg-gray-100 text-gray-700">
+                                <tr>
+                                    <th class="px-4 py-3 font-medium">Date</th>
+                                    <th class="px-4 py-3 font-medium">PO Number</th>
+                                    <th class="px-4 py-3 font-medium">Material</th>
+                                    <th class="px-4 py-3 font-medium">Quantity</th>
+                                    <th class="px-4 py-3 font-medium">Defect Qty</th>
+                                    <th class="px-4 py-3 font-medium">Supplier</th>
+                                    <th class="px-4 py-3 font-medium">Status</th>
+                                    <th class="px-4 py-3 font-medium">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receivedStockTableBody" class="divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Received</p>
+                                <p id="totalReceived" class="text-xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Total Defects</p>
+                                <p id="totalDefects" class="text-xl font-bold text-red-600">0</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Net Quantity</p>
+                                <p id="netQuantity" class="text-xl font-bold text-green-600">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Tab functions
         function showTab(tab) {
@@ -637,7 +719,7 @@
             container.innerHTML = '<p class="text-gray-500 text-center py-8">Loading items...</p>';
 
             fetch(`/procurement/purchase-orders/${orderId}/items`)
-                .then(response => response.json())
+                .then(response => response.json())  
                 .then(data => {
                     if (!data.success || !data.items || data.items.length === 0) {
                         container.innerHTML = '<p class="text-gray-500 text-center py-8">No remaining items to receive for this purchase order.</p>';
@@ -842,6 +924,137 @@
                 form.appendChild(methodField);
                 document.body.appendChild(form);
                 form.submit();
+            }
+        }
+
+        // Received Stock Reports Modal Functions
+        function openReceivedStockReportsModal() {
+            document.getElementById('receivedStockReportsModal').classList.remove('hidden');
+            loadReceivedStockReports();
+        }
+
+        function closeReceivedStockReportsModal() {
+            document.getElementById('receivedStockReportsModal').classList.add('hidden');
+        }
+
+        async function loadReceivedStockReports() {
+            const tbody = document.getElementById('receivedStockTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
+
+            try {
+                const response = await fetch('/procurement/received-stock-reports');
+                const data = await response.json();
+
+                if (data.success && data.movements && data.movements.length > 0) {
+                    let totalReceived = 0;
+                    let totalDefects = 0;
+
+                    tbody.innerHTML = data.movements.map(movement => {
+                        const receivedQty = parseFloat(movement.quantity || 0);
+                        const defectQty = parseFloat(movement.defect_quantity || 0);
+                        totalReceived += receivedQty;
+                        totalDefects += defectQty;
+
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-gray-700">${movement.date}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.po_number || 'N/A'}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.material_name}</td>
+                                <td class="px-4 py-3 text-gray-700">${receivedQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-red-600">${defectQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.supplier_name || 'N/A'}</td>
+                                <td class="px-4 py-3">
+                                    <span class="text-xs font-semibold ${
+                                        movement.status === 'completed' ? 'text-green-600' : 
+                                        movement.status === 'pending' ? 'text-orange-600' : 'text-red-600'
+                                    }">${movement.status || 'N/A'}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    // Update summary
+                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
+                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
+                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
+
+                    // Populate material filter
+                    const materialSelect = document.getElementById('filterMaterial');
+                    const uniqueMaterials = [...new Set(data.movements.map(m => m.material_name))];
+                    materialSelect.innerHTML = '<option value="">All Materials</option>' + 
+                        uniqueMaterials.map(material => `<option value="${material}">${material}</option>`).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No received stock records found</td></tr>';
+                    document.getElementById('totalReceived').textContent = '0';
+                    document.getElementById('totalDefects').textContent = '0';
+                    document.getElementById('netQuantity').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error loading received stock reports:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
+            }
+        }
+
+        async function filterReceivedStock() {
+            const dateFrom = document.getElementById('filterDateFrom').value;
+            const dateTo = document.getElementById('filterDateTo').value;
+            const material = document.getElementById('filterMaterial').value;
+
+            const params = new URLSearchParams();
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo) params.append('date_to', dateTo);
+            if (material) params.append('material', material);
+
+            const tbody = document.getElementById('receivedStockTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
+
+            try {
+                const response = await fetch(`/procurement/received-stock-reports?${params.toString()}`);
+                const data = await response.json();
+
+                if (data.success && data.movements && data.movements.length > 0) {
+                    let totalReceived = 0;
+                    let totalDefects = 0;
+
+                    tbody.innerHTML = data.movements.map(movement => {
+                        const receivedQty = parseFloat(movement.quantity || 0);
+                        const defectQty = parseFloat(movement.defect_quantity || 0);
+                        totalReceived += receivedQty;
+                        totalDefects += defectQty;
+
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-gray-700">${movement.date}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.po_number || 'N/A'}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.material_name}</td>
+                                <td class="px-4 py-3 text-gray-700">${receivedQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-red-600">${defectQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-gray-700">${movement.supplier_name || 'N/A'}</td>
+                                <td class="px-4 py-3">
+                                    <span class="text-xs font-semibold ${
+                                        movement.status === 'completed' ? 'text-green-600' : 
+                                        movement.status === 'pending' ? 'text-orange-600' : 'text-red-600'
+                                    }">${movement.status || 'N/A'}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    // Update summary
+                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
+                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
+                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No records found matching the filters</td></tr>';
+                    document.getElementById('totalReceived').textContent = '0';
+                    document.getElementById('totalDefects').textContent = '0';
+                    document.getElementById('netQuantity').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error filtering received stock:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
             }
         }
 
