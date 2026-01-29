@@ -22,7 +22,7 @@ class PurchaseOrderSeeder extends Seeder
             'total_amount' => 3500.00,
             'paid_amount' => 3500.00,
             'notes' => 'Oak lumber delivery received',
-            'status' => 'delivered',
+            'status' => 'received',
             'assigned_to' => 'John',
             'quality_status' => 'approved',
             'approved_by' => 'Manager',
@@ -35,7 +35,7 @@ class PurchaseOrderSeeder extends Seeder
             'material_id' => 1,
             'quantity' => 500,
             'unit_price' => 5.50,
-            'subtotal' => 2750.00,
+            'total_price' => 2750.00,
         ]);
 
         PurchaseOrderItem::create([
@@ -43,7 +43,7 @@ class PurchaseOrderSeeder extends Seeder
             'material_id' => 6,
             'quantity' => 2,
             'unit_price' => 22.50,
-            'subtotal' => 45.00,
+            'total_price' => 45.00,
         ]);
 
         // Purchase Order 2 - Maple Lumber Co.
@@ -55,7 +55,7 @@ class PurchaseOrderSeeder extends Seeder
             'total_amount' => 7200.00,
             'paid_amount' => 3600.00,
             'notes' => 'Maple plywood order',
-            'status' => 'in_transit',
+            'status' => 'approved',
             'assigned_to' => 'Sarah',
             'quality_status' => 'pending',
             'approved_by' => 'Manager',
@@ -68,7 +68,7 @@ class PurchaseOrderSeeder extends Seeder
             'material_id' => 2,
             'quantity' => 150,
             'unit_price' => 45.00,
-            'subtotal' => 6750.00,
+            'total_price' => 6750.00,
         ]);
 
         // Purchase Order 3 - Exotic Woods Trading
@@ -93,7 +93,7 @@ class PurchaseOrderSeeder extends Seeder
             'material_id' => 3,
             'quantity' => 300,
             'unit_price' => 8.75,
-            'subtotal' => 2625.00,
+            'total_price' => 2625.00,
         ]);
 
         // Purchase Order 4 - Cedar & Pine Mills
@@ -105,7 +105,7 @@ class PurchaseOrderSeeder extends Seeder
             'total_amount' => 4000.00,
             'paid_amount' => 2000.00,
             'notes' => 'Pine lumber and cedar shingles',
-            'status' => 'in_transit',
+            'status' => 'approved',
             'assigned_to' => 'Emma',
             'quality_status' => 'pending',
             'approved_by' => 'Manager',
@@ -118,7 +118,7 @@ class PurchaseOrderSeeder extends Seeder
             'material_id' => 4,
             'quantity' => 200,
             'unit_price' => 12.00,
-            'subtotal' => 2400.00,
+            'total_price' => 2400.00,
         ]);
 
         PurchaseOrderItem::create([
@@ -126,7 +126,7 @@ class PurchaseOrderSeeder extends Seeder
             'material_id' => 5,
             'quantity' => 50,
             'unit_price' => 35.00,
-            'subtotal' => 1750.00,
+            'total_price' => 1750.00,
         ]);
     }
 }
