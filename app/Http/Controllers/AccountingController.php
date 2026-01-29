@@ -27,7 +27,7 @@ class AccountingController extends Controller
             ->orderBy('order_date', 'desc')
             ->get();
         
-        // Show all purchase orders (both paid and partially paid) so users can add more payments
+        // Show only purchase orders with remaining balance (not fully paid)
         $purchaseOrders = PurchaseOrder::with(['supplier', 'accountingTransactions' => function($query) {
             $query->where('transaction_type', 'Expense');
         }])
@@ -49,7 +49,11 @@ class AccountingController extends Controller
                 $po->remaining_balance = $po->total_amount - $totalPaid;
                 $po->paid_amount_total = $totalPaid;
                 return $po;
-            });
+            })
+            ->filter(function($po) {
+                return $po->remaining_balance > 0;
+            })
+            ->values();
         
         // Fetch accounting transactions for the table
         $transactions = Accounting::with(['salesOrder.customer', 'purchaseOrder.supplier'])

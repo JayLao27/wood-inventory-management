@@ -407,14 +407,17 @@
 		}
 
 		// Transaction selection
-		function selectTransaction(reference, amount, date, type, orderId) {
+		function selectTransaction(reference, amount, date, type, orderId, remainingBalance = null) {
 			document.getElementById('confirmRef').textContent = reference;
 			document.getElementById('confirmAmount').textContent = '₱' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 			document.getElementById('confirmDate').textContent = date;
 			document.getElementById('confirmType').textContent = type;
 			
+			// For expenses (purchase orders), use remaining balance; for income, use full amount
+			const paymentCap = type === 'Expense' && remainingBalance !== null ? remainingBalance : amount;
+			
 			// Store max amount for validation
-			maxPaymentAmount = amount;
+			maxPaymentAmount = paymentCap;
 			
 			// Set hidden form fields
 			document.getElementById('formRef').value = reference;
@@ -422,10 +425,10 @@
 			document.getElementById('formDate').value = date;
 			document.getElementById('formType').value = type;
 			document.getElementById('formOrderId').value = orderId;
-			document.getElementById('paymentAmount').value = amount.toLocaleString('en-US');
+			document.getElementById('paymentAmount').value = paymentCap.toLocaleString('en-US');
 			
 			// Display max amount with formatting
-			document.getElementById('maxAmount').textContent = '₱' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+			document.getElementById('maxAmount').textContent = '₱' + paymentCap.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 			
 			// Hide transaction list and show confirmation
 			document.getElementById('salesOrdersContainer').classList.add('hidden');
@@ -453,6 +456,15 @@
 		// Handle form submission - remove commas before sending
 		document.getElementById('transactionForm').addEventListener('submit', function(e) {
 			let paymentAmount = document.getElementById('paymentAmount').value.replace(/,/g, '');
+			let numValue = parseInt(paymentAmount) || 0;
+			
+			// Validate payment amount doesn't exceed max
+			if (numValue > maxPaymentAmount) {
+				e.preventDefault();
+				alert('Payment amount cannot exceed ₱' + maxPaymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+				return false;
+			}
+			
 			document.getElementById('paymentAmount').value = paymentAmount;
 		});
 
