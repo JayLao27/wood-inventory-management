@@ -25,8 +25,13 @@ class ProcurementController extends Controller
         $lowStockAlerts = Material::whereRaw('current_stock <= minimum_stock')->count();
 
         // Only show purchase orders that still have remaining quantity to receive
-        // Filter out POs where ALL items have been fully received
+        // Filter out POs where ALL items have been fully received or status is 'received'
         $openPurchaseOrders = $purchaseOrders->filter(function ($order) {
+            // Exclude POs that are already marked as 'received'
+            if (strtolower($order->status) === 'received') {
+                return false;
+            }
+            
             // A PO is "open" if ANY of its items still has remaining quantity
             // If the order has no items, exclude it
             if ($order->items->isEmpty()) {
