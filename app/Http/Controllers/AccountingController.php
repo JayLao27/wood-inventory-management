@@ -21,16 +21,16 @@ class AccountingController extends Controller
         
         // Fetch sales orders and purchase orders for the transaction modal
         $existingSalesOrderIds = Accounting::whereNotNull('sales_order_id')->pluck('sales_order_id');
-        $existingPurchaseOrderIds = Accounting::whereNotNull('purchase_order_id')->pluck('purchase_order_id');
 
         $salesOrders = SalesOrder::with('customer')
             ->whereNotIn('id', $existingSalesOrderIds)
             ->orderBy('order_date', 'desc')
             ->get();
         
-        // Only show purchase orders that have received stock (have inventory movements)
-        $purchaseOrders = PurchaseOrder::with('supplier')
-            ->whereNotIn('id', $existingPurchaseOrderIds)
+        // Show all purchase orders (both paid and partially paid) so users can add more payments
+        $purchaseOrders = PurchaseOrder::with(['supplier', 'accountingTransactions' => function($query) {
+            $query->where('transaction_type', 'Expense');
+        }])
             ->whereHas('items', function($query) {
                 $query->whereExists(function($subQuery) {
                     $subQuery->selectRaw(1)
@@ -43,7 +43,13 @@ class AccountingController extends Controller
                 });
             })
             ->orderBy('order_date', 'desc')
-            ->get();
+            ->get()
+            ->map(function($po) {
+                $totalPaid = $po->accountingTransactions->sum('amount');
+                $po->remaining_balance = $po->total_amount - $totalPaid;
+                $po->paid_amount_total = $totalPaid;
+                return $po;
+            });
         
         // Fetch accounting transactions for the table
         $transactions = Accounting::with(['salesOrder.customer', 'purchaseOrder.supplier'])
