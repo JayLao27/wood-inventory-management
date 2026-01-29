@@ -202,7 +202,7 @@
                                 @if($order->payment_status === 'Paid')
                                     <span class="text-xs font-semibold text-green-400">{{ $order->payment_status }}</span>
                                 @elseif($order->payment_status === 'Partial')
-                                    <span class="text-xs font-semibold text-orange-400">{{ $order->payment_status }}</span>
+                                    <span class="text-xs font-semibold text-yellow-400">{{ $order->payment_status }}</span>
                                 @else
                                     <span class="text-xs font-semibold text-slate-400">{{ $order->payment_status }}</span>
                                 @endif
@@ -548,14 +548,16 @@
                                 <thead class="bg-gray-100 border-b border-gray-200">
                                     <tr>
                                         <th class="px-4 py-3 text-left font-medium text-gray-700">Material</th>
-                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Quantity</th>
+                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Ordered</th>
+                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Received</th>
+                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Remaining</th>
                                         <th class="px-4 py-3 text-right font-medium text-gray-700">Unit Price</th>
                                         <th class="px-4 py-3 text-right font-medium text-gray-700">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody id="viewOrderItemsTable" class="divide-y divide-gray-200">
                                     <tr>
-                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500">Loading items...</td>
+                                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">Loading items...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -792,13 +794,13 @@
             document.getElementById('viewOrderItemsModal').classList.remove('hidden');
 
             const itemsTable = document.getElementById('viewOrderItemsTable');
-            itemsTable.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Loading items...</td></tr>';
+            itemsTable.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Loading items...</td></tr>';
 
-            fetch(`/procurement/purchase-orders/${orderId}/items`)
+            fetch(`/procurement/purchase-orders/${orderId}/items?include_received=1`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.success || !data.items || data.items.length === 0) {
-                        itemsTable.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">No items found for this order.</td></tr>';
+                        itemsTable.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No items found for this order.</td></tr>';
                         return;
                     }
 
@@ -819,13 +821,15 @@
                         <tr>
                             <td class="px-4 py-3 text-gray-900">${item.material_name || 'N/A'}</td>
                             <td class="px-4 py-3 text-right text-gray-900 font-medium">${Number(item.ordered_quantity || 0).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-right text-gray-900">${Number(item.already_received || 0).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-right text-gray-900">${Number(item.remaining_quantity || 0).toFixed(2)}</td>
                             <td class="px-4 py-3 text-right text-gray-900">₱${Number(item.unit_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                             <td class="px-4 py-3 text-right text-gray-900 font-bold">₱${Number(item.total_amount || (item.ordered_quantity || 0) * (item.unit_price || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         </tr>
                     `).join('');
                 })
                 .catch(() => {
-                    itemsTable.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Failed to load items for this order.</td></tr>';
+                    itemsTable.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">Failed to load items for this order.</td></tr>';
                 });
         }
 

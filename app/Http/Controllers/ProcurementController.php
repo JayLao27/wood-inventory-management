@@ -198,7 +198,7 @@ class ProcurementController extends Controller
      * Return purchase order items with ordered and already received quantities
      * for the Receive Stock modal.
      */
-    public function getPurchaseOrderItems($purchaseOrderId)
+    public function getPurchaseOrderItems(Request $request, $purchaseOrderId)
     {
         $purchaseOrder = PurchaseOrder::with(['items.material'])->findOrFail($purchaseOrderId);
 
@@ -223,15 +223,26 @@ class ProcurementController extends Controller
                 'already_received' => $alreadyReceived,
                 'remaining_quantity' => $remaining,
                 'unit_price' => (float) $item->unit_price,
+                'total_amount' => (float) ($ordered * (float) $item->unit_price),
             ];
-        })->filter(function ($item) {
-            // Only show items that still have remaining quantity to receive
-            return $item['remaining_quantity'] > 0;
-        })->values();
+        });
+
+        if (!$request->boolean('include_received')) {
+            $items = $items->filter(function ($item) {
+                // Only show items that still have remaining quantity to receive
+                return $item['remaining_quantity'] > 0;
+            })->values();
+        } else {
+            $items = $items->values();
+        }
 
         return response()->json([
             'success' => true,
             'items' => $items,
+            'order' => [
+                'order_number' => $purchaseOrder->order_number,
+                'supplier_name' => $purchaseOrder->supplier?->name,
+            ],
         ]);
     }
 
