@@ -31,6 +31,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 2,
             'unit_price' => 750.00,
             'subtotal' => 1500.00,
+            'total_price' => 1500.00,
         ]);
 
         SalesOrderItem::create([
@@ -39,6 +40,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 4,
             'unit_price' => 350.00,
             'subtotal' => 1400.00,
+            'total_price' => 1400.00,
         ]);
 
         // Sales Order 2 - XYZ Interior Design
@@ -59,6 +61,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 3,
             'unit_price' => 450.00,
             'subtotal' => 1350.00,
+            'total_price' => 1350.00,
         ]);
 
         SalesOrderItem::create([
@@ -67,6 +70,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 1,
             'unit_price' => 420.00,
             'subtotal' => 420.00,
+            'total_price' => 420.00,
         ]);
 
         // Sales Order 3 - Local Woodcraft Store
@@ -87,6 +91,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 3,
             'unit_price' => 280.00,
             'subtotal' => 840.00,
+            'total_price' => 840.00,
         ]);
 
         SalesOrderItem::create([
@@ -95,6 +100,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 2,
             'unit_price' => 350.00,
             'subtotal' => 700.00,
+            'total_price' => 700.00,
         ]);
 
         // Sales Order 4 - Premium Home Builders
@@ -115,6 +121,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 5,
             'unit_price' => 420.00,
             'subtotal' => 2100.00,
+            'total_price' => 2100.00,
         ]);
 
         SalesOrderItem::create([
@@ -123,6 +130,7 @@ class SalesOrderSeeder extends Seeder
             'quantity' => 1,
             'unit_price' => 750.00,
             'subtotal' => 750.00,
+            'total_price' => 750.00,
         ]);
     }
 }
