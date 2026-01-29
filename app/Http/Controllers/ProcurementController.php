@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Supplier;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Material;
+use App\Models\InventoryMovement;
 
 class ProcurementController extends Controller
 {
@@ -134,5 +136,144 @@ class ProcurementController extends Controller
         $purchaseOrder->delete();
 
         return redirect()->route('procurement')->with('success', 'Purchase order deleted successfully!');
+    }
+
+    /**
+     * Return purchase order items with ordered and already received quantities
+     * for the Receive Stock modal.
+     */
+    public function getPurchaseOrderItems($purchaseOrderId)
+    {
+        $purchaseOrder = PurchaseOrder::with(['items.material'])->findOrFail($purchaseOrderId);
+
+        $items = $purchaseOrder->items->map(function ($item) use ($purchaseOrder) {
+            $ordered = (float) $item->quantity;
+
+            $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
+                ->where('item_id', $item->material_id)
+                ->where('reference_type', 'purchase_order')
+                ->where('reference_id', $purchaseOrder->id)
+                ->where('movement_type', 'in')
+                ->sum('quantity');
+
+            $remaining = max($ordered - $alreadyReceived, 0);
+
+            return [
+                'id' => $item->id,
+                'material_id' => $item->material_id,
+                'material_name' => $item->material?->name ?? 'Material',
+                'unit' => $item->material?->unit ?? '',
+                'ordered_quantity' => $ordered,
+                'already_received' => $alreadyReceived,
+                'remaining_quantity' => $remaining,
+                'unit_price' => (float) $item->unit_price,
+            ];
+        })->filter(function ($item) {
+            // Only show items that still have remaining quantity to receive
+            return $item['remaining_quantity'] > 0;
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'items' => $items,
+        ]);
+    }
+
+    /**
+     * Receive stock for a purchase order and update material inventory.
+     *
+     * Defect quantity is subtracted from the remaining quantity, and only the
+     * net quantity is stocked in.
+     */
+    public function receiveStock(Request $request, $purchaseOrderId)
+    {
+        $purchaseOrder = PurchaseOrder::with('items')->findOrFail($purchaseOrderId);
+
+        $request->validate([
+            'received_date' => 'required|date',
+            'items' => 'required|array',
+            'items.*.purchase_order_item_id' => 'required|exists:purchase_order_items,id',
+            'items.*.defect_quantity' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string',
+        ]);
+
+        DB::transaction(function () use ($request, $purchaseOrder) {
+            foreach ($request->items as $itemData) {
+                $poItem = $purchaseOrder->items->firstWhere('id', $itemData['purchase_order_item_id'] ?? null);
+
+                if (!$poItem) {
+                    continue;
+                }
+
+                $ordered = (float) $poItem->quantity;
+
+                $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
+                    ->where('item_id', $poItem->material_id)
+                    ->where('reference_type', 'purchase_order')
+                    ->where('reference_id', $purchaseOrder->id)
+                    ->where('movement_type', 'in')
+                    ->sum('quantity');
+
+                $remaining = max($ordered - $alreadyReceived, 0);
+
+                if ($remaining <= 0) {
+                    continue;
+                }
+
+                $defect = isset($itemData['defect_quantity']) ? (float) $itemData['defect_quantity'] : 0.0;
+
+                if ($defect < 0) {
+                    $defect = 0.0;
+                }
+
+                if ($defect > $remaining) {
+                    $defect = $remaining;
+                }
+
+                // Net quantity that will be added to stock
+                $toReceive = $remaining - $defect;
+
+                if ($toReceive <= 0) {
+                    continue;
+                }
+
+                $material = Material::findOrFail($poItem->material_id);
+
+                InventoryMovement::create([
+                    'item_type' => 'material',
+                    'item_id' => $material->id,
+                    'movement_type' => 'in',
+                    'quantity' => $toReceive,
+                    'reference_type' => 'purchase_order',
+                    'reference_id' => $purchaseOrder->id,
+                    'notes' => $request->input('notes') ?: 'Received from purchase order ' . $purchaseOrder->order_number,
+                ]);
+
+                $material->increment('current_stock', $toReceive);
+            }
+
+            // If everything is fully received, mark the purchase order as delivered
+            $allFullyReceived = $purchaseOrder->items->every(function ($item) use ($purchaseOrder) {
+                $ordered = (float) $item->quantity;
+
+                $received = (float) InventoryMovement::where('item_type', 'material')
+                    ->where('item_id', $item->material_id)
+                    ->where('reference_type', 'purchase_order')
+                    ->where('reference_id', $purchaseOrder->id)
+                    ->where('movement_type', 'in')
+                    ->sum('quantity');
+
+                return $received >= $ordered;
+            });
+
+            if ($allFullyReceived) {
+                $purchaseOrder->update(['status' => 'delivered']);
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock received and inventory updated successfully.',
+        ]);
     }
 }
