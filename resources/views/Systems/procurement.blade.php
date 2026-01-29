@@ -462,7 +462,7 @@
                         </button>
                     </div>
                     
-                    <form id="receiveStockForm">
+                    <form id="receiveStockForm" method="POST">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Order *</label>
@@ -627,37 +627,65 @@
         }
 
         function loadPurchaseOrderItems(orderId) {
+            const container = document.getElementById('receiveStockItems');
+
             if (!orderId) {
-                document.getElementById('receiveStockItems').innerHTML = '<p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>';
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>';
                 return;
             }
-            
-            // In a real implementation, you would fetch the order items via AJAX
-            // For now, this is a placeholder that shows the structure
-            document.getElementById('receiveStockItems').innerHTML = `
-                <div class="space-y-4">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Material</label>
-                                <p class="text-gray-900 font-medium">Loading...</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Ordered Qty</label>
-                                <p class="text-gray-600">-</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Already Received</label>
-                                <p class="text-gray-600">-</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Defect Qty</label>
-                                <input type="number" name="items[0][defect_quantity]" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., 2">
+
+            container.innerHTML = '<p class="text-gray-500 text-center py-8">Loading items...</p>';
+
+            fetch(`/procurement/purchase-orders/${orderId}/items`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success || !data.items || data.items.length === 0) {
+                        container.innerHTML = '<p class="text-gray-500 text-center py-8">No remaining items to receive for this purchase order.</p>';
+                        return;
+                    }
+
+                    const itemsHtml = data.items.map((item, index) => `
+                        <div class="bg-gray-50 p-4 rounded-lg mb-3">
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Material</label>
+                                    <p class="text-gray-900 font-medium">${item.material_name}</p>
+                                    <p class="text-xs text-gray-500">${item.unit ? item.unit : ''}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Ordered Qty</label>
+                                    <p class="text-gray-900 font-medium">${Number(item.ordered_quantity).toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Already Received</label>
+                                    <p class="text-gray-900 font-medium">${Number(item.already_received).toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Remaining</label>
+                                    <p class="text-gray-900 font-medium">${Number(item.remaining_quantity).toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Defect Qty</label>
+                                    <input
+                                        type="number"
+                                        name="items[${index}][defect_quantity]"
+                                        step="0.01"
+                                        min="0"
+                                        max="${Number(item.remaining_quantity).toFixed(2)}"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="0.00"
+                                    >
+                                    <input type="hidden" name="items[${index}][purchase_order_item_id]" value="${item.id}">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            `;
+                    `).join('');
+
+                    container.innerHTML = `<div class="space-y-4">${itemsHtml}</div>`;
+                })
+                .catch(() => {
+                    container.innerHTML = '<p class="text-red-500 text-center py-8">Failed to load items for this purchase order.</p>';
+                });
         }
 
         function openViewOrderModal(orderId) {
@@ -809,6 +837,45 @@
             purchaseOrdersTab.style.borderRadius = '10px';
             const suppliersTab = document.getElementById('suppliers-tab');
             suppliersTab.style.borderRadius = '10px';
+
+            // Handle Receive Stock form submission (AJAX)
+            const receiveStockForm = document.getElementById('receiveStockForm');
+            if (receiveStockForm) {
+                receiveStockForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const purchaseOrderSelect = document.getElementById('purchaseOrderSelect');
+                    const purchaseOrderId = purchaseOrderSelect ? purchaseOrderSelect.value : null;
+
+                    if (!purchaseOrderId) {
+                        alert('Please select a purchase order first.');
+                        return;
+                    }
+
+                    const formData = new FormData(receiveStockForm);
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    fetch(`/procurement/purchase-orders/${purchaseOrderId}/receive-stock`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message || 'Stock received successfully.');
+                                window.location.reload();
+                            } else {
+                                alert(data.message || 'Failed to receive stock.');
+                            }
+                        })
+                        .catch(() => {
+                            alert('An error occurred while receiving stock.');
+                        });
+                });
+            }
         });
     </script>
 
