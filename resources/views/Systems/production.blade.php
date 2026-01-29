@@ -107,22 +107,24 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                             </div>
-                            <input type="text" placeholder="Search work orders..." class="w-[850px] pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <input id="workOrderSearchInput" type="text" placeholder="Search work orders..." class="w-[850px] pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                     </div>
                     <div class="flex space-x-3">
-                        <button class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M3 3a1 1 0 000 2h11.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 6H19a1 1 0 100-2H3zM3 11a1 1 0 100 2h11.586l-1.293-1.293a1 1 0 111.414-1.414L16.414 14H19a1 1 0 100-2H3z"/>
-                            </svg>
-                            <span>All Status</span>
-                        </button>
-                        <button class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M3 3a1 1 0 000 2h11.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 6H19a1 1 0 100-2H3zM3 11a1 1 0 100 2h11.586l-1.293-1.293a1 1 0 111.414-1.414L16.414 14H19a1 1 0 100-2H3z"/>
-                            </svg>
-                            <span>All Priority</span>
-                        </button>
+                        <select id="statusFilterSelect" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="quality_check">Quality Check</option>
+                            <option value="completed">Completed</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                        <select id="priorityFilterSelect" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+                            <option value="all">All Priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
                     </div>
                 </div>
 
@@ -346,7 +348,64 @@
             </div>
         </div>
 
-        <script>
+            <!-- View Work Order Modal -->
+            <div id="viewWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50" onclick="if(event.target === this) closeViewWorkOrderModal()">
+                <div class="modal-content bg-amber-50 rounded-2xl max-w-lg w-[92%] shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+                    <div class="p-8">
+                        <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800 mb-2">Work Order Details</h3>
+                                <p class="text-gray-600 text-base">Summary and status for the selected work order.</p>
+                            </div>
+                            <button onclick="closeViewWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4 text-gray-800">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Order #</p>
+                                    <p id="vw_orderNumber" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Product</p>
+                                    <p id="vw_productName" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Quantity</p>
+                                    <p id="vw_quantity" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Due Date</p>
+                                    <p id="vw_dueDate" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Assigned To</p>
+                                    <p id="vw_assignedTo" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Status</p>
+                                    <p id="vw_status" class="font-medium">-</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-sm text-gray-600">Notes / Details</p>
+                                <p id="vw_notes" class="text-sm text-gray-700">-</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-6">
+                            <button type="button" onclick="closeViewWorkOrderModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-base font-medium">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
             // Modal functions with animations
             function openWorkOrderModal() {
                 const modal = document.getElementById('workOrderModal');
@@ -495,9 +554,44 @@
             }
 
             function viewWorkOrder(id) {
-                // Implementation for viewing work order details
-                console.log('View work order:', id);
+                const wo = workOrdersData.find(w => w.id === id);
+                if (!wo) {
+                    console.warn('Work order not found in page data, attempting to fetch:', id);
+                    // Fallback: try fetching from server
+                    fetch(`/production/${id}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data && data.workOrder) populateAndShowViewModal(data.workOrder);
+                            else alert('Unable to load work order details.');
+                        })
+                        .catch(() => alert('Unable to load work order details.'));
+                    return;
+                }
+
+                populateAndShowViewModal(wo);
             }
+
+            function populateAndShowViewModal(wo) {
+                document.getElementById('vw_orderNumber').textContent = wo.order_number || wo.orderNumber || '-';
+                document.getElementById('vw_productName').textContent = wo.product_name || wo.productName || '-';
+                document.getElementById('vw_quantity').textContent = (wo.quantity !== undefined) ? (wo.quantity + ' pcs') : '-';
+                document.getElementById('vw_dueDate').textContent = wo.due_date ? new Date(wo.due_date).toLocaleDateString() : (wo.dueDate || '-');
+                document.getElementById('vw_assignedTo').textContent = wo.assigned_to || wo.assignedTo || '-';
+                document.getElementById('vw_status').textContent = wo.status ? String(wo.status).replace('_', ' ') : '-';
+                document.getElementById('vw_notes').textContent = wo.notes || wo.details || '-';
+
+                const modal = document.getElementById('viewWorkOrderModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function closeViewWorkOrderModal() {
+                const modal = document.getElementById('viewWorkOrderModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+
 
             function startWorkOrder(id) {
                 if (confirm('Start this work order?')) {
@@ -550,10 +644,13 @@
                 }
             });
 
-            // Set minimum date to today
+            // Set minimum date to today and wire up search/filter
             document.addEventListener('DOMContentLoaded', function() {
                 const today = new Date().toISOString().split('T')[0];
-                document.querySelector('input[name="due_date"]').setAttribute('min', today);
+                const dueDateInput = document.querySelector('input[name="due_date"]');
+                if (dueDateInput) dueDateInput.setAttribute('min', today);
+
+
             });
         </script>
 @endsection
