@@ -103,24 +103,21 @@
                     </div>
                 </div>
 
-                <!-- Search and Filter Bar -->
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex-1 max-w-md">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </div>
-                            <input type="text" placeholder="Search items....." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
+                <!-- Search + Filters -->
+                @php
+                    $inventoryCategories = collect($materials ?? [])->pluck('category')->filter()->unique()->values();
+                @endphp
+                <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                    <input type="search" id="searchInput" placeholder="Search items..." class="bg-white w-full md:w-3/4 rounded-full px-4 py-2 text-gray-900 focus:outline-none">
+                    <div class="flex gap-2">
+                        <select id="categoryFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+                            <option value="">All Categories</option>
+                            @foreach($inventoryCategories as $category)
+                                <option value="{{ $category }}">{{ $category }}</option>
+                            @endforeach
+                            <option value="Products">Products</option>
+                        </select>
                     </div>
-                    <button class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3 3a1 1 0 000 2h11.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 6H19a1 1 0 100-2H3zM3 11a1 1 0 100 2h11.586l-1.293-1.293a1 1 0 111.414-1.414L16.414 14H19a1 1 0 100-2H3z"/>
-                        </svg>
-                        <span>All Categories</span>
-                    </button>
                 </div>
 
                 <!-- Tabs -->
@@ -132,7 +129,7 @@
                 <!-- Materials Table -->
                 <div id="materials-table" class="space-y-3 overflow-y-auto" style="max-height:60vh;">
                     @forelse($materials ?? [] as $material)
-                    <div class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 transition">
+                    <div class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 transition" data-name="{{ $material->name }}" data-category="{{ $material->category }}">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-semibold text-white">{{ $material->name }}</h3>
@@ -183,7 +180,7 @@
                 <!-- Products Table -->
                 <div id="products-table" class="space-y-3 overflow-y-auto hidden" style="max-height:60vh;">
                     @forelse($products ?? [] as $product)
-                    <div class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 transition">
+                    <div class="p-4 border border-slate-600 rounded-lg hover:bg-slate-600 hover:border-slate-500 transition" data-name="{{ $product->product_name }}" data-category="Products">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-semibold text-white">{{ $product->product_name }}</h3>
@@ -495,6 +492,34 @@
                     materialsButton.classList.add('hidden');
                     productsButton.classList.remove('hidden');
                 }
+
+                applyInventoryFilters();
+            }
+
+            function applyInventoryFilters() {
+                const searchValue = (document.getElementById('searchInput')?.value || '').toLowerCase();
+                const categoryValue = document.getElementById('categoryFilter')?.value || '';
+
+                const materialsTable = document.getElementById('materials-table');
+                const productsTable = document.getElementById('products-table');
+
+                const cards = [];
+                if (materialsTable && !materialsTable.classList.contains('hidden')) {
+                    cards.push(...materialsTable.querySelectorAll('[data-name]'));
+                }
+                if (productsTable && !productsTable.classList.contains('hidden')) {
+                    cards.push(...productsTable.querySelectorAll('[data-name]'));
+                }
+
+                cards.forEach(card => {
+                    const name = (card.getAttribute('data-name') || '').toLowerCase();
+                    const category = card.getAttribute('data-category') || '';
+
+                    const matchesSearch = !searchValue || name.includes(searchValue);
+                    const matchesCategory = !categoryValue || category === categoryValue;
+
+                    card.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+                });
             }
 
             // Modal functions
@@ -618,6 +643,15 @@
                 materialsTab.style.borderRadius = '10px';
                 const productsTab = document.getElementById('products-tab');
                 productsTab.style.borderRadius = '10px';
+
+                const searchInput = document.getElementById('searchInput');
+                const categoryFilter = document.getElementById('categoryFilter');
+                if (searchInput) {
+                    searchInput.addEventListener('input', applyInventoryFilters);
+                }
+                if (categoryFilter) {
+                    categoryFilter.addEventListener('change', applyInventoryFilters);
+                }
             });
 
         </script>
