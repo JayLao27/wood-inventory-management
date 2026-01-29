@@ -176,7 +176,7 @@
 											<div class="relative">
 												<button onclick="toggleKebab(event, 'kebab-{{ $order->id }}')" class="p-1 hover:bg-slate-500 rounded">
 													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-														<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+													<path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"/>
 													</svg>
 												</button>
 												<div id="kebab-{{ $order->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
@@ -325,7 +325,7 @@
 										<div class="relative">
 											<button onclick="toggleKebab(event, 'kebab-customer-{{ $customer->id }}')" class="p-1 hover:bg-slate-500 rounded">
 												<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-													<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+													<path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"/>
 												</svg>
 											</button>
 											<div id="kebab-customer-{{ $customer->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
