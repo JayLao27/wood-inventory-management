@@ -93,7 +93,7 @@
 				</div>
 
 				<!-- Sales Management Card -->
-				<section class="bg-slate-700 text-white p-6 rounded-2xl">
+			<section class="bg-slate-700 text-white p-6 rounded-2xl overflow-visible">
 					<header class="flex justify-between items-center mb-4">
 						<div>
 							<h2 class="text-xl font-semibold">Sales Management</h2>
@@ -129,7 +129,7 @@
 					</div>
 
 					<!-- Sales Orders Table -->
-					<div id="salesTable" class="overflow-y-auto" style="max-height: 60vh;">
+					<div id="salesTable" class="overflow-y-auto overflow-x-visible" style="max-height: 60vh;">
 						<table class="w-full border-collapse text-left text-sm text-white">
 							<thead class="bg-slate-800 text-slate-300 sticky top-0">
 								<tr>
@@ -179,7 +179,7 @@
 													<path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"/>
 													</svg>
 												</button>
-												<div id="kebab-{{ $order->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+												<div id="kebab-{{ $order->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200" style="z-index: 9999;">
 													<button onclick="openModal('viewOrderModal-{{ $order->id }}'); closeKebab('kebab-{{ $order->id }}')" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2 rounded-t-lg">
 														<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 															<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
@@ -298,7 +298,7 @@
 					</div>
 
 					<!-- Customers Table -->
-					<div id="customerTable" class="hidden overflow-y-auto" style="max-height: 60vh;">
+					<div id="customerTable" class="hidden overflow-y-auto overflow-x-visible" style="max-height: 60vh;">
 						<table class="w-full border-collapse text-left text-sm text-white">
 							<thead class="bg-slate-800 text-slate-300 sticky top-0">
 								<tr>
@@ -328,7 +328,7 @@
 													<path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"/>
 												</svg>
 											</button>
-											<div id="kebab-customer-{{ $customer->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+										<div id="kebab-customer-{{ $customer->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200" style="z-index: 9999;">
 												<button onclick="openModal('viewCustomerModal-{{ $customer->id }}'); closeKebab('kebab-customer-{{ $customer->id }}')" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2 rounded-t-lg">
 													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 														<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
