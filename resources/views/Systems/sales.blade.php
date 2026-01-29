@@ -124,7 +124,7 @@
 
 					<!-- Tabs -->
 					<div class="flex justify-center gap-2 mb-6">
-						<button id="salesTab" class="flex-auto px-[240px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">SalesOrders</button>
+						<button id="salesTab" class="flex-auto px-[240px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Orders</button>
 						<button id="customersTab" class="flex-auto px-[240px] py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Customers</button>
 					</div>
 
