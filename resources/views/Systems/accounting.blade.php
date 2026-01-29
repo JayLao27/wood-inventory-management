@@ -146,7 +146,7 @@
 									@forelse($transactions as $transaction)
 										<tr class="transaction-row hover:bg-slate-600 transition cursor-pointer" 
 											data-type="{{ $transaction->transaction_type }}"
-											data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif">
+											data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@elseif($transaction->salesOrder){{ strtolower($transaction->salesOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif">
 											<td class="px-4 py-3 font-mono text-slate-300">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
 											<td class="px-4 py-3 text-slate-300">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
 											<td class="px-4 py-3">
