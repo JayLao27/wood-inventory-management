@@ -184,7 +184,7 @@
                             </td>
                             <td class="py-3 px-4">
                                 <div class="flex space-x-2">
-                                    <button onclick="event.stopPropagation(); viewOrder({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded">
+                                    <button onclick="event.stopPropagation(); openViewOrderModal({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded" title="View Items">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                             <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
@@ -491,6 +491,62 @@
         </div>
     </div>
 
+    <!-- View Order Items Modal -->
+    <div id="viewOrderItemsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Order Items</h3>
+                        <button onclick="closeViewOrderItemsModal()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Order Number</label>
+                                <p id="viewOrderNumber" class="text-gray-900 font-medium">-</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                                <p id="viewSupplierName" class="text-gray-900 font-medium">-</p>
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-lg font-medium text-gray-900 mb-4">Items</h4>
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 border-b border-gray-200">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Material</th>
+                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Quantity</th>
+                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Unit Price</th>
+                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="viewOrderItemsTable" class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500">Loading items...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="button" onclick="closeViewOrderItemsModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Tab functions
         function showTab(tab) {
@@ -592,6 +648,44 @@
                     </div>
                 </div>
             `;
+        }
+
+        function openViewOrderModal(orderId) {
+            document.getElementById('viewOrderItemsModal').classList.remove('hidden');
+            // Find the order from the table
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const firstCell = row.querySelector('td:first-child');
+                if (firstCell) {
+                    // Load sample data - in production, fetch from server
+                    document.getElementById('viewOrderNumber').textContent = firstCell.textContent;
+                    const supplierCell = row.querySelector('td:nth-child(2)');
+                    if (supplierCell) {
+                        document.getElementById('viewSupplierName').textContent = supplierCell.textContent;
+                    }
+                }
+            });
+            
+            // Generate sample items table
+            const itemsTable = document.getElementById('viewOrderItemsTable');
+            itemsTable.innerHTML = `
+                <tr>
+                    <td class="px-4 py-3 text-gray-900">Material 1</td>
+                    <td class="px-4 py-3 text-right text-gray-900 font-medium">50</td>
+                    <td class="px-4 py-3 text-right text-gray-900">₱1,500.00</td>
+                    <td class="px-4 py-3 text-right text-gray-900 font-bold">₱75,000.00</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-3 text-gray-900">Material 2</td>
+                    <td class="px-4 py-3 text-right text-gray-900 font-medium">30</td>
+                    <td class="px-4 py-3 text-right text-gray-900">₱2,000.00</td>
+                    <td class="px-4 py-3 text-right text-gray-900 font-bold">₱60,000.00</td>
+                </tr>
+            `;
+        }
+
+        function closeViewOrderItemsModal() {
+            document.getElementById('viewOrderItemsModal').classList.add('hidden');
         }
 
         // Purchase Order Item Management
