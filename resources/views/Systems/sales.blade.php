@@ -173,27 +173,37 @@
 											@endif
 										</td>
 										<td class="px-4 py-3">
-											<div class="flex space-x-2">
-												<button onclick="openModal('viewOrderModal-{{ $order->id }}')" class="p-1 hover:bg-slate-500 rounded">
-													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-														<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-														<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+											<div class="relative">
+												<button onclick="toggleKebab(event, 'kebab-{{ $order->id }}')" class="p-1 hover:bg-slate-500 rounded">
+													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+														<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
 													</svg>
 												</button>
-												<button onclick="openModal('editOrderModal-{{ $order->id }}')" class="p-1 hover:bg-slate-500 rounded">
-													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-														<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-													</svg>
-												</button>
-												<form action="{{ route('sales-orders.destroy', $order) }}" method="POST" class="inline-block" onsubmit="return confirm('Cancel this order?')">
-													@csrf
-													@method('DELETE')
-													<button type="submit" class="p-1 hover:bg-slate-500 rounded">
+												<div id="kebab-{{ $order->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+													<button onclick="openModal('viewOrderModal-{{ $order->id }}'); closeKebab('kebab-{{ $order->id }}')" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2 rounded-t-lg">
 														<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-															<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+															<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+															<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
 														</svg>
+														<span>View</span>
 													</button>
-												</form>
+													<button onclick="openModal('editOrderModal-{{ $order->id }}'); closeKebab('kebab-{{ $order->id }}')" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
+														<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+															<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+														</svg>
+														<span>Edit</span>
+													</button>
+													<form action="{{ route('sales-orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Cancel this order?')" class="w-full">
+														@csrf
+														@method('DELETE')
+														<button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center space-x-2 rounded-b-lg">
+															<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+																<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+															</svg>
+															<span>Delete</span>
+														</button>
+													</form>
+												</div>
 											</div>
 										</td>
 									</tr>
@@ -312,31 +322,37 @@
 										<td class="px-4 py-3 text-slate-300">{{ $customer->totalOrders() }}</td>
 										<td class="px-4 py-3 font-bold text-slate-300">₱{{ number_format($customer->totalSpent(), 2) }}</td>
 									<td class="px-4 py-3">
-											<div class="flex space-x-2">
-												<button onclick="openModal('viewCustomerModal-{{ $customer->id }}')" class="p-1 hover:bg-slate-500 rounded">
+										<div class="relative">
+											<button onclick="toggleKebab(event, 'kebab-customer-{{ $customer->id }}')" class="p-1 hover:bg-slate-500 rounded">
+												<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+													<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+												</svg>
+											</button>
+											<div id="kebab-customer-{{ $customer->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+												<button onclick="openModal('viewCustomerModal-{{ $customer->id }}'); closeKebab('kebab-customer-{{ $customer->id }}')" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2 rounded-t-lg">
 													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 														<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
 														<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
 													</svg>
+													<span>View</span>
 												</button>
-												<button onclick="openModal('editCustomerModal-{{ $customer->id }}')" class="p-1 hover:bg-slate-500 rounded">
+												<button onclick="openModal('editCustomerModal-{{ $customer->id }}'); closeKebab('kebab-customer-{{ $customer->id }}')" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
 													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 														<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
 													</svg>
+													<span>Edit</span>
 												</button>
-												<form action="{{ route('customers.delete', $customer) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this customer?')">
+												<form action="{{ route('customers.delete', $customer) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this customer?')" class="w-full">
 													@csrf
 													@method('DELETE')
-													<button type="submit" class="p-1 hover:bg-slate-500 rounded">
+													<button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center space-x-2 rounded-b-lg">
 														<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 															<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
 														</svg>
+														<span>Delete</span>
 													</button>
 												</form>
 											</div>
-										</td>
-									</tr>
-
 									<!-- View Customer Modal -->
 									<div id="viewCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/70 hidden">
 										<div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-2xl w-[92%] mx-auto mt-16 p-6">
@@ -521,6 +537,27 @@
 		function closeModal(modalId) {
 			document.getElementById(modalId).classList.add('hidden');
 		}
+
+		function toggleKebab(event, kebabId) {
+			event.stopPropagation();
+			const kebab = document.getElementById(kebabId);
+			// Close all other kebabs
+			document.querySelectorAll('[id^="kebab-"]').forEach(k => {
+				if (k.id !== kebabId) k.classList.add('hidden');
+			});
+			kebab.classList.toggle('hidden');
+		}
+
+		function closeKebab(kebabId) {
+			document.getElementById(kebabId).classList.add('hidden');
+		}
+
+		// Close kebab menus when clicking outside
+		document.addEventListener('click', function(event) {
+			if (!event.target.closest('[id^="kebab-"]') && !event.target.closest('button[onclick*="toggleKebab"]')) {
+				document.querySelectorAll('[id^="kebab-"]').forEach(k => k.classList.add('hidden'));
+			}
+		});
 
 		(function() {
 			const salesTab = document.getElementById('salesTab');
