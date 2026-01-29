@@ -37,6 +37,14 @@ Route::get('/', function () {
     Route::get('/procurement', [ProcurementController::class, 'index'])->name('procurement');
     Route::post('/procurement/suppliers', [ProcurementController::class, 'storeSupplier'])->name('procurement.supplier.store');
     Route::post('/procurement/purchase-orders', [ProcurementController::class, 'storePurchaseOrder'])->name('procurement.purchase-order.store');
+    Route::get(
+        '/procurement/purchase-orders/{purchaseOrder}/items',
+        [ProcurementController::class, 'getPurchaseOrderItems']
+    )->name('procurement.purchase-order.items');
+    Route::post(
+        '/procurement/purchase-orders/{purchaseOrder}/receive-stock',
+        [ProcurementController::class, 'receiveStock']
+    )->name('procurement.purchase-order.receive-stock');
     Route::put('/procurement/suppliers/{id}', [ProcurementController::class, 'updateSupplier'])->name('procurement.supplier.update');
     Route::put('/procurement/purchase-orders/{id}', [ProcurementController::class, 'updatePurchaseOrder'])->name('procurement.purchase-order.update');
     Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'removeSupplier'])->name('procurement.supplier.destroy');
