@@ -40,7 +40,7 @@
 						<div class="flex justify-between items-start">
 							<div>
 								<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
-								<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->sum('total_amount'), 2) }}</p>
+							<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->sum('total_amount'), 0) }}</p>
 								<p class="text-slate-300 text-sm mt-1">All time sales</p>
 							</div>
 							<div>
@@ -54,7 +54,7 @@
 						<div class="flex justify-between items-start">
 							<div>
 								<h3 class="text-sm font-medium text-slate-300">Payments Received</h3>
-								<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->where('payment_status', 'Paid')->sum('total_amount'), 2) }}</p>
+							<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->where('payment_status', 'Paid')->sum('total_amount'), 0) }}</p>
 								<p class="text-slate-300 text-sm mt-1">Paid orders</p>
 							</div>
 							<div >
@@ -68,7 +68,7 @@
 						<div class="flex justify-between items-start">
 							<div>
 								<h3 class="text-sm font-medium text-slate-300">Pending Payments</h3>
-								<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->whereIn('payment_status', ['Pending', 'Partial'])->sum('total_amount'), 2) }}</p>
+							<p class="text-3xl font-bold mt-2">₱{{ number_format($salesOrders->whereIn('payment_status', ['Pending', 'Partial'])->sum('total_amount'), 0) }}</p>
 								<p class="text-slate-300 text-sm mt-1">Outstanding amount</p>
 							</div>
 							<div ">
