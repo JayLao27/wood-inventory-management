@@ -363,11 +363,6 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
                                     <input type="number" name="selling_price" id="productSellingPrice" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 </div>
-                                
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                    <textarea name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                                </div>
                             </div>
 
                             <!-- Materials Section -->
@@ -439,11 +434,6 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
                                     <input type="number" id="editProductSellingPrice" name="selling_price" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                </div>
-                                
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                    <textarea id="editProductDescription" name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
                                 </div>
                             </div>
 
@@ -720,7 +710,6 @@
                         document.getElementById('editProductCategory').value = data.category;
                         document.getElementById('editProductProductionCost').value = data.production_cost;
                         document.getElementById('editProductSellingPrice').value = data.selling_price;
-                        document.getElementById('editProductDescription').value = data.description || '';
                         
                         // Set form action
                         document.getElementById('editProductForm').action = `/inventory/${productId}`;
