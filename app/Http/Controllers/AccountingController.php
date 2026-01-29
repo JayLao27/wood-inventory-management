@@ -27,8 +27,21 @@ class AccountingController extends Controller
             ->whereNotIn('id', $existingSalesOrderIds)
             ->orderBy('order_date', 'desc')
             ->get();
+        
+        // Only show purchase orders that have received stock (have inventory movements)
         $purchaseOrders = PurchaseOrder::with('supplier')
             ->whereNotIn('id', $existingPurchaseOrderIds)
+            ->whereHas('items', function($query) {
+                $query->whereExists(function($subQuery) {
+                    $subQuery->selectRaw(1)
+                        ->from('inventory_movements')
+                        ->whereColumn('inventory_movements.item_id', 'purchase_order_items.material_id')
+                        ->where('inventory_movements.item_type', 'material')
+                        ->where('inventory_movements.movement_type', 'in')
+                        ->whereColumn('inventory_movements.reference_id', 'purchase_order_items.purchase_order_id')
+                        ->where('inventory_movements.reference_type', 'purchase_order');
+                });
+            })
             ->orderBy('order_date', 'desc')
             ->get();
         
