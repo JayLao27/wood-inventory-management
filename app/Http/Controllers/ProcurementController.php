@@ -23,10 +23,44 @@ class ProcurementController extends Controller
         $pendingPayments = PurchaseOrder::whereIn('payment_status', ['Pending', 'Partial'])->sum('total_amount');
         $activeSuppliers = Supplier::where('status', 'active')->count();
         $lowStockAlerts = Material::whereRaw('current_stock <= minimum_stock')->count();
+
+        // Only show purchase orders that still have remaining quantity to receive
+        // Filter out POs where ALL items have been fully received
+        $openPurchaseOrders = $purchaseOrders->filter(function ($order) {
+            // A PO is "open" if ANY of its items still has remaining quantity
+            // If the order has no items, exclude it
+            if ($order->items->isEmpty()) {
+                return false;
+            }
+            
+            // Check if at least one item has remaining quantity
+            $hasRemainingItems = $order->items->contains(function ($item) use ($order) {
+                $ordered = (float) $item->quantity;
+
+                $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
+                    ->where('item_id', $item->material_id)
+                    ->where('reference_type', 'purchase_order')
+                    ->where('reference_id', $order->id)
+                    ->where('movement_type', 'in')
+                    ->sum('quantity');
+
+                $remaining = $ordered - $alreadyReceived;
+                return $remaining > 0.001; // Use small threshold to account for floating point precision
+            });
+            
+            return $hasRemainingItems;
+        })->values();
         
         return view('Systems.procurement', compact(
-            'suppliers', 'purchaseOrders', 'materials', 'totalSpent', 
-            'paymentsMade', 'pendingPayments', 'activeSuppliers', 'lowStockAlerts'
+            'suppliers',
+            'purchaseOrders',
+            'materials',
+            'totalSpent',
+            'paymentsMade',
+            'pendingPayments',
+            'activeSuppliers',
+            'lowStockAlerts',
+            'openPurchaseOrders'
         ));
     }
 
@@ -267,7 +301,7 @@ class ProcurementController extends Controller
             });
 
             if ($allFullyReceived) {
-                $purchaseOrder->update(['status' => 'delivered']);
+                $purchaseOrder->update(['status' => 'received']);
             }
         });
 
