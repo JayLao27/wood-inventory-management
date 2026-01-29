@@ -19,13 +19,13 @@
 					<p class="text-lg text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
 				</div>
 				<div class="flex space-x-3">
-					<button class="flex items-center space-x-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-						</svg>
-						<span>Export Reports</span>
-					</button>
-					<button onclick="openAddTransaction()" class="flex items-center space-x-2  bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+				<button class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+					</svg>
+					<span>Export Reports</span>
+				</button>
+				<button onclick="openAddTransaction()" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
 						<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
 						</svg>
@@ -110,15 +110,15 @@
 								</div>
 							</div>
 							<div class="flex gap-2">
-								<select class="bg-white text-gray-900 rounded-lg px-3 py-2 text-sm">
-									<option>All Status</option>
-									<option>Completed</option>
-									<option>Pending</option>
+								<select id="statusFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+									<option value="all">All Status</option>
+									<option value="paid">Paid</option>
+									<option value="partial">Partial</option>
 								</select>
-								<select class="bg-white text-gray-900 rounded-lg px-3 py-2 text-sm">
-									<option>All Categories</option>
-									<option>Income</option>
-									<option>Expense</option>
+								<select id="categoryFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+									<option value="all">All Categories</option>
+									<option value="Income">Income</option>
+									<option value="Expense">Expense</option>
 								</select>
 							</div>
 						</div>
@@ -144,7 +144,9 @@
 								</thead>
 								<tbody class="divide-y divide-slate-600">
 									@forelse($transactions as $transaction)
-										<tr class="hover:bg-slate-600 transition cursor-pointer">
+										<tr class="transaction-row hover:bg-slate-600 transition cursor-pointer" 
+											data-type="{{ $transaction->transaction_type }}"
+											data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif">
 											<td class="px-4 py-3 font-mono text-slate-300">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
 											<td class="px-4 py-3 text-slate-300">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
 											<td class="px-4 py-3">
@@ -338,6 +340,31 @@
 
 	<script>
 		let maxPaymentAmount = 0;
+
+		// Filter functionality
+		function filterTransactions() {
+			const categoryFilter = document.getElementById('categoryFilter').value;
+			const statusFilter = document.getElementById('statusFilter').value;
+			const rows = document.querySelectorAll('.transaction-row');
+			
+			rows.forEach(row => {
+				const rowType = row.getAttribute('data-type');
+				const rowStatus = row.getAttribute('data-status');
+				
+				const categoryMatch = categoryFilter === 'all' || rowType === categoryFilter;
+				const statusMatch = statusFilter === 'all' || rowStatus === statusFilter;
+				
+				if (categoryMatch && statusMatch) {
+					row.style.display = '';
+				} else {
+					row.style.display = 'none';
+				}
+			});
+		}
+
+		// Attach filter event listeners
+		document.getElementById('categoryFilter').addEventListener('change', filterTransactions);
+		document.getElementById('statusFilter').addEventListener('change', filterTransactions);
 
 		// Modal functions
 		function openAddTransaction() {
