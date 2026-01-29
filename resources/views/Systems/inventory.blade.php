@@ -498,8 +498,16 @@
                     productsButton.classList.remove('hidden');
                 }
 
+                // Save active tab to localStorage
+                localStorage.setItem('activeInventoryTab', tab);
                 applyInventoryFilters();
             }
+
+            // Restore active tab on page load
+            window.addEventListener('DOMContentLoaded', function() {
+                const activeTab = localStorage.getItem('activeInventoryTab') || 'products';
+                showTab(activeTab);
+            });
 
             function applyInventoryFilters() {
                 const searchValue = (document.getElementById('searchInput')?.value || '').toLowerCase();
@@ -545,6 +553,11 @@
                 document.getElementById('addProductModal').classList.add('hidden');
                 document.getElementById('addProductForm').reset();
             }
+
+            // Ensure products tab stays active after adding product
+            document.getElementById('addProductForm')?.addEventListener('submit', function() {
+                localStorage.setItem('activeInventoryTab', 'products');
+            });
 
             function openStockModal(type, id) {
                 document.getElementById('stockModal').classList.remove('hidden');
