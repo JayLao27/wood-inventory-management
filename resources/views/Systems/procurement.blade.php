@@ -29,7 +29,7 @@
                     <div>
                         <h3 class="text-sm font-medium text-slate-300">Total Spent</h3>
                         @php
-                            $totalSpentFormatted = number_format($totalSpent, 2);
+                            $totalSpentFormatted = number_format($totalSpent, 0);
                             $totalSpentLength = strlen($totalSpentFormatted);
                             $totalSpentSize = $totalSpentLength > 15 ? 'text-lg' : ($totalSpentLength > 12 ? 'text-xl' : 'text-2xl');
                         @endphp
@@ -48,7 +48,7 @@
                     <div>
                         <h3 class="text-sm font-medium text-slate-300">Payments Made</h3>
                         @php
-                            $paymentsMadeFormatted = number_format($paymentsMade, 2);
+                            $paymentsMadeFormatted = number_format($paymentsMade, 0);
                             $paymentsMadeLength = strlen($paymentsMadeFormatted);
                             $paymentsMadeSize = $paymentsMadeLength > 15 ? 'text-lg' : ($paymentsMadeLength > 12 ? 'text-xl' : 'text-2xl');
                         @endphp
@@ -67,7 +67,7 @@
                     <div>
                         <h3 class="text-sm font-medium text-slate-300">Pending Payments</h3>
                         @php
-                            $pendingPaymentsFormatted = number_format($pendingPayments, 2);
+                            $pendingPaymentsFormatted = number_format($pendingPayments, 0);
                             $pendingPaymentsLength = strlen($pendingPaymentsFormatted);
                             $pendingPaymentsSize = $pendingPaymentsLength > 15 ? 'text-lg' : ($pendingPaymentsLength > 12 ? 'text-xl' : 'text-2xl');
                         @endphp
