@@ -498,28 +498,40 @@
 
             function applyInventoryFilters() {
                 const searchValue = (document.getElementById('searchInput')?.value || '').toLowerCase();
-                const categoryValue = document.getElementById('categoryFilter')?.value || '';
+                const categoryValue = (document.getElementById('categoryFilter')?.value || '').toLowerCase();
 
                 const materialsTable = document.getElementById('materials-table');
                 const productsTable = document.getElementById('products-table');
 
-                const cards = [];
-                if (materialsTable && !materialsTable.classList.contains('hidden')) {
-                    cards.push(...materialsTable.querySelectorAll('[data-name]'));
-                }
-                if (productsTable && !productsTable.classList.contains('hidden')) {
-                    cards.push(...productsTable.querySelectorAll('[data-name]'));
-                }
+                // Determine which container is active
+                const activeContainer = (materialsTable && !materialsTable.classList.contains('hidden')) ? materialsTable : productsTable;
+                if (!activeContainer) return;
 
+                const cards = Array.from(activeContainer.querySelectorAll('[data-name]'));
+
+                let visibleCount = 0;
                 cards.forEach(card => {
                     const name = (card.getAttribute('data-name') || '').toLowerCase();
-                    const category = card.getAttribute('data-category') || '';
+                    const category = (card.getAttribute('data-category') || '').toLowerCase();
 
                     const matchesSearch = !searchValue || name.includes(searchValue);
                     const matchesCategory = !categoryValue || category === categoryValue;
 
-                    card.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+                    const show = matchesSearch && matchesCategory;
+                    card.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
                 });
+
+                // Handle no-results message inside active container
+                let noResults = activeContainer.querySelector('#noResultsMessage');
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.id = 'noResultsMessage';
+                    noResults.className = 'text-slate-500 text-center py-6';
+                    noResults.textContent = 'No items match your search/filter.';
+                    activeContainer.appendChild(noResults);
+                }
+                noResults.style.display = visibleCount > 0 ? 'none' : '';
             }
 
             // Modal functions
@@ -612,19 +624,23 @@
                 }
             }
 
-            // Handle product category selection and auto-fill pricing
-            document.getElementById('productCategorySelect').addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const productionCost = selectedOption.getAttribute('data-production-cost');
-                const sellingPrice = selectedOption.getAttribute('data-selling-price');
-                
-                if (productionCost) {
-                    document.getElementById('productProductionCost').value = productionCost;
-                }
-                if (sellingPrice) {
-                    document.getElementById('productSellingPrice').value = sellingPrice;
-                }
-            });
+            // Handle product category selection and auto-fill pricing (only if select exists)
+            (function() {
+                const prodCat = document.getElementById('productCategorySelect');
+                if (!prodCat) return;
+                prodCat.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const productionCost = selectedOption.getAttribute('data-production-cost');
+                    const sellingPrice = selectedOption.getAttribute('data-selling-price');
+                    
+                    if (productionCost && document.getElementById('productProductionCost')) {
+                        document.getElementById('productProductionCost').value = productionCost;
+                    }
+                    if (sellingPrice && document.getElementById('productSellingPrice')) {
+                        document.getElementById('productSellingPrice').value = sellingPrice;
+                    }
+                });
+            })();
 
 
             // Close modals when clicking outside
@@ -636,18 +652,19 @@
                 }
             });
 
-            // Initialize tab state on page load
+            // Initialize tab state and input listeners on page load
             document.addEventListener('DOMContentLoaded', function() {
                 showTab('materials');
                 const materialsTab = document.getElementById('materials-tab');
-                materialsTab.style.borderRadius = '10px';
                 const productsTab = document.getElementById('products-tab');
-                productsTab.style.borderRadius = '10px';
+                if (materialsTab) materialsTab.style.borderRadius = '10px';
+                if (productsTab) productsTab.style.borderRadius = '10px';
 
                 const searchInput = document.getElementById('searchInput');
                 const categoryFilter = document.getElementById('categoryFilter');
                 if (searchInput) {
                     searchInput.addEventListener('input', applyInventoryFilters);
+                    searchInput.addEventListener('change', applyInventoryFilters);
                 }
                 if (categoryFilter) {
                     categoryFilter.addEventListener('change', applyInventoryFilters);
