@@ -412,7 +412,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Material *</label>
-                                        <select name="items[0][material_id]" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <select name="items[0][material_id]" class="material-select w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                             <option value="">Select Material</option>
                                             @foreach($materials ?? [] as $material)
                                                 <option value="{{ $material->id }}" data-price="{{ $material->unit_cost }}">{{ $material->name }}</option>
@@ -427,7 +427,7 @@
                                     
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Unit Price *</label>
-                                        <input type="number" name="items[0][unit_price]" step="100" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <input type="number" name="items[0][unit_price]" step="0.01" min="0" placeholder="0.00" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                     </div>
                                     
                                     <div class="flex items-end">
@@ -967,6 +967,17 @@
             }
         }
 
+        // Function to populate unit price from material data
+        function populateUnitPrice(selectElement) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const unitPrice = selectedOption.getAttribute('data-price');
+            const unitPriceInput = selectElement.closest('.grid').querySelector('input[name*="[unit_price]"]');
+            
+            if (unitPrice && unitPriceInput) {
+                unitPriceInput.value = unitPrice;
+            }
+        }
+
         // Purchase Order Item Management
         let itemCount = 1;
 
@@ -977,7 +988,7 @@
             newItem.innerHTML = `
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Material *</label>
-                    <select name="items[${itemCount}][material_id]" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    <select name="items[${itemCount}][material_id]" class="material-select w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                         <option value="">Select Material</option>
                         @foreach($materials ?? [] as $material)
                             <option value="{{ $material->id }}" data-price="{{ $material->unit_cost }}">{{ $material->name }}</option>
@@ -992,7 +1003,7 @@
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit Price *</label>
-                    <input type="number" name="items[${itemCount}][unit_price]" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    <input type="number" name="items[${itemCount}][unit_price]" step="0.01" min="0" placeholder="0.00" class="unit-price-input w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                 </div>
                 
                 <div class="flex items-end">
@@ -1002,6 +1013,13 @@
                 </div>
             `;
             container.appendChild(newItem);
+            
+            // Attach event listener to the newly added material select
+            const materialSelect = newItem.querySelector('.material-select');
+            materialSelect.addEventListener('change', function() {
+                populateUnitPrice(this);
+            });
+            
             itemCount++;
         }
 
@@ -1209,6 +1227,14 @@
             purchaseOrdersTab.style.borderRadius = '10px';
             const suppliersTab = document.getElementById('suppliers-tab');
             suppliersTab.style.borderRadius = '10px';
+
+            // Attach event listeners to all material select dropdowns
+            const materialSelects = document.querySelectorAll('.material-select');
+            materialSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    populateUnitPrice(this);
+                });
+            });
 
             // Procurement search & filter logic
             function applyProcurementFilters() {
