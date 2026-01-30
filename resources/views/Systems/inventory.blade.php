@@ -467,7 +467,7 @@
         <!-- Stock View Modal -->
         <div id="stockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="bg-[#FFF1DA] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-6">
                             <div>
@@ -483,15 +483,15 @@
 
                         <!-- Item Info Cards -->
                         <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+                            <div class="bg-blue-50 p-6 rounded-lg border-2" style="border-color: #374151;">
                                 <p class="text-base font-bold text-gray-700">Current Stock</p>
                                 <p id="currentStock" class="text-3xl font-bold text-blue-600 mt-3">-</p>
                             </div>
-                            <div class="bg-yellow-50 p-6 rounded-lg border-2 border-yellow-200">
+                            <div class="bg-yellow-50 p-6 rounded-lg border-2" style="border-color: #374151;">
                                 <p class="text-base font-bold text-gray-700">Minimum Stock</p>
                                 <p id="minimumStock" class="text-3xl font-bold text-yellow-600 mt-3">-</p>
                             </div>
-                            <div class="bg-green-50 p-6 rounded-lg border-2 border-green-200">
+                            <div class="bg-green-50 p-6 rounded-lg border-2" style="border-color: #374151;">
                                 <p class="text-base font-bold text-gray-700">Unit Cost</p>
                                 <p id="unitCost" class="text-3xl font-bold text-green-600 mt-3">-</p>
                             </div>
@@ -500,9 +500,9 @@
                         <!-- Inventory Movements Table -->
                         <div class="mb-6">
                             <h4 class="text-2xl font-bold text-gray-900 mb-4">Movement History</h4>
-                            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                            <div class="overflow-x-auto rounded-lg" style="border: 1px solid #374151;">
                                 <table class="w-full text-base">
-                                    <thead class="bg-gray-100 border-b border-gray-200">
+                                    <thead class="bg-[#FFF1DA] border-b" style="border-color: #374151;">
                                         <tr>
                                             <th class="px-6 py-4 text-left font-bold text-gray-800">Date</th>
                                             <th class="px-6 py-4 text-left font-bold text-gray-800">Type</th>
@@ -510,7 +510,7 @@
                                             <th class="px-6 py-4 text-left font-bold text-gray-800">Notes</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="movementTableBody" class="divide-y divide-gray-200">
+                                    <tbody id="movementTableBody" class="divide-y" style="border-color: #374151;">
                                         <tr>
                                             <td colspan="4" class="px-6 py-8 text-center text-gray-600 font-medium">
                                                 Loading movements...
