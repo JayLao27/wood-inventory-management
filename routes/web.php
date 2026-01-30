@@ -27,9 +27,9 @@ Route::get('/', function () {
 
     // Inventory    
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
-    Route::get('/inventory/{id}/details', [InventoryController::class, 'getDetails'])->name('inventory.details');
-    Route::get('/inventory/{id}/edit-product', [InventoryController::class, 'editProduct'])->name('inventory.edit-product');
     Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
+    Route::get('/inventory/{id}/details', [InventoryController::class, 'getDetails'])->name('inventory.details');
+    Route::get('/inventory/{id}/edit-product', action: [InventoryController::class, 'editProduct'])->name('inventory.edit-product');
     Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update');
     Route::delete('/inventory/{id}/{type}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
     Route::post('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('inventory.adjust-stock');

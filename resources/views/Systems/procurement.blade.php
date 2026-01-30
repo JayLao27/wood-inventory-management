@@ -516,59 +516,53 @@
     </div>
 
     <!-- View Order Items Modal -->
-    <div id="viewOrderItemsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-gray-900">Order Items</h3>
-                        <button onclick="closeViewOrderItemsModal()" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Order Number</label>
-                                <p id="viewOrderNumber" class="text-gray-900 font-medium">-</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
-                                <p id="viewSupplierName" class="text-gray-900 font-medium">-</p>
-                            </div>
-                        </div>
-                        
-                        <h4 class="text-lg font-medium text-gray-900 mb-4">Items</h4>
-                        <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                            <table class="w-full text-sm">
-                                <thead class="bg-gray-100 border-b border-gray-200">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Material</th>
-                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Ordered</th>
-                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Received</th>
-                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Remaining</th>
-                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Unit Price</th>
-                                        <th class="px-4 py-3 text-right font-medium text-gray-700">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="viewOrderItemsTable" class="divide-y divide-gray-200">
-                                    <tr>
-                                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">Loading items...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end">
-                        <button type="button" onclick="closeViewOrderItemsModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                            Close
-                        </button>
+    <div id="viewOrderItemsModal" class="fixed inset-0 bg-black/70 hidden overflow-y-auto" style="z-index: 99999;">
+        <div class="rounded-lg shadow-2xl max-w-4xl w-[95%] mx-auto my-8 p-8" style="background-color: #FFF1DA;">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8 border-b-2 pb-6" style="border-color: #374151;">
+                <div>
+                    <h3 class="text-3xl font-bold" id="viewOrderHeaderNumber" style="color: #374151;">Order #-</h3>
+                    <p class="mt-1" id="viewOrderHeaderSupplier" style="color: #666;">-</p>
+                </div>
+                <button class="text-2xl transition" style="color: #999;" onclick="closeViewOrderItemsModal()">✕</button>
+            </div>
+
+            <!-- Order Information Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                    <p class="text-sm font-semibold" style="color: #374151;">Order Number</p>
+                    <p class="text-lg font-bold mt-2" id="viewOrderDetailNumber" style="color: #374151;">-</p>
+                </div>
+                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                    <p class="text-sm font-semibold" style="color: #374151;">Supplier</p>
+                    <p class="text-lg font-bold mt-2" id="viewOrderDetailSupplier" style="color: #374151;">-</p>
+                </div>
+                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                    <p class="text-sm font-semibold" style="color: #374151;">Total Items</p>
+                    <p class="text-lg font-bold mt-2" id="viewOrderTotalItems" style="color: #374151;">0</p>
+                </div>
+                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #388E3C;">
+                    <p class="text-sm font-semibold" style="color: #374151;">Order Total</p>
+                    <p class="text-lg font-bold mt-2" id="viewOrderTotalAmount" style="color: #388E3C;">₱0.00</p>
+                </div>
+            </div>
+
+            <!-- Items Section -->
+            <div class="mb-8">
+                <h4 class="text-xl font-bold mb-4 flex items-center" style="color: #374151;">
+                    <span class="w-1 h-6 rounded mr-3" style="background-color: #374151;"></span>
+                    Materials & Items Ordered
+                </h4>
+                <div id="viewOrderItemsContainer" class="space-y-3">
+                    <div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #999;">
+                        Loading items...
                     </div>
                 </div>
+            </div>
+
+            <!-- Close Button -->
+            <div class="flex justify-end">
+                <button class="px-6 py-3 rounded-lg font-semibold transition text-white" style="background-color: #374151;" onclick="closeViewOrderItemsModal()">Close</button>
             </div>
         </div>
     </div>
@@ -792,43 +786,83 @@
         function openViewOrderModal(orderId) {
             document.getElementById('viewOrderItemsModal').classList.remove('hidden');
 
-            const itemsTable = document.getElementById('viewOrderItemsTable');
-            itemsTable.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Loading items...</td></tr>';
+            const itemsContainer = document.getElementById('viewOrderItemsContainer');
+            itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #999;">Loading items...</div>';
 
             fetch(`/procurement/purchase-orders/${orderId}/items?include_received=1`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.success || !data.items || data.items.length === 0) {
-                        itemsTable.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No items found for this order.</td></tr>';
+                        itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #999;">No items found for this order.</div>';
                         return;
                     }
 
                     if (data.order) {
-                        document.getElementById('viewOrderNumber').textContent = data.order.order_number || '-';
-                        document.getElementById('viewSupplierName').textContent = data.order.supplier_name || '-';
+                        const orderNumber = data.order.order_number || '-';
+                        const supplierName = data.order.supplier_name || '-';
+                        document.getElementById('viewOrderHeaderNumber').textContent = `Order #${orderNumber}`;
+                        document.getElementById('viewOrderHeaderSupplier').textContent = supplierName;
+                        document.getElementById('viewOrderDetailNumber').textContent = orderNumber;
+                        document.getElementById('viewOrderDetailSupplier').textContent = supplierName;
                     } else {
                         const row = document.querySelector(`button[onclick="event.stopPropagation(); openViewOrderModal(${orderId})"]`)?.closest('tr');
                         if (row) {
                             const orderCell = row.querySelector('td:first-child');
                             const supplierCell = row.querySelector('td:nth-child(2)');
-                            document.getElementById('viewOrderNumber').textContent = orderCell ? orderCell.textContent.trim() : '-';
-                            document.getElementById('viewSupplierName').textContent = supplierCell ? supplierCell.textContent.trim() : '-';
+                            const orderNumber = orderCell ? orderCell.textContent.trim() : '-';
+                            const supplierName = supplierCell ? supplierCell.textContent.trim() : '-';
+                            document.getElementById('viewOrderHeaderNumber').textContent = `Order #${orderNumber}`;
+                            document.getElementById('viewOrderHeaderSupplier').textContent = supplierName;
+                            document.getElementById('viewOrderDetailNumber').textContent = orderNumber;
+                            document.getElementById('viewOrderDetailSupplier').textContent = supplierName;
                         }
                     }
 
-                    itemsTable.innerHTML = data.items.map(item => `
-                        <tr>
-                            <td class="px-4 py-3 text-gray-900">${item.material_name || 'N/A'}</td>
-                            <td class="px-4 py-3 text-right text-gray-900 font-medium">${Number(item.ordered_quantity || 0).toFixed(2)}</td>
-                            <td class="px-4 py-3 text-right text-gray-900">${Number(item.already_received || 0).toFixed(2)}</td>
-                            <td class="px-4 py-3 text-right text-gray-900">${Number(item.remaining_quantity || 0).toFixed(2)}</td>
-                            <td class="px-4 py-3 text-right text-gray-900">₱${Number(item.unit_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            <td class="px-4 py-3 text-right text-gray-900 font-bold">₱${Number(item.total_amount || (item.ordered_quantity || 0) * (item.unit_price || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                        </tr>
-                    `).join('');
+                    // Calculate totals
+                    let totalAmount = 0;
+                    const itemsHTML = data.items.map(item => {
+                        const lineTotal = (item.ordered_quantity || 0) * (item.unit_price || 0);
+                        totalAmount += lineTotal;
+                        const received = Number(item.already_received || 0);
+                        const ordered = Number(item.ordered_quantity || 0);
+                        
+                        return `
+                            <div class="p-5 rounded-lg border-l-4 hover:shadow-md transition" style="background-color: rgba(255,255,255,0.85); border-left-color: #374151;">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <h5 class="font-bold text-lg" style="color: #374151;">${item.material_name || 'Unknown Material'}</h5>
+                                        <p class="text-sm mt-1" style="color: #666;">Unit Price: <span class="font-semibold" style="color: #374151;">₱${Number(item.unit_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="inline-block px-4 py-2 rounded-full font-bold text-lg" style="background-color: #F57C00; color: white;">
+                                            ${Number(ordered).toFixed(2)} <span class="text-sm">units</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 pt-3 grid grid-cols-3 gap-4" style="border-top: 1px solid #E8D5BF;">
+                                    <div>
+                                        <p class="text-xs font-semibold" style="color: #666;">Received</p>
+                                        <p class="text-sm font-bold" style="color: #374151;">${Number(received).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-semibold" style="color: #666;">Remaining</p>
+                                        <p class="text-sm font-bold" style="color: #374151;">${Number(ordered - received).toFixed(2)}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs font-semibold" style="color: #666;">Line Total</p>
+                                        <p class="text-sm font-bold" style="color: #388E3C;">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('viewOrderTotalItems').textContent = data.items.length;
+                    document.getElementById('viewOrderTotalAmount').textContent = `₱${Number(totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    itemsContainer.innerHTML = itemsHTML;
                 })
                 .catch(() => {
-                    itemsTable.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">Failed to load items for this order.</td></tr>';
+                    itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #e74c3c;">Failed to load items for this order.</div>';
                 });
         }
 
