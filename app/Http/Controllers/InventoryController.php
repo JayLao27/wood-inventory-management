@@ -56,14 +56,12 @@ class InventoryController extends Controller
         if ($request->type === 'product') {
             $item = Product::create([
                 'product_name' => $request->product_name,
-                'description' => $request->description,
                 'category' => $request->category,
                 'unit' => $request->unit,
                 'current_stock' => 0,
                 'minimum_stock' => 0,
                 'selling_price' => $request->selling_price,
                 'production_cost' => $request->production_cost,
-                'status' => 'active'
             ]);
 
             // Attach materials to product if provided
