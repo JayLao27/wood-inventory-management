@@ -465,67 +465,66 @@
         </div>
 
         <!-- Stock View Modal -->
-        <div id="stockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-[#FFF1DA] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <div>
-                                <h3 class="text-3xl font-bold text-gray-900">Item Details & Movement History</h3>
-                                <p id="itemName" class="text-base text-gray-700 mt-2 font-medium"></p>
-                            </div>
-                            <button onclick="closeStockModal()" class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
+        <div id="stockModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50" onclick="if(event.target === this) closeStockModal()">
+            <div class="modal-content bg-amber-50 rounded-2xl max-w-4xl w-[92%] max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6 pb-4 border-b-2" style="border-color: #374151;">
+                        <div>
+                            <h3 class="text-3xl font-bold" style="color: #374151;">Item Details & Movement History</h3>
+                            <p id="itemName" class="text-base mt-2 font-medium" style="color: #666;"></p>
                         </div>
+                        <button onclick="closeStockModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
 
-                        <!-- Item Info Cards -->
-                        <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="bg-blue-50 p-6 rounded-lg border-2" style="border-color: #374151;">
-                                <p class="text-base font-bold text-gray-700">Current Stock</p>
-                                <p id="currentStock" class="text-3xl font-bold text-blue-600 mt-3">-</p>
-                            </div>
-                            <div class="bg-yellow-50 p-6 rounded-lg border-2" style="border-color: #374151;">
-                                <p class="text-base font-bold text-gray-700">Minimum Stock</p>
-                                <p id="minimumStock" class="text-3xl font-bold text-yellow-600 mt-3">-</p>
-                            </div>
-                            <div class="bg-green-50 p-6 rounded-lg border-2" style="border-color: #374151;">
-                                <p class="text-base font-bold text-gray-700">Unit Cost</p>
-                                <p id="unitCost" class="text-3xl font-bold text-green-600 mt-3">-</p>
-                            </div>
+                    <!-- Item Info Cards -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="p-6 rounded-lg border-2 shadow-md hover:shadow-lg transition" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border-color: #1976D2;">
+                            <p class="text-base font-bold" style="color: #1565C0;">Current Stock</p>
+                            <p id="currentStock" class="text-3xl font-bold mt-3" style="color: #1565C0;">-</p>
                         </div>
+                        <div class="p-6 rounded-lg border-2 shadow-md hover:shadow-lg transition" style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-color: #F57C00;">
+                            <p class="text-base font-bold" style="color: #E65100;">Minimum Stock</p>
+                            <p id="minimumStock" class="text-3xl font-bold mt-3" style="color: #E65100;">-</p>
+                        </div>
+                        <div class="p-6 rounded-lg border-2 shadow-md hover:shadow-lg transition" style="background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border-color: #388E3C;">
+                            <p class="text-base font-bold" style="color: #2E7D32;">Unit Cost</p>
+                            <p id="unitCost" class="text-3xl font-bold mt-3" style="color: #2E7D32;">-</p>
+                        </div>
+                    </div>
 
-                        <!-- Inventory Movements Table -->
-                        <div class="mb-6">
-                            <h4 class="text-2xl font-bold text-gray-900 mb-4">Movement History</h4>
-                            <div class="overflow-x-auto rounded-lg" style="border: 1px solid #374151;">
-                                <table class="w-full text-base">
-                                    <thead class="bg-[#FFF1DA] border-b" style="border-color: #374151;">
-                                        <tr>
-                                            <th class="px-6 py-4 text-left font-bold text-gray-800">Date</th>
-                                            <th class="px-6 py-4 text-left font-bold text-gray-800">Type</th>
-                                            <th class="px-6 py-4 text-right font-bold text-gray-800">Quantity</th>
-                                            <th class="px-6 py-4 text-left font-bold text-gray-800">Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="movementTableBody" class="divide-y" style="border-color: #374151;">
-                                        <tr>
-                                            <td colspan="4" class="px-6 py-8 text-center text-gray-600 font-medium">
-                                                Loading movements...
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- Inventory Movements Table -->
+                    <div class="mb-6">
+                        <h4 class="text-2xl font-bold mb-4 flex items-center" style="color: #374151;">
+                            <span class="w-1 h-6 rounded mr-3" style="background-color: #374151;"></span>
+                            Movement History
+                        </h4>
+                        <div class="overflow-x-auto rounded-lg shadow-md" style="border: 2px solid #374151;">
+                            <table class="w-full text-base">
+                                <thead style="background: linear-gradient(135deg, #374151 0%, #4a5568 100%);" class="text-white">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left font-bold">Date</th>
+                                        <th class="px-6 py-4 text-left font-bold">Type</th>
+                                        <th class="px-6 py-4 text-right font-bold">Quantity</th>
+                                        <th class="px-6 py-4 text-left font-bold">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="movementTableBody" class="divide-y" style="border-color: #374151;">
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-8 text-center font-medium" style="color: #666;">
+                                            Loading movements...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
 
-                        <div class="flex justify-end pt-4 border-t border-gray-200">
-                            <button type="button" onclick="closeStockModal()" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-bold text-base hover:bg-gray-50">
-                                Close
-                            </button>
-                        </div>
+                    <div class="flex justify-end pt-4">
+                        <button type="button" onclick="closeStockModal()" class="px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 text-base font-medium text-white" style="background-color: #374151;">
+                            Close
+                        </button>
                     </div>
                 </div>
             </div>
