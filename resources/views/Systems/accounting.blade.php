@@ -106,7 +106,7 @@
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 										</svg>
 									</div>
-									<input type="text" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+									<input type="text" id="searchInput" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
 								</div>
 							</div>
 							<div class="flex gap-2">
@@ -146,7 +146,11 @@
 									@forelse($transactions as $transaction)
 										<tr class="transaction-row hover:bg-slate-600 transition cursor-pointer" 
 											data-type="{{ $transaction->transaction_type }}"
-											data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@elseif($transaction->salesOrder){{ strtolower($transaction->salesOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif">
+										data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@elseif($transaction->salesOrder){{ strtolower($transaction->salesOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif"
+										data-id="TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}"
+										data-date="{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}"
+										data-category="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->customer->name ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->supplier->name ?? '') }}@endif"
+										data-description="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->order_number ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->order_number ?? '') }}@else{{ strtolower($transaction->description ?? '') }}@endif">
 											<td class="px-4 py-3 font-mono text-slate-300">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
 											<td class="px-4 py-3 text-slate-300">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
 											<td class="px-4 py-3">
@@ -357,6 +361,7 @@
 
 		// Filter functionality
 		function filterTransactions() {
+			const searchInput = document.getElementById('searchInput').value.toLowerCase();
 			const categoryFilter = document.getElementById('categoryFilter').value;
 			const statusFilter = document.getElementById('statusFilter').value;
 			const rows = document.querySelectorAll('.transaction-row');
@@ -364,11 +369,21 @@
 			rows.forEach(row => {
 				const rowType = row.getAttribute('data-type');
 				const rowStatus = row.getAttribute('data-status');
+				const rowId = row.getAttribute('data-id').toLowerCase();
+				const rowDate = row.getAttribute('data-date').toLowerCase();
+				const rowCategory = row.getAttribute('data-category').toLowerCase();
+				const rowDescription = row.getAttribute('data-description').toLowerCase();
 				
 				const categoryMatch = categoryFilter === 'all' || rowType === categoryFilter;
 				const statusMatch = statusFilter === 'all' || rowStatus === statusFilter;
+				const searchMatch = searchInput === '' || 
+					rowId.includes(searchInput) ||
+					rowDate.includes(searchInput) ||
+					rowType.toLowerCase().includes(searchInput) ||
+					rowCategory.includes(searchInput) ||
+					rowDescription.includes(searchInput);
 				
-				if (categoryMatch && statusMatch) {
+				if (categoryMatch && statusMatch && searchMatch) {
 					row.style.display = '';
 				} else {
 					row.style.display = 'none';
@@ -377,6 +392,7 @@
 		}
 
 		// Attach filter event listeners
+		document.getElementById('searchInput').addEventListener('input', filterTransactions);
 		document.getElementById('categoryFilter').addEventListener('change', filterTransactions);
 		document.getElementById('statusFilter').addEventListener('change', filterTransactions);
 
