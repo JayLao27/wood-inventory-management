@@ -199,43 +199,106 @@
 									</tr>
 
 									<!-- View Order Modal -->
-										<div id="viewOrderModal-{{ $order->id }}" class="fixed inset-0 bg-black/70 hidden" style="z-index: 99999;">
-										<div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-2xl w-[92%] mx-auto mt-16 p-6">
-											<div class="flex items-center justify-between mb-4">
-												<h3 class="text-2xl font-bold">Order Details</h3>
-												<button class="text-xl" onclick="closeModal('viewOrderModal-{{ $order->id }}')">✕</button>
+										<div id="viewOrderModal-{{ $order->id }}" class="fixed inset-0 bg-black/70 hidden overflow-y-auto" style="z-index: 99999;">
+										<div class="bg-white text-gray-900 rounded-lg shadow-2xl max-w-4xl w-[95%] mx-auto my-8 p-8">
+											<!-- Header -->
+											<div class="flex items-center justify-between mb-8 border-b-2 pb-6" style="border-color: #374151;">
+												<div>
+													<h3 class="text-3xl font-bold text-gray-800">Order #{{ $order->order_number }}</h3>
+													<p class="text-gray-500 mt-1">{{ $order->customer?->name }}</p>
+												</div>
+												<button class="text-2xl text-gray-400 hover:text-gray-600 transition" onclick="closeModal('viewOrderModal-{{ $order->id }}')">✕</button>
 											</div>
-											<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg leading-relaxed">
-												<div><span class="font-semibold">Order #:</span> {{ $order->order_number }}</div>
-												<div><span class="font-semibold">Customer:</span> {{ $order->customer?->name }}</div>
-												<div><span class="font-semibold">Customer Type:</span> <span class="px-2 py-0.5 rounded text-white" style="background: {{ $customerTypeBg[$order->customer?->customer_type] ?? '#e5e7eb' }};">{{ $order->customer?->customer_type }}</span></div>
-												<div><span class="font-semibold">Order Date:</span> {{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</div>
-												<div><span class="font-semibold">Delivery Date:</span> {{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</div>
-												@php
-													$vsb = $order->status === 'Pending' ? '#ffffff' : ($statusBg[$order->status] ?? '#e5e7eb');
-													$vstText = $order->status === 'Pending' ? 'color: #111827;' : 'color: #ffffff;';
-												@endphp
-												<div><span class="font-semibold">Status:</span> <span class="px-2 py-0.5 rounded" style="background: {{ $vsb }}; {{ $vstText }}">{{ $order->status }}</span></div>
-												@php
-													$vpb = $paymentBg[$order->payment_status] ?? '#ffffff';
-													$vptText = $order->payment_status === 'Pending' ? 'color: #111827;' : 'color: #ffffff;';
-												@endphp
-												<div><span class="font-semibold">Payment Status:</span>
-											@if($order->payment_status === 'Paid')
-												<span class="text-green-400 font-semibold">{{ $order->payment_status }}</span>
-											@elseif($order->payment_status === 'Partial')
-												<span class="text-orange-400 font-semibold">{{ $order->payment_status }}</span>
-											@else
-												<span class="text-slate-400 font-semibold">{{ $order->payment_status }}</span>
-											@endif
-										</div>
-												<div><span class="font-semibold">Total Amount:</span> ₱{{ number_format($order->total_amount, 2) }}</div>
-												<div class="md:col-span-2"><span class="font-semibold">Notes:</span>
-													<div class="mt-1 whitespace-pre-wrap">{{ $order->note ?: '—' }}</div>
+
+											<!-- Order Information Cards -->
+											<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+												<div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4" style="border-left-color: #374151;">
+													<p class="text-gray-600 text-sm font-semibold">Customer Type</p>
+													<p class="text-lg font-bold mt-2" style="color: {{ $customerTypeBg[$order->customer?->customer_type] ?? '#e5e7eb' }};">{{ $order->customer?->customer_type }}</p>
+												</div>
+												<div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-l-4" style="border-left-color: #374151;">
+													<p class="text-gray-600 text-sm font-semibold">Order Date</p>
+													<p class="text-lg font-bold mt-2 text-gray-800">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</p>
+												</div>
+												<div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4" style="border-left-color: #374151;">
+													<p class="text-gray-600 text-sm font-semibold">Delivery Date</p>
+													<p class="text-lg font-bold mt-2 text-gray-800">{{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</p>
+												</div>
+												<div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border-l-4" style="border-left-color: #374151;">
+													<p class="text-gray-600 text-sm font-semibold">Status</p>
+													<p class="text-lg font-bold mt-2 px-2 py-1 rounded text-white text-center" style="background: {{ $statusBg[$order->status] ?? '#e5e7eb' }};">{{ $order->status }}</p>
 												</div>
 											</div>
-											<div class="flex justify-end mt-6">
-												<button class="px-4 py-2 bg-gray-900 text-white rounded" onclick="closeModal('viewOrderModal-{{ $order->id }}')">Close</button>
+
+											<!-- Payment Information -->
+											<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+												<div class="bg-slate-50 p-4 rounded-lg border" style="border-color: #374151;">
+													<p class="text-gray-600 text-sm font-semibold">Payment Status</p>
+													<p class="text-lg font-bold mt-2 
+														@if($order->payment_status === 'Paid') text-green-600
+														@elseif($order->payment_status === 'Partial') text-orange-600
+														@else text-gray-600
+														@endif">
+														{{ $order->payment_status }}
+													</p>
+												</div>
+												<div class="bg-slate-50 p-4 rounded-lg border md:col-span-2" style="border-color: #374151;">
+													<p class="text-gray-600 text-sm font-semibold">Total Amount</p>
+													<p class="text-2xl font-bold mt-2 text-gray-800">₱{{ number_format($order->total_amount, 2) }}</p>
+												</div>
+											</div>
+
+											<!-- Products Ordered -->
+											<div class="mb-8">
+												<h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+													<span class="w-1 h-6 rounded mr-3" style="background-color: #374151;"></span>
+													Products & Materials Ordered
+												</h4>
+												@if($order->items && $order->items->count() > 0)
+													<div class="space-y-3">
+														@foreach($order->items as $item)
+															<div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg border-l-4 hover:shadow-md transition" style="border-left-color: #374151;">
+																<div class="flex justify-between items-start">
+																	<div class="flex-1">
+																		<h5 class="font-bold text-gray-900 text-lg">{{ $item->product?->product_name ?? 'Unknown Product' }}</h5>
+																		<p class="text-gray-600 text-sm mt-1">Unit Price: <span class="font-semibold text-gray-900">₱{{ number_format($item->unit_price, 2) }}</span></p>
+																	</div>
+																	<div class="text-right">
+																		<div class="inline-block bg-blue-200 text-blue-900 px-4 py-2 rounded-full font-bold text-lg">
+																			{{ $item->quantity }} <span class="text-sm">pcs</span>
+																		</div>
+																	</div>
+																</div>
+																<div class="mt-3 pt-3 border-t border-blue-200 flex justify-between items-center">
+																	<span class="text-gray-600 text-sm">Line Total:</span>
+																	<span class="font-bold text-lg text-gray-900">₱{{ number_format($item->quantity * $item->unit_price, 2) }}</span>
+																</div>
+															</div>
+														@endforeach
+													</div>
+													<!-- Order Summary -->
+													<div class="mt-6 bg-slate-100 p-5 rounded-lg border-2 flex justify-between items-center" style="border-color: #374151;">
+														<span class="text-lg font-bold text-gray-800">Order Total:</span>
+														<span class="text-2xl font-bold text-gray-900">₱{{ number_format($order->total_amount, 2) }}</span>
+													</div>
+												@else
+													<div class="bg-gray-50 p-6 rounded-lg border text-center text-gray-500" style="border-color: #374151;">
+														No products in this order
+													</div>
+												@endif
+											</div>
+
+											<!-- Notes Section -->
+											@if($order->note)
+												<div class="bg-amber-50 p-6 rounded-lg border-l-4 mb-8" style="border-left-color: #374151;">
+													<p class="text-gray-600 font-semibold mb-2">Notes</p>
+													<p class="text-gray-700 whitespace-pre-wrap">{{ $order->note }}</p>
+												</div>
+											@endif
+
+											<!-- Close Button -->
+											<div class="flex justify-end">
+												<button class="px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-900 transition" onclick="closeModal('viewOrderModal-{{ $order->id }}')">Close</button>
 											</div>
 										</div>
 									</div>
@@ -336,12 +399,12 @@
 										</div>
 									<!-- View Customer Modal -->
 								<div id="viewCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/70 hidden" style="z-index: 99999;">
-										<div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-2xl w-[92%] mx-auto mt-16 p-6">
+										<div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-4xl w-[92%] mx-auto mt-16 p-6 max-h-[90vh] overflow-y-auto">
 											<div class="flex items-center justify-between mb-4">
 												<h3 class="text-2xl font-bold">Customer Details</h3>
 												<button class="text-xl" onclick="closeModal('viewCustomerModal-{{ $customer->id }}')">✕</button>
 											</div>
-											<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg leading-relaxed">
+											<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg leading-relaxed mb-6">
 												<div><span class="font-semibold">Name:</span> {{ $customer->name }}</div>
 												<div><span class="font-semibold">Type:</span> <span class="px-2 py-0.5 rounded text-white" style="background: {{ $customerTypeBg[$customer->customer_type] ?? '#e5e7eb' }};">{{ $customer->customer_type }}</span></div>
 												<div><span class="font-semibold">Contact #:</span> {{ $customer->phone ?: '—' }}</div>
@@ -349,6 +412,46 @@
 												<div><span class="font-semibold">Total Orders:</span> {{ $customer->totalOrders() }}</div>
 												<div><span class="font-semibold">Total Spent:</span> ₱{{ number_format($customer->totalSpent(), 2) }}</div>
 											</div>
+
+											<!-- Products Purchased Section -->
+											<div class="border-t pt-6">
+												<h4 class="text-xl font-semibold mb-4">Products Purchased</h4>
+												@php
+													$productsSummary = [];
+													foreach($customer->salesOrders as $order) {
+														foreach($order->items as $item) {
+															$productName = $item->product->product_name ?? 'Unknown Product';
+															if (!isset($productsSummary[$productName])) {
+																$productsSummary[$productName] = 0;
+															}
+															$productsSummary[$productName] += $item->quantity;
+														}
+													}
+												@endphp
+												@if(count($productsSummary) > 0)
+													<div class="overflow-x-auto">
+														<table class="w-full text-sm border-collapse">
+															<thead>
+																<tr class="bg-slate-100 border-b">
+																	<th class="px-4 py-2 text-left font-semibold">Product Name</th>
+																	<th class="px-4 py-2 text-right font-semibold">Total Quantity</th>
+																</tr>
+															</thead>
+															<tbody>
+																@foreach($productsSummary as $productName => $totalQty)
+																	<tr class="border-b hover:bg-slate-50">
+																		<td class="px-4 py-2">{{ $productName }}</td>
+																		<td class="px-4 py-2 text-right font-medium">{{ $totalQty }} pcs</td>
+																	</tr>
+																@endforeach
+															</tbody>
+														</table>
+													</div>
+												@else
+													<p class="text-slate-500 text-sm">No products purchased yet</p>
+												@endif
+											</div>
+
 											<div class="flex justify-end mt-6">
 												<button class="px-4 py-2 bg-gray-900 text-white rounded" onclick="closeModal('viewCustomerModal-{{ $customer->id }}')">Close</button>
 											</div>
