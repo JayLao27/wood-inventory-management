@@ -221,6 +221,8 @@ class InventoryController extends Controller
                 return [
                     'movement_type' => $movement->movement_type,
                     'quantity' => $movement->quantity,
+                    'reference_type' => $movement->reference_type,
+                    'reference_id' => $movement->reference_id,
                     'notes' => $movement->notes,
                     'created_at' => $movement->created_at,
                 ];
