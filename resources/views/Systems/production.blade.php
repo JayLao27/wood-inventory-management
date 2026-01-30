@@ -98,7 +98,7 @@
                     </div>
                 </div>
 
-                <!-- Search and Filter Bar -->
+                <!-- Search Bar and Status Filter -->
                 <div class="flex justify-between items-center mb-12">
                     <div class="flex-1 max-w-md">
                         <div class="relative">
@@ -110,7 +110,7 @@
                             <input id="workOrderSearchInput" type="text" placeholder="Search work orders..." class="w-[850px] pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                     </div>
-                    <div class="flex space-x-3">
+                    <div>
                         <select id="statusFilterSelect" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
                             <option value="all">All Status</option>
                             <option value="pending">Pending</option>
@@ -118,12 +118,6 @@
                             <option value="quality_check">Quality Check</option>
                             <option value="completed">Completed</option>
                             <option value="overdue">Overdue</option>
-                        </select>
-                        <select id="priorityFilterSelect" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                            <option value="all">All Priority</option>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
                         </select>
                     </div>
                 </div>
@@ -138,17 +132,34 @@
                                 <th class="text-left py-3 px-4 font-medium">Quantity</th>
                                 <th class="text-left py-3 px-4 font-medium">Due Date</th>
                                 <th class="text-left py-3 px-4 font-medium">Assigned To</th>
+                                <th class="text-left py-3 px-4 font-medium">Status</th>
                                 <th class="text-left py-3 px-4 font-medium">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-600">
+                        <tbody class="divide-y divide-slate-600" id="workOrderTableBody">
                             @forelse($workOrders ?? [] as $workOrder)
-                            <tr class="hover:bg-slate-600 cursor-pointer">
+                            <tr class="hover:bg-slate-600 cursor-pointer work-order-row" data-order-number="{{ $workOrder->order_number }}" data-product-name="{{ $workOrder->product_name }}" data-assigned-to="{{ $workOrder->assigned_to }}" data-status="{{ $workOrder->status }}">
                                 <td class="py-3 px-4">{{ $workOrder->order_number }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->product_name }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->quantity }} pcs</td>
                                 <td class="py-3 px-4">{{ $workOrder->due_date->format('m/d/Y') }}</td>
                                 <td class="py-3 px-4">{{ $workOrder->assigned_to }}</td>
+                                <td class="py-3 px-4">
+                                    @php
+                                        $statusColors = [
+                                            'pending' => 'bg-yellow-500',
+                                            'in_progress' => 'bg-blue-500',
+                                            'quality_check' => 'bg-purple-500',
+                                            'completed' => 'bg-green-500',
+                                            'overdue' => 'bg-red-500'
+                                        ];
+                                        $statusColor = $statusColors[$workOrder->status] ?? 'bg-gray-500';
+                                        $statusLabel = ucwords(str_replace('_', ' ', $workOrder->status));
+                                    @endphp
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold text-white {{ $statusColor }}">
+                                        {{ $statusLabel }}
+                                    </span>
+                                </td>
                                 <td class="py-3 px-4">
                                     <div class="flex space-x-2">
                                         <button onclick="viewWorkOrder({{ $workOrder->id }})" class="p-1 hover:bg-slate-500 rounded">
@@ -185,7 +196,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="py-8 px-4 text-center text-slate-400">No work orders found</td>
+                                <td colspan="7" class="py-8 px-4 text-center text-slate-400">No work orders found</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -644,13 +655,62 @@
                 }
             });
 
-            // Set minimum date to today and wire up search/filter
+            // Set minimum date to today and wire up search
             document.addEventListener('DOMContentLoaded', function() {
                 const today = new Date().toISOString().split('T')[0];
                 const dueDateInput = document.querySelector('input[name="due_date"]');
                 if (dueDateInput) dueDateInput.setAttribute('min', today);
 
+                const searchInput = document.getElementById('workOrderSearchInput');
+                const statusFilter = document.getElementById('statusFilterSelect');
 
+                // Combined filter function
+                function filterWorkOrders() {
+                    const searchTerm = searchInput?.value.toLowerCase().trim() || '';
+                    const statusValue = statusFilter?.value || 'all';
+                    const rows = document.querySelectorAll('.work-order-row');
+                    let visibleCount = 0;
+
+                    rows.forEach(row => {
+                        const orderNumber = row.getAttribute('data-order-number')?.toLowerCase() || '';
+                        const productName = row.getAttribute('data-product-name')?.toLowerCase() || '';
+                        const assignedTo = row.getAttribute('data-assigned-to')?.toLowerCase() || '';
+                        const status = row.getAttribute('data-status') || '';
+
+                        // Check search match
+                        const searchMatch = !searchTerm || 
+                                          orderNumber.includes(searchTerm) || 
+                                          productName.includes(searchTerm) || 
+                                          assignedTo.includes(searchTerm);
+
+                        // Check status match
+                        const statusMatch = statusValue === 'all' || status === statusValue;
+
+                        // Show row only if both conditions are met
+                        if (searchMatch && statusMatch) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Show/hide empty state
+                    const emptyRow = document.querySelector('#workOrderTableBody tr td[colspan]');
+                    if (emptyRow && emptyRow.parentElement) {
+                        emptyRow.parentElement.style.display = visibleCount === 0 ? '' : 'none';
+                    }
+                }
+
+                // Search functionality
+                if (searchInput) {
+                    searchInput.addEventListener('input', filterWorkOrders);
+                }
+
+                // Status filter functionality
+                if (statusFilter) {
+                    statusFilter.addEventListener('change', filterWorkOrders);
+                }
             });
         </script>
 @endsection
