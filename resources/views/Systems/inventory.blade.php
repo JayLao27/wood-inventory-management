@@ -414,45 +414,6 @@
                                 </table>
                             </div>
                         </div>
-
-                        <!-- Add Adjustment Section -->
-                        <div class="border-t border-gray-200 pt-6">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-4">Add Stock Adjustment</h4>
-                            <form id="stockForm" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" id="stockItemType">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Movement Type *</label>
-                                        <select name="movement_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                            <option value="">Select Movement Type</option>
-                                            <option value="in">Stock In</option>
-                                            <option value="out">Stock Out</option>
-                                            <option value="adjustment">Adjustment</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
-                                        <input type="number" name="quantity" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                                        <input type="text" name="notes" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Optional notes">
-                                    </div>
-                                </div>
-                                
-                                <div class="flex justify-end space-x-3 mt-4">
-                                    <button type="button" onclick="closeStockModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                                        Close
-                                    </button>
-                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                        Add Adjustment
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>
