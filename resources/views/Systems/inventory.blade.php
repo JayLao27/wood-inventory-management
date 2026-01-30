@@ -376,7 +376,7 @@
                         </div>
 
                         <!-- Item Info Cards -->
-                        <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                             <div class="bg-blue-50 p-4 rounded-lg">
                                 <p class="text-sm text-gray-600">Current Stock</p>
                                 <p id="currentStock" class="text-2xl font-bold text-blue-600 mt-1">-</p>
@@ -389,6 +389,14 @@
                                 <p class="text-sm text-gray-600">Unit Cost</p>
                                 <p id="unitCost" class="text-2xl font-bold text-green-600 mt-1">-</p>
                             </div>
+                            <div class="bg-emerald-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-600">Total Stock In</p>
+                                <p id="totalStockIn" class="text-2xl font-bold text-emerald-600 mt-1">-</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-600">Total Stock Out</p>
+                                <p id="totalStockOut" class="text-2xl font-bold text-red-600 mt-1">-</p>
+                            </div>
                         </div>
 
                         <!-- Inventory Movements Table -->
@@ -398,15 +406,16 @@
                                 <table class="w-full text-sm">
                                     <thead class="bg-gray-100 border-b border-gray-200">
                                         <tr>
-                                            <th class="px-4 py-3 text-left font-medium text-gray-700">Date</th>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-700">Date & Time</th>
                                             <th class="px-4 py-3 text-left font-medium text-gray-700">Type</th>
                                             <th class="px-4 py-3 text-right font-medium text-gray-700">Quantity</th>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-700">Reference</th>
                                             <th class="px-4 py-3 text-left font-medium text-gray-700">Notes</th>
                                         </tr>
                                     </thead>
                                     <tbody id="movementTableBody" class="divide-y divide-gray-200">
                                         <tr>
-                                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
                                                 Loading movements...
                                             </td>
                                         </tr>
@@ -516,8 +525,6 @@
 
             function openStockModal(type, id) {
                 document.getElementById('stockModal').classList.remove('hidden');
-                document.getElementById('stockForm').action = `/inventory/${id}/adjust-stock`;
-                document.getElementById('stockItemType').value = type;
                 
                 // Fetch item details and movements
                 fetch(`/inventory/${id}/details?type=${type}`)
@@ -529,32 +536,82 @@
                         document.getElementById('minimumStock').textContent = data.item.minimum_stock || '-';
                         document.getElementById('unitCost').textContent = data.item.unit_cost ? '₱' + parseFloat(data.item.unit_cost).toFixed(2) : 'N/A';
                         
+                        // Calculate total stock in and out
+                        let totalIn = 0;
+                        let totalOut = 0;
+                        if (data.movements && data.movements.length > 0) {
+                            data.movements.forEach(movement => {
+                                const qty = parseFloat(movement.quantity) || 0;
+                                if (movement.movement_type === 'in') {
+                                    totalIn += qty;
+                                } else if (movement.movement_type === 'out') {
+                                    totalOut += qty;
+                                }
+                            });
+                        }
+                        
+                        document.getElementById('totalStockIn').textContent = totalIn.toFixed(2) + ' ' + (data.item.unit || '');
+                        document.getElementById('totalStockOut').textContent = totalOut.toFixed(2) + ' ' + (data.item.unit || '');
+                        
                         // Populate movements table
                         const tbody = document.getElementById('movementTableBody');
                         if (data.movements && data.movements.length > 0) {
-                            tbody.innerHTML = data.movements.map(movement => `
+                            tbody.innerHTML = data.movements.map(movement => {
+                                const date = new Date(movement.created_at);
+                                const formattedDate = date.toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                });
+                                const formattedTime = date.toLocaleTimeString('en-US', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                });
+                                
+                                // Format reference type
+                                let referenceText = '-';
+                                if (movement.reference_type) {
+                                    referenceText = movement.reference_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                }
+                                
+                                return `
                                 <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3 text-gray-900">${new Date(movement.created_at).toLocaleDateString()}</td>
+                                    <td class="px-4 py-3 text-gray-900">
+                                        <div class="font-medium">${formattedDate}</div>
+                                        <div class="text-xs text-gray-500">${formattedTime}</div>
+                                    </td>
                                     <td class="px-4 py-3">
                                         <span class="px-2 py-1 text-xs font-semibold rounded-full ${
                                             movement.movement_type === 'in' ? 'bg-green-100 text-green-800' :
                                             movement.movement_type === 'out' ? 'bg-red-100 text-red-800' :
                                             'bg-blue-100 text-blue-800'
                                         }">
-                                            ${movement.movement_type.charAt(0).toUpperCase() + movement.movement_type.slice(1)}
+                                            ${movement.movement_type === 'in' ? '↑ Stock In' : 
+                                              movement.movement_type === 'out' ? '↓ Stock Out' : 
+                                              '⟳ Adjustment'}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3 text-right font-medium text-gray-900">${movement.quantity}</td>
+                                    <td class="px-4 py-3 text-right font-medium ${
+                                        movement.movement_type === 'in' ? 'text-green-600' :
+                                        movement.movement_type === 'out' ? 'text-red-600' :
+                                        'text-blue-600'
+                                    }">
+                                        ${movement.movement_type === 'in' ? '+' : movement.movement_type === 'out' ? '-' : ''}${parseFloat(movement.quantity).toFixed(2)}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">${referenceText}</span>
+                                    </td>
                                     <td class="px-4 py-3 text-gray-600">${movement.notes || '-'}</td>
                                 </tr>
-                            `).join('');
+                            `;
+                            }).join('');
                         } else {
-                            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">No movements recorded yet</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No movements recorded yet</td></tr>';
                         }
                     })
                     .catch(error => {
                         console.error('Error fetching item details:', error);
-                        document.getElementById('movementTableBody').innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Error loading data</td></tr>';
+                        document.getElementById('movementTableBody').innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-red-500">Error loading data</td></tr>';
                     });
             }
 
