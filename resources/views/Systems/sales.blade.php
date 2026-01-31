@@ -460,37 +460,58 @@
 
 									<!-- Edit Customer Modal -->
 								<div id="editCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/50 hidden" style="z-index: 99999;">
-										<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-6">
+										<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-6 max-h-[90vh] overflow-y-auto">
 											<div class="flex items-center justify-between mb-4">
 												<h3 class="font-semibold">Edit Customer</h3>
 												<button onclick="closeModal('editCustomerModal-{{ $customer->id }}')">✕</button>
 											</div>
+											@if ($errors->any())
+												<div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+													<ul class="list-disc list-inside text-sm">
+														@foreach ($errors->all() as $error)
+															<li>{{ $error }}</li>
+														@endforeach
+													</ul>
+												</div>
+											@endif
 											<form method="POST" action="{{ route('customers.update', $customer) }}">
 												@csrf
 												@method('PUT')
 												<div class="grid gap-4">
 													<div>
 														<label class="text-sm">Name <span class="text-red-500">*</span></label>
-														<input type="text" name="name" value="{{ $customer->name }}" class="w-full border rounded px-2 py-1" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
+														<input type="text" name="name" value="{{ old('name', $customer->name) }}" class="w-full border rounded px-2 py-1 @error('name') border-red-500 @enderror" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
+														@error('name')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+														@enderror
 													</div>
 													<div class="grid grid-cols-2 gap-3">
 														<div>
 															<label class="text-sm">Type <span class="text-red-500">*</span></label>
-															<select name="customer_type" class="w-full border rounded px-2 py-1" required>
+															<select name="customer_type" class="w-full border rounded px-2 py-1 @error('customer_type') border-red-500 @enderror" required>
 																@foreach(['Retail','Contractor','Wholesale'] as $t)
-																	<option value="{{ $t }}" @selected($customer->customer_type==$t)>{{ $t }}</option>
+																	<option value="{{ $t }}" {{ old('customer_type', $customer->customer_type) === $t ? 'selected' : '' }}>{{ $t }}</option>
 																@endforeach
 															</select>
+															@error('customer_type')
+																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@enderror
 														</div>
 														<div>
 															<label class="text-sm">Phone</label>
-															<input type="tel" name="phone" value="{{ $customer->phone }}" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+															<input type="tel" name="phone" value="{{ old('phone', $customer->phone) }}" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+															@error('phone')
+																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@enderror
 														</div>
 													</div>
 													<div class="grid grid-cols-2 gap-3">
 														<div>
 															<label class="text-sm">Email</label>
-															<input type="email" name="email" value="{{ $customer->email }}" class="w-full border rounded px-2 py-1" maxlength="255" title="Please enter a valid email address">
+															<input type="email" name="email" value="{{ old('email', $customer->email) }}" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror" maxlength="255" title="Please enter a valid email address">
+															@error('email')
+																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@enderror
 														</div>
 													</div>
 													<div class="flex justify-end gap-2">
@@ -511,42 +532,63 @@
 
 				<!-- New Order Modal -->
 				<div id="newOrderModal" class="fixed inset-0 bg-black/50 hidden">
-					<div class="bg-white text-gray-900 rounded shadow max-w-2xl w-full mx-auto mt-16 p-6">
+					<div class="bg-white text-gray-900 rounded shadow max-w-2xl w-full mx-auto mt-16 p-6 max-h-[90vh] overflow-y-auto">
 						<div class="flex items-center justify-between mb-4">
 							<h3 class="font-semibold">Create New Order</h3>
 							<button onclick="closeModal('newOrderModal')">✕</button>
 						</div>
+						@if ($errors->any())
+							<div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+								<ul class="list-disc list-inside text-sm">
+									@foreach ($errors->all() as $error)
+										<li>{{ $error }}</li>
+									@endforeach
+								</ul>
+							</div>
+						@endif
 						<form method="POST" action="{{ route('sales-orders.store') }}">
 							@csrf
 							<div class="grid gap-4">
 								<div>
 									<label class="text-sm">Customer <span class="text-red-500">*</span></label>
-									<select name="customer_id" class="w-full border rounded px-2 py-1" required>
-										<option value="">Select Customer</option>
+									<select name="customer_id" class="w-full border rounded px-2 py-1 @error('customer_id') border-red-500 @enderror" required>
+										<option value="">-- Select Customer --</option>
 										@foreach($customers as $c)
-											<option value="{{ $c->id }}">{{ $c->name }} ({{ $c->customer_type }}	)</option>
+											<option value="{{ $c->id }}" {{ old('customer_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} ({{ $c->customer_type }})</option>
 										@endforeach
 									</select>
+									@error('customer_id')
+										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+									@enderror
 								</div>
 								<div class="grid grid-cols-2 gap-3">
 									<div>
 										<label class="text-sm">Delivery Date <span class="text-red-500">*</span></label>
-										<input type="date" name="delivery_date" class="w-full border rounded px-2 py-1" required>
+										<input type="date" name="delivery_date" class="w-full border rounded px-2 py-1 @error('delivery_date') border-red-500 @enderror" value="{{ old('delivery_date') }}" required>
+										@error('delivery_date')
+											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+										@enderror
 									</div>
 								</div>
 								<div class="grid grid-cols-3 gap-3 items-end">
 									<div>
-										<label class="text-sm">Product</label>
-										<select id="newItemProduct" name="items[0][product_id]" class="w-full border rounded px-2 py-1">
+										<label class="text-sm">Product <span class="text-red-500">*</span></label>
+										<select id="newItemProduct" name="items[0][product_id]" class="w-full border rounded px-2 py-1 @error('items.0.product_id') border-red-500 @enderror" required>
 											<option value="">-- select product --</option>
 											@foreach($products as $p)
 												<option value="{{ $p->id }}" data-price="{{ number_format($p->selling_price,2,'.','') }}">{{ $p->product_name }}</option>
 											@endforeach
 										</select>
+										@error('items.0.product_id')
+											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+										@enderror
 									</div>
 									<div>
-										<label class="text-sm">Quantity</label>
-										<input id="newItemQty" type="number" min="1" name="items[0][quantity]" class="w-full border rounded px-2 py-1" placeholder="1">
+										<label class="text-sm">Quantity <span class="text-red-500">*</span></label>
+										<input id="newItemQty" type="number" min="1" name="items[0][quantity]" class="w-full border rounded px-2 py-1 @error('items.0.quantity') border-red-500 @enderror" placeholder="1" value="{{ old('items.0.quantity') }}" required>
+										@error('items.0.quantity')
+											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+										@enderror
 									</div>
 									<div>
 										<label class="text-sm">Unit Price</label>
@@ -575,30 +617,52 @@
 							<h3 class="font-semibold">Add New Customer</h3>
 							<button onclick="closeModal('newCustomerModal')">✕</button>
 						</div>
+						@if ($errors->any())
+							<div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+								<ul class="list-disc list-inside text-sm">
+									@foreach ($errors->all() as $error)
+										<li>{{ $error }}</li>
+									@endforeach
+								</ul>
+							</div>
+						@endif
 						<form method="POST" action="{{ route('customers.store') }}">
 							@csrf
 							<div class="grid gap-4">
 								<div>
 									<label class="text-sm">Name <span class="text-red-500">*</span></label>
-									<input type="text" name="name" class="w-full border rounded px-2 py-1" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
+									<input type="text" name="name" class="w-full border rounded px-2 py-1 @error('name') border-red-500 @enderror" value="{{ old('name') }}" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
+									@error('name')
+										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+									@enderror
 								</div>
 								<div class="grid grid-cols-2 gap-3">
 									<div>
 										<label class="text-sm">Type <span class="text-red-500">*</span></label>
-										<select name="customer_type" class="w-full border rounded px-2 py-1" required>
+										<select name="customer_type" class="w-full border rounded px-2 py-1 @error('customer_type') border-red-500 @enderror" required>
+											<option value="">-- Select Type --</option>
 											@foreach(['Retail','Contractor','Wholesale'] as $t)
-												<option value="{{ $t }}">{{ $t }}</option>
+												<option value="{{ $t }}" {{ old('customer_type') === $t ? 'selected' : '' }}>{{ $t }}</option>
 											@endforeach
 										</select>
+										@error('customer_type')
+											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+										@enderror
 									</div>
 									<div>
 										<label class="text-sm">Phone</label>
-										<input type="tel" name="phone" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+										<input type="tel" name="phone" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror" value="{{ old('phone') }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+										@error('phone')
+											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+										@enderror
 									</div>
 								</div>
 								<div>
 									<label class="text-sm">Email</label>
-									<input type="email" name="email" class="w-full border rounded px-2 py-1" maxlength="255" title="Please enter a valid email address">
+									<input type="email" name="email" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror" value="{{ old('email') }}" maxlength="255" title="Please enter a valid email address">
+									@error('email')
+										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+									@enderror
 								</div>
 								<div class="flex justify-end gap-2">
 									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newCustomerModal')">Cancel</button>
