@@ -27,6 +27,12 @@ class CustomerController extends Controller
 			'email.email' => 'Please enter a valid email address.',
 			'email.unique' => 'This email is already registered.',
 		]);
+
+		// Check if at least one contact method is provided
+		if (empty($request->phone) && empty($request->email)) {
+			return redirect()->back()->withInput()->withErrors(['contact' => 'Please provide at least a phone number or email address.']);
+		}
+
 		Customer::create($request->only('name','customer_type','phone','email','address'));
 		return redirect()->route('sales-orders.index')->with('success', 'Customer added.');
 	}
@@ -47,6 +53,12 @@ class CustomerController extends Controller
 			'email.email' => 'Please enter a valid email address.',
 			'email.unique' => 'This email is already registered.',
 		]);
+
+		// Check if at least one contact method is provided
+		if (empty($request->phone) && empty($request->email)) {
+			return redirect()->back()->withInput()->withErrors(['contact' => 'Please provide at least a phone number or email address.']);
+		}
+
 		$customer->update($request->only('name','customer_type','phone','email','address'));
 		return redirect()->route('sales-orders.index')->with('success', 'Customer updated.');
 	}
