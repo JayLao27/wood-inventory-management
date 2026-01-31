@@ -470,13 +470,13 @@
 												@method('PUT')
 												<div class="grid gap-4">
 													<div>
-														<label class="text-sm">Name</label>
-														<input type="text" name="name" value="{{ $customer->name }}" class="w-full border rounded px-2 py-1">
+														<label class="text-sm">Name <span class="text-red-500">*</span></label>
+														<input type="text" name="name" value="{{ $customer->name }}" class="w-full border rounded px-2 py-1" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
 													</div>
 													<div class="grid grid-cols-2 gap-3">
 														<div>
-															<label class="text-sm">Type</label>
-															<select name="customer_type" class="w-full border rounded px-2 py-1">
+															<label class="text-sm">Type <span class="text-red-500">*</span></label>
+															<select name="customer_type" class="w-full border rounded px-2 py-1" required>
 																@foreach(['Retail','Contractor','Wholesale'] as $t)
 																	<option value="{{ $t }}" @selected($customer->customer_type==$t)>{{ $t }}</option>
 																@endforeach
@@ -484,13 +484,13 @@
 														</div>
 														<div>
 															<label class="text-sm">Phone</label>
-															<input type="text" name="phone" value="{{ $customer->phone }}" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX">
+															<input type="tel" name="phone" value="{{ $customer->phone }}" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
 														</div>
 													</div>
 													<div class="grid grid-cols-2 gap-3">
 														<div>
 															<label class="text-sm">Email</label>
-															<input type="email" name="email" value="{{ $customer->email }}" class="w-full border rounded px-2 py-1">
+															<input type="email" name="email" value="{{ $customer->email }}" class="w-full border rounded px-2 py-1" maxlength="255" title="Please enter a valid email address">
 														</div>
 													</div>
 													<div class="flex justify-end gap-2">
@@ -580,7 +580,7 @@
 							<div class="grid gap-4">
 								<div>
 									<label class="text-sm">Name <span class="text-red-500">*</span></label>
-									<input type="text" name="name" class="w-full border rounded px-2 py-1" required>
+									<input type="text" name="name" class="w-full border rounded px-2 py-1" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
 								</div>
 								<div class="grid grid-cols-2 gap-3">
 									<div>
@@ -593,12 +593,12 @@
 									</div>
 									<div>
 										<label class="text-sm">Phone</label>
-										<input type="text" name="phone" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX">
+										<input type="tel" name="phone" class="w-full border rounded px-2 py-1" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
 									</div>
 								</div>
 								<div>
 									<label class="text-sm">Email</label>
-									<input type="email" name="email" class="w-full border rounded px-2 py-1">
+									<input type="email" name="email" class="w-full border rounded px-2 py-1" maxlength="255" title="Please enter a valid email address">
 								</div>
 								<div class="flex justify-end gap-2">
 									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newCustomerModal')">Cancel</button>

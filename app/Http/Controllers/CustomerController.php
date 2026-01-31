@@ -13,10 +13,10 @@ class CustomerController extends Controller
 
 	public function store(Request $request) {
 		$request->validate([
-			'name' => 'required|string|max:255',
+			'name' => 'required|string|min:2|max:255|regex:/^[a-zA-Z\s\'-]+$/',
 			'customer_type' => 'required|in:Retail,Contractor,Wholesale',
-			'phone' => ['nullable','regex:/^09\\d{9}$/'],
-			'email' => 'required|email:rfc,dns|unique:customers,email',
+			'phone' => ['nullable','regex:/^[0-9]{0,12}$/','max:12'],
+			'email' => 'nullable|email|max:255|unique:customers,email',
 			'address' => 'nullable|string|max:255',
 		]);
 		Customer::create($request->only('name','customer_type','phone','email','address'));
@@ -25,10 +25,10 @@ class CustomerController extends Controller
 
 	public function update(Request $request, Customer $customer) {
 		$request->validate([
-			'name' => 'required|string|max:255',
+			'name' => 'required|string|min:2|max:255|regex:/^[a-zA-Z\s\'-]+$/',
 			'customer_type' => 'required|in:Retail,Contractor,Wholesale',
-			'phone' => ['nullable','regex:/^09\\d{9}$/'],
-			'email' => 'required|email:rfc,dns|unique:customers,email,' . $customer->id,
+			'phone' => ['nullable','regex:/^[0-9]{0,12}$/','max:12'],
+			'email' => 'nullable|email|max:255|unique:customers,email,' . $customer->id,
 			'address' => 'nullable|string|max:255',
 		]);
 		$customer->update($request->only('name','customer_type','phone','email','address'));
