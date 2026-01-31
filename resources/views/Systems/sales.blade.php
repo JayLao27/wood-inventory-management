@@ -498,21 +498,23 @@
 															@enderror
 														</div>
 														<div>
-															<label class="text-sm">Phone</label>
-															<input type="tel" name="phone" value="{{ old('phone', $customer->phone) }}" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+															<label class="text-sm">Phone <span class="text-orange-500">**</span></label>
+															<input type="tel" name="phone" value="{{ old('phone', $customer->phone) }}" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
 															@error('phone')
 																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
 															@enderror
 														</div>
 													</div>
-													<div class="grid grid-cols-2 gap-3">
-														<div>
-															<label class="text-sm">Email</label>
-															<input type="email" name="email" value="{{ old('email', $customer->email) }}" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror" maxlength="255" title="Please enter a valid email address">
-															@error('email')
-																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-															@enderror
-														</div>
+													<div>
+														<label class="text-sm">Email <span class="text-orange-500">**</span></label>
+														<input type="email" name="email" value="{{ old('email', $customer->email) }}" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" maxlength="255" title="Please enter a valid email address">
+														@error('email')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+														@enderror
+														@error('contact')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+														@enderror
+														<p class="text-gray-500 text-xs mt-1">** At least one contact method (phone or email) is required</p>
 													</div>
 													<div class="flex justify-end gap-2">
 														<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('editCustomerModal-{{ $customer->id }}')">Cancel</button>
@@ -650,19 +652,23 @@
 										@enderror
 									</div>
 									<div>
-										<label class="text-sm">Phone</label>
-										<input type="tel" name="phone" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror" value="{{ old('phone') }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+										<label class="text-sm">Phone <span class="text-orange-500">**</span></label>
+										<input type="tel" name="phone" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone') }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
 										@error('phone')
 											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
 										@enderror
 									</div>
 								</div>
 								<div>
-									<label class="text-sm">Email</label>
-									<input type="email" name="email" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror" value="{{ old('email') }}" maxlength="255" title="Please enter a valid email address">
+									<label class="text-sm">Email <span class="text-orange-500">**</span></label>
+									<input type="email" name="email" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email') }}" maxlength="255" title="Please enter a valid email address">
 									@error('email')
 										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
 									@enderror
+									@error('contact')
+										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+									@enderror
+									<p class="text-gray-500 text-xs mt-1">** At least one contact method (phone or email) is required</p>
 								</div>
 								<div class="flex justify-end gap-2">
 									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newCustomerModal')">Cancel</button>
