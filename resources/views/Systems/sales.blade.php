@@ -474,7 +474,7 @@
 													</ul>
 												</div>
 											@endif
-											<form method="POST" action="{{ route('customers.update', $customer) }}">
+											<form method="POST" action="{{ route('customers.update', $customer) }}" class="editCustomerForm">
 												@csrf
 												@method('PUT')
 												<div class="grid gap-4">
@@ -483,6 +483,8 @@
 														<input type="text" name="name" value="{{ old('name', $customer->name) }}" class="w-full border rounded px-2 py-1 @error('name') border-red-500 @enderror" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
 														@error('name')
 															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+														@else
+															<p class="text-gray-400 text-xs mt-1">This field is required. Enter customer name.</p>
 														@enderror
 													</div>
 													<div class="grid grid-cols-2 gap-3">
@@ -495,26 +497,32 @@
 															</select>
 															@error('customer_type')
 																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@else
+																<p class="text-gray-400 text-xs mt-1">This field is required. Select a customer type.</p>
 															@enderror
 														</div>
 														<div>
 															<label class="text-sm">Phone <span class="text-orange-500">**</span></label>
-															<input type="tel" name="phone" value="{{ old('phone', $customer->phone) }}" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+															<input type="tel" name="phone" class="editCustomerPhone w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone', $customer->phone) }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
 															@error('phone')
 																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@else
+																<p class="text-gray-400 text-xs mt-1">Enter a phone number (up to 12 digits) or email below.</p>
 															@enderror
 														</div>
 													</div>
 													<div>
 														<label class="text-sm">Email <span class="text-orange-500">**</span></label>
-														<input type="email" name="email" value="{{ old('email', $customer->email) }}" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" maxlength="255" title="Please enter a valid email address">
+														<input type="email" name="email" class="editCustomerEmail w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email', $customer->email) }}" maxlength="255" title="Please enter a valid email address">
 														@error('email')
 															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
 														@enderror
 														@error('contact')
 															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+														@else
+															<p class="text-gray-400 text-xs mt-1">** At least one contact method (phone or email) is required</p>
 														@enderror
-														<p class="text-gray-500 text-xs mt-1">** At least one contact method (phone or email) is required</p>
+														<p class="editCustomerContactError text-red-500 text-xs mt-1 hidden"></p>
 													</div>
 													<div class="flex justify-end gap-2">
 														<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('editCustomerModal-{{ $customer->id }}')">Cancel</button>
@@ -628,7 +636,7 @@
 								</ul>
 							</div>
 						@endif
-						<form method="POST" action="{{ route('customers.store') }}">
+						<form method="POST" action="{{ route('customers.store') }}" id="newCustomerForm">
 							@csrf
 							<div class="grid gap-4">
 								<div>
@@ -636,6 +644,8 @@
 									<input type="text" name="name" class="w-full border rounded px-2 py-1 @error('name') border-red-500 @enderror" value="{{ old('name') }}" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
 									@error('name')
 										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+									@else
+										<p class="text-gray-400 text-xs mt-1">This field is required. Enter customer name.</p>
 									@enderror
 								</div>
 								<div class="grid grid-cols-2 gap-3">
@@ -649,26 +659,32 @@
 										</select>
 										@error('customer_type')
 											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+										@else
+											<p class="text-gray-400 text-xs mt-1">This field is required. Select a customer type.</p>
 										@enderror
 									</div>
 									<div>
 										<label class="text-sm">Phone <span class="text-orange-500">**</span></label>
-										<input type="tel" name="phone" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone') }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+										<input type="tel" name="phone" id="newCustomerPhone" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone') }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
 										@error('phone')
 											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+										@else
+											<p class="text-gray-400 text-xs mt-1">Enter a phone number (up to 12 digits) or email below.</p>
 										@enderror
 									</div>
 								</div>
 								<div>
 									<label class="text-sm">Email <span class="text-orange-500">**</span></label>
-									<input type="email" name="email" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email') }}" maxlength="255" title="Please enter a valid email address">
+									<input type="email" name="email" id="newCustomerEmail" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email') }}" maxlength="255" title="Please enter a valid email address">
 									@error('email')
 										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
 									@enderror
 									@error('contact')
 										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+									@else
+										<p class="text-gray-400 text-xs mt-1">** At least one contact method (phone or email) is required</p>
 									@enderror
-									<p class="text-gray-500 text-xs mt-1">** At least one contact method (phone or email) is required</p>
+									<p id="newCustomerContactError" class="text-red-500 text-xs mt-1 hidden"></p>
 								</div>
 								<div class="flex justify-end gap-2">
 									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newCustomerModal')">Cancel</button>
@@ -838,6 +854,69 @@
 
 			// Initialize pricing display if fields already have values
 			updatePricingFields();
+
+			// ---- Contact method validation for customer forms ----
+			function validateContactMethod(phoneInput, emailInput, errorMessageEl) {
+				const phone = (phoneInput?.value || '').trim();
+				const email = (emailInput?.value || '').trim();
+				const hasError = !phone && !email;
+
+				if (hasError) {
+					phoneInput?.classList.add('border-red-500');
+					emailInput?.classList.add('border-red-500');
+					if (errorMessageEl) {
+						errorMessageEl.textContent = 'Please provide at least a phone number or email address.';
+						errorMessageEl.classList.remove('hidden');
+					}
+				} else {
+					phoneInput?.classList.remove('border-red-500');
+					emailInput?.classList.remove('border-red-500');
+					if (errorMessageEl) {
+						errorMessageEl.classList.add('hidden');
+						errorMessageEl.textContent = '';
+					}
+				}
+
+				return !hasError;
+			}
+
+			// New Customer form validation
+			const newCustomerForm = document.getElementById('newCustomerForm');
+			if (newCustomerForm) {
+				const newPhoneInput = document.getElementById('newCustomerPhone');
+				const newEmailInput = document.getElementById('newCustomerEmail');
+				const newContactError = document.getElementById('newCustomerContactError');
+
+				newCustomerForm.addEventListener('submit', function(e) {
+					if (!validateContactMethod(newPhoneInput, newEmailInput, newContactError)) {
+						e.preventDefault();
+						return false;
+					}
+				});
+
+				// Real-time validation as user types
+				newPhoneInput?.addEventListener('blur', () => validateContactMethod(newPhoneInput, newEmailInput, newContactError));
+				newEmailInput?.addEventListener('blur', () => validateContactMethod(newPhoneInput, newEmailInput, newContactError));
+			}
+
+			// Edit Customer form validation (for each customer)
+			const editCustomerForms = document.querySelectorAll('.editCustomerForm');
+			editCustomerForms.forEach(form => {
+				const phoneInput = form.querySelector('.editCustomerPhone');
+				const emailInput = form.querySelector('.editCustomerEmail');
+				const contactError = form.querySelector('.editCustomerContactError');
+
+				form.addEventListener('submit', function(e) {
+					if (!validateContactMethod(phoneInput, emailInput, contactError)) {
+						e.preventDefault();
+						return false;
+					}
+				});
+
+				// Real-time validation as user types
+				phoneInput?.addEventListener('blur', () => validateContactMethod(phoneInput, emailInput, contactError));
+				emailInput?.addEventListener('blur', () => validateContactMethod(phoneInput, emailInput, contactError));
+			});
 
 			// default: sales tab
 			setMode('sales');
