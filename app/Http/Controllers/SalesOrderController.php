@@ -131,4 +131,63 @@ public function RemoveCustomer($id)
             $nextSeq++;
         } while (true);
     }
+
+    public function exportReceipt($orderNumber)
+    {
+        $salesOrder = SalesOrder::with(['customer', 'items.product'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        return view('exports.receipt', compact('salesOrder'));
+    }
+
+    public function exportSalesReport()
+    {
+        $salesOrders = SalesOrder::with(['customer', 'items.product'])
+            ->latest()
+            ->get();
+
+        $filename = 'sales-report-' . now()->format('Y-m-d') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function() use ($salesOrders) {
+            $file = fopen('php://output', 'w');
+            
+            // CSV Headers
+            fputcsv($file, [
+                'Order Number',
+                'Customer',
+                'Customer Type',
+                'Order Date',
+                'Delivery Date',
+                'Status',
+                'Total Amount',
+                'Payment Status',
+                'Paid Amount',
+            ]);
+
+            // CSV Data
+            foreach ($salesOrders as $order) {
+                fputcsv($file, [
+                    $order->order_number,
+                    $order->customer?->name ?? 'N/A',
+                    $order->customer?->customer_type ?? 'N/A',
+                    $order->order_date,
+                    $order->delivery_date,
+                    $order->status,
+                    number_format($order->total_amount, 2),
+                    $order->payment_status,
+                    number_format($order->paid_amount, 2),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
