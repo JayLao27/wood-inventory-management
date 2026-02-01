@@ -63,6 +63,9 @@ Route::get('/', function () {
     Route::resource('sales-orders', SalesOrderController::class);
     Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
     Route::delete('/sales/customers/{id}', [SalesOrderController::class, 'RemoveCustomer'])->name('customers.delete');
+    Route::get('/sales/receipt/{orderNumber}', [SalesOrderController::class, 'exportReceipt'])->name('sales.receipt');
+    Route::get('/sales/export/report', [SalesOrderController::class, 'exportSalesReport'])->name('sales.export.report');
+    Route::get('/customers/export', [CustomerController::class, 'exportCustomers'])->name('customers.export');
 
     //Accounting
     Route::get('/accounting', [AccountingController::class, 'index'])->name('accounting');
