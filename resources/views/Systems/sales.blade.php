@@ -48,7 +48,7 @@
 							</svg>
 						</button>
 						<!-- Export Dropdown -->
-						<div id="exportDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+						<div id="exportDropdown" class="hidden fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
 							<div class="py-1">
 								<a href="#" onclick="exportReceipt(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
 									<div class="flex items-center gap-2">
@@ -978,7 +978,17 @@
 		if (exportButton && exportDropdown) {
 			exportButton.addEventListener('click', function(e) {
 				e.stopPropagation();
-				exportDropdown.classList.toggle('hidden');
+				const isHidden = exportDropdown.classList.contains('hidden');
+				
+				if (isHidden) {
+					// Position the dropdown below the button
+					const rect = exportButton.getBoundingClientRect();
+					exportDropdown.style.top = (rect.bottom + 8) + 'px';
+					exportDropdown.style.right = (window.innerWidth - rect.right) + 'px';
+					exportDropdown.classList.remove('hidden');
+				} else {
+					exportDropdown.classList.add('hidden');
+				}
 			});
 
 			// Close dropdown when clicking outside

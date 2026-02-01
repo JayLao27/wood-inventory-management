@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<div class="w-64 bg-slate-700 text-white flex flex-col">
+<div class="w-64 bg-slate-700 text-white flex flex-col relative z-40">
     <!-- Logo Section -->
     <div class="p-6 border-b border-slate-600">
         <div class="flex items-center space-x-3">

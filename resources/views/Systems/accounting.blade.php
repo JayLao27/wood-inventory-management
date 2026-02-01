@@ -1,15 +1,6 @@
 @extends('layouts.system')
 
 @section('main-content')
-	<style>
-		.selected-transaction-row {
-			background-color: #4B5563 !important;
-			border-left: 4px solid #F59E0B !important;
-		}
-		.selected-transaction-row:hover {
-			background-color: #4B5563 !important;
-		}
-	</style>
 	@php
 		$typeBg = [
 			'Payment Made' => '#FFB74D',
@@ -39,7 +30,7 @@
 							</svg>
 						</button>
 						<!-- Export Dropdown -->
-						<div id="exportDropdownAccounting" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+						<div id="exportDropdownAccounting" class="hidden fixed w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
 							<div class="py-1">
 								<a href="#" onclick="exportTransactionReceipt(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
 									<div class="flex items-center gap-2">
@@ -173,7 +164,7 @@
 						</div>
 
 						<!-- Transactions Table -->
-						<div class="overflow-y-auto" style="max-height: 60vh;">
+						<div class="overflow-y-auto max-h-[60vh]">
 							<table class="w-full border-collapse text-left text-sm text-white">
 								<thead class="bg-slate-800 text-slate-300 sticky top-0">
 									<tr>
@@ -260,7 +251,7 @@
 									<span class="text-sm">Backend materials</span>
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full" style="width: 53.5%"></div>
+									<div class="bg-red-700 h-3 rounded-full w-[53.5%]"></div>
 								</div>
 								<p class="text-xs text-slate-400 mt-1">backend</p>
 							</div>
@@ -272,7 +263,7 @@
 									<span class="text-sm">backend</span>
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full" style="width: 29.5%"></div>
+									<div class="bg-red-700 h-3 rounded-full w-[29.5%]"></div>
 								</div>
 								<p class="text-xs text-slate-400 mt-1">29.5% of total expenses</p>
 							</div>
@@ -554,7 +545,17 @@
 	if (exportButtonAccounting && exportDropdownAccounting) {
 		exportButtonAccounting.addEventListener('click', function(e) {
 			e.stopPropagation();
-			exportDropdownAccounting.classList.toggle('hidden');
+			const isHidden = exportDropdownAccounting.classList.contains('hidden');
+			
+			if (isHidden) {
+				// Position the dropdown below the button
+				const rect = exportButtonAccounting.getBoundingClientRect();
+				exportDropdownAccounting.style.top = (rect.bottom + 8) + 'px';
+				exportDropdownAccounting.style.right = (window.innerWidth - rect.right) + 'px';
+				exportDropdownAccounting.classList.remove('hidden');
+			} else {
+				exportDropdownAccounting.classList.add('hidden');
+			}
 		});
 
 		// Close dropdown when clicking outside
@@ -574,10 +575,12 @@
 			if (row) {
 				// Remove selection from all rows
 				const allRows = document.querySelectorAll('tr.transaction-row');
-				allRows.forEach(r => r.classList.remove('selected-transaction-row'));
+				allRows.forEach(r => {
+					r.classList.remove('!bg-gray-600', 'border-l-4', 'border-amber-500');
+				});
 				
-				// Add selection to clicked row
-				row.classList.add('selected-transaction-row');
+				// Add selection to clicked row using Tailwind classes
+				row.classList.add('!bg-gray-600', 'border-l-4', 'border-amber-500');
 			}
 		});
 	}
@@ -588,7 +591,7 @@
 		exportDropdownAccounting.classList.add('hidden');
 		
 		// Get the selected transaction from the table
-		const selectedRow = document.querySelector('tr.transaction-row.selected-transaction-row');
+		const selectedRow = document.querySelector('tr.transaction-row.border-amber-500');
 		
 		if (!selectedRow) {
 			alert('Please select a transaction by clicking on a row in the table to export as receipt.');
