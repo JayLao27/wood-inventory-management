@@ -67,4 +67,44 @@ class CustomerController extends Controller
 		$customer->delete();
 		return redirect()->route('sales-orders.index')->with('success', 'Customer deleted.');
 	}
+
+	public function exportCustomers()
+	{
+		$customers = Customer::orderBy('name')->get();
+
+		$filename = 'customers-' . now()->format('Y-m-d') . '.csv';
+		
+		$headers = [
+			'Content-Type' => 'text/csv',
+			'Content-Disposition' => "attachment; filename=\"$filename\"",
+		];
+
+		$callback = function() use ($customers) {
+			$file = fopen('php://output', 'w');
+			
+			// CSV Headers
+			fputcsv($file, [
+				'Customer Name',
+				'Customer Type',
+				'Phone',
+				'Email',
+				'Address',
+			]);
+
+			// CSV Data
+			foreach ($customers as $customer) {
+				fputcsv($file, [
+					$customer->name,
+					$customer->customer_type,
+					$customer->phone ?? 'N/A',
+					$customer->email ?? 'N/A',
+					$customer->address ?? 'N/A',
+				]);
+			}
+
+			fclose($file);
+		};
+
+		return response()->stream($callback, 200, $headers);
+	}
 }
