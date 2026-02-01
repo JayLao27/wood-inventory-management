@@ -1,6 +1,15 @@
 @extends('layouts.system')
 
 @section('main-content')
+	<style>
+		.selected-transaction-row {
+			background-color: #4B5563 !important;
+			border-left: 4px solid #F59E0B !important;
+		}
+		.selected-transaction-row:hover {
+			background-color: #4B5563 !important;
+		}
+	</style>
 	@php
 		$typeBg = [
 			'Payment Made' => '#FFB74D',
@@ -19,12 +28,46 @@
 					<p class="text-lg text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
 				</div>
 				<div class="flex space-x-3">
-				<button class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-					</svg>
-					<span>Export Reports</span>
-				</button>
+					<div class="relative">
+						<button id="exportButtonAccounting" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+							</svg>
+							<span>Export</span>
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+							</svg>
+						</button>
+						<!-- Export Dropdown -->
+						<div id="exportDropdownAccounting" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+							<div class="py-1">
+								<a href="#" onclick="exportTransactionReceipt(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+									<div class="flex items-center gap-2">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+										</svg>
+										<span>Transaction Receipt</span>
+									</div>
+								</a>
+								<a href="#" onclick="exportFinancialReport(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+									<div class="flex items-center gap-2">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+										</svg>
+										<span>Financial Report</span>
+									</div>
+								</a>
+								<a href="#" onclick="exportTransactionHistory(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+									<div class="flex items-center gap-2">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+										</svg>
+										<span>Transaction History</span>
+									</div>
+								</a>
+							</div>
+						</div>
+					</div>
 				<button onclick="openAddTransaction()" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
 						<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
@@ -503,6 +546,72 @@
 				closeAddTransaction();
 			}
 		});
-	</script>
-	</script>
-@endsection
+
+	// Export Dropdown Toggle
+	const exportButtonAccounting = document.getElementById('exportButtonAccounting');
+	const exportDropdownAccounting = document.getElementById('exportDropdownAccounting');
+
+	if (exportButtonAccounting && exportDropdownAccounting) {
+		exportButtonAccounting.addEventListener('click', function(e) {
+			e.stopPropagation();
+			exportDropdownAccounting.classList.toggle('hidden');
+		});
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', function(e) {
+			if (!exportButtonAccounting.contains(e.target) && !exportDropdownAccounting.contains(e.target)) {
+				exportDropdownAccounting.classList.add('hidden');
+			}
+		});
+	}
+
+	// Add row selection functionality for transactions
+	const transactionTable = document.querySelector('.transaction-row');
+	if (transactionTable) {
+		document.addEventListener('click', function(e) {
+			const row = e.target.closest('tr.transaction-row');
+			
+			if (row) {
+				// Remove selection from all rows
+				const allRows = document.querySelectorAll('tr.transaction-row');
+				allRows.forEach(r => r.classList.remove('selected-transaction-row'));
+				
+				// Add selection to clicked row
+				row.classList.add('selected-transaction-row');
+			}
+		});
+	}
+
+	// Export Functions
+	function exportTransactionReceipt(event) {
+		event.preventDefault();
+		exportDropdownAccounting.classList.add('hidden');
+		
+		// Get the selected transaction from the table
+		const selectedRow = document.querySelector('tr.transaction-row.selected-transaction-row');
+		
+		if (!selectedRow) {
+			alert('Please select a transaction by clicking on a row in the table to export as receipt.');
+			return;
+		}
+		
+		// Extract transaction ID from the selected row
+		const transactionId = selectedRow.getAttribute('data-id');
+		
+		// Open receipt in new tab
+		window.open(`/accounting/receipt/${transactionId}`, '_blank');
+	}
+
+	function exportFinancialReport(event) {
+		event.preventDefault();
+		exportDropdownAccounting.classList.add('hidden');
+		// Implement financial report export (PDF)
+		window.location.href = '/accounting/export/financial-report';
+	}
+
+	function exportTransactionHistory(event) {
+		event.preventDefault();
+		exportDropdownAccounting.classList.add('hidden');
+		// Implement transaction history export (CSV)
+		window.location.href = '/accounting/export/transactions';
+	}
