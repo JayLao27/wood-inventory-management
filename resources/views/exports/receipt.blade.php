@@ -25,59 +25,92 @@
     <button class="fixed top-5 right-5 bg-slate-700 hover:bg-slate-800 text-white px-6 py-3 rounded-lg font-semibold text-sm shadow-lg print:hidden" onclick="window.print()">🖨️ Print Receipt</button>
 
     <div class="max-w-4xl mx-auto bg-white p-10 shadow-lg">
-        <div class="header">
-            <h1>SALES RECEIPT</h1>
-            <p>Wood Inventory Management System</p>
+    <div class="max-w-4xl mx-auto bg-white p-10 shadow-lg">
+        <div class="text-center border-b-4 border-slate-700 pb-5 mb-8">
+            <h1 class="text-4xl font-bold text-slate-700 mb-1">SALES RECEIPT</h1>
+            <p class="text-gray-500 text-sm">Wood Inventory Management System</p>
         </div>
 
-        <div class="receipt-info">
-            <div class="info-section">
-                <h3>Order Information</h3>
-                <p><span class="info-label">Order Number:</span> {{ $salesOrder->order_number }}</p>
-                <p><span class="info-label">Order Date:</span> {{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}</p>
-                <p><span class="info-label">Delivery Date:</span> {{ \Carbon\Carbon::parse($salesOrder->delivery_date)->format('F d, Y') }}</p>
-                <p>
-                    <span class="info-label">Status:</span> 
+        <div class="flex justify-between mb-8">
+            <div class="flex-1">
+                <h3 class="text-sm font-semibold text-slate-700 uppercase mb-3">Order Information</h3>
+                <p class="my-1 text-gray-600 text-sm">
+                    <span class="font-semibold inline-block w-32">Order Number:</span> 
+                    {{ $salesOrder->order_number }}
+                </p>
+                <p class="my-1 text-gray-600 text-sm">
+                    <span class="font-semibold inline-block w-32">Order Date:</span> 
+                    {{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}
+                </p>
+                <p class="my-1 text-gray-600 text-sm">
+                    <span class="font-semibold inline-block w-32">Delivery Date:</span> 
+                    {{ \Carbon\Carbon::parse($salesOrder->delivery_date)->format('F d, Y') }}
+                </p>
+                <p class="my-1 text-gray-600 text-sm">
+                    <span class="font-semibold inline-block w-32">Status:</span> 
                     {{ $salesOrder->status }}
                 </p>
             </div>
 
-            <div class="info-section">
-                <h3>Customer Information</h3>
-                <p><span class="info-label">Name:</span> {{ $salesOrder->customer?->name ?? 'N/A' }}</p>
-                <p><span class="info-label">Type:</span> {{ $salesOrder->customer?->customer_type ?? 'N/A' }}</p>
+            <div class="flex-1">
+                <h3 class="text-sm font-semibold text-slate-700 uppercase mb-3">Customer Information</h3>
+                <p class="my-1 text-gray-600 text-sm">
+                    <span class="font-semibold inline-block w-32">Name:</span> 
+                    {{ $salesOrder->customer?->name ?? 'N/A' }}
+                </p>
+                <p class="my-1 text-gray-600 text-sm">
+                    <span class="font-semibold inline-block w-32">Type:</span> 
+                    {{ $salesOrder->customer?->customer_type ?? 'N/A' }}
+                </p>
                 @if($salesOrder->customer?->phone)
-                    <p><span class="info-label">Phone:</span> {{ $salesOrder->customer->phone }}</p>
+                    <p class="my-1 text-gray-600 text-sm">
+                        <span class="font-semibold inline-block w-32">Phone:</span> 
+                        {{ $salesOrder->customer->phone }}
+                    </p>
                 @endif
                 @if($salesOrder->customer?->email)
-                    <p><span class="info-label">Email:</span> {{ $salesOrder->customer->email }}</p>
+                    <p class="my-1 text-gray-600 text-sm">
+                        <span class="font-semibold inline-block w-32">Email:</span> 
+                        {{ $salesOrder->customer->email }}
+                    </p>
                 @endif
                 @if($salesOrder->customer?->address)
-                    <p><span class="info-label">Address:</span> {{ $salesOrder->customer->address }}</p>
+                    <p class="my-1 text-gray-600 text-sm">
+                        <span class="font-semibold inline-block w-32">Address:</span> 
+                        {{ $salesOrder->customer->address }}
+                    </p>
                 @endif
             </div>
         </div>
 
-        <table class="items-table">
-            <thead>
+        <table class="w-full border-collapse my-8">
+            <thead class="bg-slate-700 text-white">
                 <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th class="text-right">Unit Price</th>
-                    <th class="text-right">Total</th>
+                    <th class="px-3 py-3 text-left text-sm font-semibold">Product</th>
+                    <th class="px-3 py-3 text-left text-sm font-semibold">Quantity</th>
+                    <th class="px-3 py-3 text-right text-sm font-semibold">Unit Price</th>
+                    <th class="px-3 py-3 text-right text-sm font-semibold">Total</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($salesOrder->items as $item)
-                    <tr>
-                        <td>{{ $item->product?->product_name ?? 'N/A' }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td class="text-right">₱{{ number_format($item->unit_price, 2) }}</td>
-                        <td class="text-right">₱{{ number_format($item->total_price, 2) }}</td>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-3 border-b border-gray-200 text-sm text-gray-600">
+                            {{ $item->product?->product_name ?? 'N/A' }}
+                        </td>
+                        <td class="px-3 py-3 border-b border-gray-200 text-sm text-gray-600">
+                            {{ $item->quantity }}
+                        </td>
+                        <td class="px-3 py-3 border-b border-gray-200 text-sm text-gray-600 text-right">
+                            ₱{{ number_format($item->unit_price, 2) }}
+                        </td>
+                        <td class="px-3 py-3 border-b border-gray-200 text-sm text-gray-600 text-right">
+                            ₱{{ number_format($item->total_price, 2) }}
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 30px; color: #9CA3AF;">
+                        <td colspan="4" class="px-3 py-8 text-center text-gray-400">
                             No items in this order
                         </td>
                     </tr>
@@ -85,30 +118,39 @@
             </tbody>
         </table>
 
-        <div class="totals">
-            <table class="totals-table">
+        <div class="mt-8 flex justify-end">
+            <table class="w-80">
                 <tr>
-                    <td>Subtotal:</td>
-                    <td>₱{{ number_format($salesOrder->total_amount, 2) }}</td>
+                    <td class="py-2 pr-5 text-right text-sm text-gray-500 font-medium">Subtotal:</td>
+                    <td class="py-2 text-right text-sm text-slate-700 font-semibold">
+                        ₱{{ number_format($salesOrder->total_amount, 2) }}
+                    </td>
                 </tr>
-                <tr class="total-row">
-                    <td>TOTAL:</td>
-                    <td>₱{{ number_format($salesOrder->total_amount, 2) }}</td>
+                <tr class="border-t-2 border-slate-700">
+                    <td class="pt-4 pr-5 text-right text-lg font-bold text-slate-700">TOTAL:</td>
+                    <td class="pt-4 text-right text-lg font-bold text-slate-700">
+                        ₱{{ number_format($salesOrder->total_amount, 2) }}
+                    </td>
                 </tr>
                 <tr>
-                    <td>Paid Amount:</td>
-                    <td>₱{{ number_format($salesOrder->paid_amount, 2) }}</td>
+                    <td class="py-2 pr-5 text-right text-sm text-gray-500 font-medium">Paid Amount:</td>
+                    <td class="py-2 text-right text-sm text-slate-700 font-semibold">
+                        ₱{{ number_format($salesOrder->paid_amount, 2) }}
+                    </td>
                 </tr>
-                <tr style="border-top: 1px solid #E5E7EB;">
-                    <td>Balance Due:</td>
-                    <td style="color: {{ $salesOrder->total_amount - $salesOrder->paid_amount > 0 ? '#DC2626' : '#059669' }};">
+                <tr class="border-t border-gray-200">
+                    <td class="py-2 pr-5 text-right text-sm text-gray-500 font-medium">Balance Due:</td>
+                    <td class="py-2 text-right text-sm font-semibold {{ $salesOrder->total_amount - $salesOrder->paid_amount > 0 ? 'text-red-600' : 'text-green-600' }}">
                         ₱{{ number_format($salesOrder->total_amount - $salesOrder->paid_amount, 2) }}
                     </td>
                 </tr>
                 <tr>
-                    <td>Payment Status:</td>
-                    <td>
-                        <span class="status-badge status-{{ strtolower($salesOrder->payment_status) }}">
+                    <td class="py-2 pr-5 text-right text-sm text-gray-500 font-medium">Payment Status:</td>
+                    <td class="py-2 text-right">
+                        <span class="inline-block px-3 py-1 rounded text-xs font-semibold 
+                            {{ $salesOrder->payment_status === 'Paid' ? 'bg-green-100 text-green-800' : '' }}
+                            {{ $salesOrder->payment_status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                            {{ $salesOrder->payment_status === 'Partial' ? 'bg-orange-100 text-orange-800' : '' }}">
                             {{ $salesOrder->payment_status }}
                         </span>
                     </td>
@@ -117,21 +159,16 @@
         </div>
 
         @if($salesOrder->note)
-            <div class="note-section">
-                <h4>Notes:</h4>
-                <p>{{ $salesOrder->note }}</p>
+            <div class="mt-8 p-4 bg-gray-50 border-l-4 border-slate-700">
+                <h4 class="text-sm font-semibold text-slate-700 mb-2">Notes:</h4>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ $salesOrder->note }}</p>
             </div>
         @endif
 
-        <div class="footer">
+        <div class="mt-12 pt-5 border-t border-gray-200 text-center text-gray-500 text-xs">
             <p>Thank you for your business!</p>
             <p>Generated on {{ now()->format('F d, Y \a\t h:i A') }}</p>
         </div>
     </div>
-
-    <script>
-        // Optional: Auto-print on load
-        // window.onload = function() { window.print(); }
-    </script>
 </body>
 </html>
