@@ -248,5 +248,111 @@ class AccountingController extends Controller
         return view('Systems.accounting_report', compact('financialData', 'startDate', 'endDate', 'totalRevenue', 'salesOrders'));
     }
 
+    public function exportTransactionReceipt($transactionId)
+    {
+        // Extract the actual ID from the format TO-YYYY-XXX
+        $parts = explode('-', $transactionId);
+        $id = isset($parts[2]) ? (int)$parts[2] : null;
+        
+        if (!$id) {
+            abort(404, 'Invalid transaction ID');
+        }
+
+        $transaction = Accounting::with(['salesOrder.customer', 'purchaseOrder.supplier'])
+            ->findOrFail($id);
+
+        return view('exports.transaction-receipt', compact('transaction', 'transactionId'));
+    }
+
+    public function exportFinancialReport()
+    {
+        $totalRevenue = Accounting::where('transaction_type', 'Income')->sum('amount');
+        $totalExpenses = Accounting::where('transaction_type', 'Expense')->sum('amount');
+        $netProfit = $totalRevenue - $totalExpenses;
+
+        $filename = 'financial-report-' . now()->format('Y-m-d') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function() use ($totalRevenue, $totalExpenses, $netProfit) {
+            $file = fopen('php://output', 'w');
+            
+            // CSV Headers
+            fputcsv($file, ['Financial Report', 'Generated on ' . now()->format('F d, Y')]);
+            fputcsv($file, []);
+            fputcsv($file, ['Metric', 'Amount']);
+            
+            // CSV Data
+            fputcsv($file, ['Total Revenue', number_format($totalRevenue, 2)]);
+            fputcsv($file, ['Total Expenses', number_format($totalExpenses, 2)]);
+            fputcsv($file, ['Net Profit', number_format($netProfit, 2)]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportTransactionHistory()
+    {
+        $transactions = Accounting::with(['salesOrder.customer', 'purchaseOrder.supplier'])
+            ->orderBy('date', 'desc')
+            ->get();
+
+        $filename = 'transactions-' . now()->format('Y-m-d') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function() use ($transactions) {
+            $file = fopen('php://output', 'w');
+            
+            // CSV Headers
+            fputcsv($file, [
+                'Transaction ID',
+                'Date',
+                'Type',
+                'Category',
+                'Description',
+                'Amount',
+            ]);
+
+            // CSV Data
+            foreach ($transactions as $transaction) {
+                $transactionId = 'TO-' . \Carbon\Carbon::parse($transaction->date)->format('Y') . '-' . str_pad($transaction->id, 3, '0', STR_PAD_LEFT);
+                $category = '';
+                $description = '';
+
+                if ($transaction->salesOrder) {
+                    $category = $transaction->salesOrder->customer->name ?? 'N/A';
+                    $description = $transaction->salesOrder->order_number ?? '';
+                } elseif ($transaction->purchaseOrder) {
+                    $category = $transaction->purchaseOrder->supplier->name ?? 'N/A';
+                    $description = $transaction->purchaseOrder->order_number ?? '';
+                } else {
+                    $category = 'N/A';
+                    $description = $transaction->description ?? '-';
+                }
+
+                fputcsv($file, [
+                    $transactionId,
+                    \Carbon\Carbon::parse($transaction->date)->format('M d, Y'),
+                    $transaction->transaction_type,
+                    $category,
+                    $description,
+                    number_format($transaction->amount, 2),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
    
 }
