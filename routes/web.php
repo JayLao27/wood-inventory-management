@@ -70,6 +70,9 @@ Route::get('/', function () {
     //Accounting
     Route::get('/accounting', [AccountingController::class, 'index'])->name('accounting');
     Route::post('/accounting/transaction', [AccountingController::class, 'salesTransaction'])->name('accounting.transaction.store');
+    Route::get('/accounting/receipt/{transactionId}', [AccountingController::class, 'exportTransactionReceipt'])->name('accounting.receipt');
+    Route::get('/accounting/export/financial-report', [AccountingController::class, 'exportFinancialReport'])->name('accounting.export.financial');
+    Route::get('/accounting/export/transactions', [AccountingController::class, 'exportTransactionHistory'])->name('accounting.export.transactions');
         
 
     // Profile
