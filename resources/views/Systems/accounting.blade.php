@@ -10,11 +10,11 @@
 		];
 	@endphp
 	<!-- Main Content -->
-		<div class="flex-1 flex flex-col overflow-hidden">
-			<!-- Header -->
-			<div class="bg-amber-50 p-8">
-				<div class="flex justify-between items-center">
-					<div>
+	<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
+		<!-- Header -->
+		<div class="mb-8">
+			<div class="flex justify-between items-center">
+				<div>
 					<h1 class="text-4xl font-bold text-gray-800">Accounting & Finance</h1>
 					<p class="text-lg text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
 				</div>
@@ -59,7 +59,7 @@
 							</div>
 						</div>
 					</div>
-				<button onclick="openAddTransaction()" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+					<button onclick="openAddTransaction()" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
 						<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
 						</svg>
@@ -70,7 +70,6 @@
 		</div>
 
 		<!-- Dashboard Content -->
-		<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
 			<!-- Summary Cards -->
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 				<!-- Total Revenue Card -->
@@ -273,7 +272,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
 	</div>
 
 	<!-- Add Transaction Modal -->
@@ -618,3 +616,5 @@
 		// Implement transaction history export (CSV)
 		window.location.href = '/accounting/export/transactions';
 	}
+	</script>
+@endsection
