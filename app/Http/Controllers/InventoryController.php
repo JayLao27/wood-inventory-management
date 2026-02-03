@@ -280,21 +280,18 @@ class InventoryController extends Controller
     }
 
     /**
-     * Get stock movements report - logs of all stock movements
+     * Get stock movements report - logs of material stock movements only
      */
     public function stockMovementsReport(Request $request)
     {
         $query = InventoryMovement::query()
             ->with('item')
+            ->where('item_type', 'material') // Only get materials
             ->orderBy('created_at', 'desc');
 
         // Apply filters if provided
         if ($request->has('movement_type') && $request->movement_type) {
             $query->where('movement_type', $request->movement_type);
-        }
-
-        if ($request->has('item_type') && $request->item_type) {
-            $query->where('item_type', $request->item_type);
         }
 
         if ($request->has('date_from') && $request->date_from) {
@@ -309,16 +306,8 @@ class InventoryController extends Controller
 
         // Format for response
         $formattedMovements = $movements->map(function ($movement) {
-            $itemName = '';
-            $itemUnit = '';
-            
-            if ($movement->item_type === 'material') {
-                $itemName = $movement->item?->name ?? 'Unknown Material';
-                $itemUnit = $movement->item?->unit ?? 'unit';
-            } else {
-                $itemName = $movement->item?->product_name ?? 'Unknown Product';
-                $itemUnit = $movement->item?->unit ?? 'unit';
-            }
+            $itemName = $movement->item?->name ?? 'Unknown Material';
+            $itemUnit = $movement->item?->unit ?? 'unit';
 
             // Determine movement label
             $movementLabel = match($movement->movement_type) {
