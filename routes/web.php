@@ -33,6 +33,7 @@ Route::get('/', function () {
     Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update');
     Route::delete('/inventory/{id}/{type}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
     Route::post('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('inventory.adjust-stock');
+    Route::get('/inventory/stock-movements/report', [InventoryController::class, 'stockMovementsReport'])->name('inventory.stock-movements-report');
 
     // Procurement
     Route::get('/procurement', [ProcurementController::class, 'index'])->name('procurement');
