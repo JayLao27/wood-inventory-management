@@ -899,13 +899,11 @@
                 const movementType = document.getElementById('logMovementTypeFilter')?.value || '';
                 const dateFrom = document.getElementById('logDateFromFilter')?.value || '';
                 const dateTo = document.getElementById('logDateToFilter')?.value || '';
-                const itemType = document.getElementById('logItemTypeFilter')?.value || '';
 
                 const params = new URLSearchParams();
                 if (movementType) params.append('movement_type', movementType);
                 if (dateFrom) params.append('date_from', dateFrom);
                 if (dateTo) params.append('date_to', dateTo);
-                if (itemType) params.append('item_type', itemType);
 
                 fetch(`{{ route('inventory.stock-movements-report') }}?${params.toString()}`)
                     .then(res => res.json())
@@ -972,7 +970,7 @@
 
                     <div class="p-6">
                         <!-- Filters -->
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-bold text-gray-900 mb-2">Type</label>
                                 <select id="logMovementTypeFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-slate-500" onchange="loadStockLogs()">
@@ -989,14 +987,6 @@
                             <div>
                                 <label class="block text-sm font-bold text-gray-900 mb-2">To Date</label>
                                 <input type="date" id="logDateToFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-slate-500" onchange="loadStockLogs()">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-2">Item Type</label>
-                                <select id="logItemTypeFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-slate-500" onchange="loadStockLogs()">
-                                    <option value="">All</option>
-                                    <option value="material">Material</option>
-                                    <option value="product">Product</option>
-                                </select>
                             </div>
                         </div>
 
