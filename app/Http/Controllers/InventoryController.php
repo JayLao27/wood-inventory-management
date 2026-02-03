@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product; 
 use App\Models\Material;
 use App\Models\Supplier;
+use App\Models\PurchaseOrder;
 use App\Models\InventoryMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
