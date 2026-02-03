@@ -10,6 +10,11 @@
                         <h1 class="text-4xl font-bold text-gray-900">Inventory Management</h1>
                         <p class="text-base text-gray-700 mt-2 font-medium">Track and manage raw materials and finished products</p>
                     </div>
+                    <div class="flex space-x-3">
+                        <button onclick="openStockLogsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
+                            📋 Stock Logs
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -880,5 +885,160 @@
                 }
             });
 
+            // Stock Logs Modal Functions
+            function openStockLogsModal() {
+                document.getElementById('stockLogsModal').classList.remove('hidden');
+                loadStockLogs();
+            }
+
+            function closeStockLogsModal() {
+                document.getElementById('stockLogsModal').classList.add('hidden');
+            }
+
+            function loadStockLogs() {
+                const movementType = document.getElementById('logMovementTypeFilter')?.value || '';
+                const dateFrom = document.getElementById('logDateFromFilter')?.value || '';
+                const dateTo = document.getElementById('logDateToFilter')?.value || '';
+                const itemType = document.getElementById('logItemTypeFilter')?.value || '';
+
+                const params = new URLSearchParams();
+                if (movementType) params.append('movement_type', movementType);
+                if (dateFrom) params.append('date_from', dateFrom);
+                if (dateTo) params.append('date_to', dateTo);
+                if (itemType) params.append('item_type', itemType);
+
+                fetch(`{{ route('inventory.stock-movements-report') }}?${params.toString()}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            displayStockLogs(data.movements, data.summary);
+                        }
+                    })
+                    .catch(err => console.error('Error loading logs:', err));
+            }
+
+            function displayStockLogs(movements, summary) {
+                const tableBody = document.getElementById('stockLogsTable');
+
+                if (movements.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No stock movements found</td></tr>';
+                    return;
+                }
+
+                let htmlRows = '';
+                movements.forEach((movement) => {
+                    const typeColor = movement.movement_type === 'in' ? 'text-green-600 bg-green-50' : 
+                                     movement.movement_type === 'out' ? 'text-red-600 bg-red-50' : 'text-yellow-600 bg-yellow-50';
+
+                    const row = `
+                        <tr class="${typeColor}">
+                            <td class="px-4 py-3">${movement.date} ${movement.time}</td>
+                            <td class="px-4 py-3 font-bold">${movement.movement_label}</td>
+                            <td class="px-4 py-3">${movement.item_name}</td>
+                            <td class="px-4 py-3 text-center font-bold">${movement.movement_type === 'out' ? '-' : '+'}${movement.quantity.toFixed(2)} ${movement.unit}</td>
+                            <td class="px-4 py-3">${movement.reference_info}</td>
+                            <td class="px-4 py-3 text-xs max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
+                        </tr>
+                    `;
+                    htmlRows += row;
+                });
+
+                tableBody.innerHTML = htmlRows;
+
+                // Update summary
+                document.getElementById('logTotalIn').textContent = summary.total_in.toFixed(2);
+                document.getElementById('logTotalOut').textContent = summary.total_out.toFixed(2);
+                document.getElementById('logTotalMovements').textContent = summary.total_movements;
+            }
         </script>
+
+        <!-- Stock Logs Modal -->
+        <div id="stockLogsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-6 text-white">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold">📋 Stock Logs</h3>
+                                <p class="text-slate-300 text-sm mt-1">Complete audit trail of all inventory movements</p>
+                            </div>
+                            <button onclick="closeStockLogsModal()" class="text-white hover:text-slate-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <!-- Filters -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-2">Type</label>
+                                <select id="logMovementTypeFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-slate-500" onchange="loadStockLogs()">
+                                    <option value="">All</option>
+                                    <option value="in">📦 Stock In</option>
+                                    <option value="out">📤 Stock Out</option>
+                                    <option value="adjustment">⚙️ Adjustment</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-2">From Date</label>
+                                <input type="date" id="logDateFromFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-slate-500" onchange="loadStockLogs()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-2">To Date</label>
+                                <input type="date" id="logDateToFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-slate-500" onchange="loadStockLogs()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-2">Item Type</label>
+                                <select id="logItemTypeFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-slate-500" onchange="loadStockLogs()">
+                                    <option value="">All</option>
+                                    <option value="material">Material</option>
+                                    <option value="product">Product</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <p class="text-green-600 text-sm font-medium">Total In</p>
+                                <p id="logTotalIn" class="text-2xl font-bold text-green-700">0</p>
+                            </div>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                                <p class="text-red-600 text-sm font-medium">Total Out</p>
+                                <p id="logTotalOut" class="text-2xl font-bold text-red-700">0</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                                <p class="text-slate-600 text-sm font-medium">Total Logs</p>
+                                <p id="logTotalMovements" class="text-2xl font-bold text-slate-700">0</p>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left font-bold text-gray-900">Date & Time</th>
+                                        <th class="px-4 py-3 text-left font-bold text-gray-900">Type</th>
+                                        <th class="px-4 py-3 text-left font-bold text-gray-900">Item</th>
+                                        <th class="px-4 py-3 text-center font-bold text-gray-900">Quantity</th>
+                                        <th class="px-4 py-3 text-left font-bold text-gray-900">Reference</th>
+                                        <th class="px-4 py-3 text-left font-bold text-gray-900">Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockLogsTable" class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">Loading logs...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 @endsection
