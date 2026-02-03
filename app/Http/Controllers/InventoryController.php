@@ -277,4 +277,101 @@ class InventoryController extends Controller
 
         return redirect()->route('inventory')->with('success', 'Stock adjusted successfully!');
     }
+
+    /**
+     * Get stock movements report - logs of all stock movements
+     */
+    public function stockMovementsReport(Request $request)
+    {
+        $query = InventoryMovement::query()
+            ->with('item')
+            ->orderBy('created_at', 'desc');
+
+        // Apply filters if provided
+        if ($request->has('movement_type') && $request->movement_type) {
+            $query->where('movement_type', $request->movement_type);
+        }
+
+        if ($request->has('item_type') && $request->item_type) {
+            $query->where('item_type', $request->item_type);
+        }
+
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $movements = $query->get();
+
+        // Format for response
+        $formattedMovements = $movements->map(function ($movement) {
+            $itemName = '';
+            $itemUnit = '';
+            
+            if ($movement->item_type === 'material') {
+                $itemName = $movement->item?->name ?? 'Unknown Material';
+                $itemUnit = $movement->item?->unit ?? 'unit';
+            } else {
+                $itemName = $movement->item?->product_name ?? 'Unknown Product';
+                $itemUnit = $movement->item?->unit ?? 'unit';
+            }
+
+            // Determine movement label
+            $movementLabel = match($movement->movement_type) {
+                'in' => '📦 Stock In',
+                'out' => '📤 Stock Out',
+                'adjustment' => '⚙️ Adjustment',
+                default => $movement->movement_type
+            };
+
+            // Get reference info
+            $referenceInfo = '';
+            if ($movement->reference_type === 'purchase_order') {
+                $po = PurchaseOrder::find($movement->reference_id);
+                $referenceInfo = $po ? "PO: {$po->order_number}" : "PO #" . $movement->reference_id;
+            } elseif ($movement->reference_type === 'work_order') {
+                $referenceInfo = "Work Order #" . $movement->reference_id;
+            } elseif ($movement->reference_type === 'manual_adjustment') {
+                $referenceInfo = "Manual Adjustment";
+            } elseif ($movement->reference_type === 'initial_stock') {
+                $referenceInfo = "Initial Stock";
+            } else {
+                $referenceInfo = ucfirst(str_replace('_', ' ', $movement->reference_type));
+            }
+
+            return [
+                'id' => $movement->id,
+                'date' => $movement->created_at->format('Y-m-d'),
+                'time' => $movement->created_at->format('H:i'),
+                'movement_type' => $movement->movement_type,
+                'movement_label' => $movementLabel,
+                'item_type' => $movement->item_type,
+                'item_name' => $itemName,
+                'unit' => $itemUnit,
+                'quantity' => (float) $movement->quantity,
+                'reference_type' => $movement->reference_type,
+                'reference_info' => $referenceInfo,
+                'notes' => $movement->notes,
+                'status' => $movement->status ?? 'completed',
+                'created_at' => $movement->created_at
+            ];
+        });
+
+        // Calculate summary
+        $totalIn = $movements->where('movement_type', 'in')->sum('quantity');
+        $totalOut = $movements->where('movement_type', 'out')->sum('quantity');
+
+        return response()->json([
+            'success' => true,
+            'movements' => $formattedMovements,
+            'summary' => [
+                'total_in' => (float) $totalIn,
+                'total_out' => (float) $totalOut,
+                'total_movements' => count($formattedMovements)
+            ]
+        ]);
+    }
 }
