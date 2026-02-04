@@ -197,13 +197,6 @@
 					<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
 						<input type="search" id="searchInput" placeholder="Search order or customers..." class="bg-white w-full md:w-3/4 rounded-full px-4 py-2 text-gray-900 focus:outline-none">
 						<div class="flex gap-2">
-							<select id="statusFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-								<option value="">All Status</option>
-								<option value="Pending">Pending</option>
-								<option value="In production">In Production</option>
-								<option value="Ready">Ready</option>
-								<option value="Delivered">Delivered</option>
-							</select>
 							<select id="paymentFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
 								<option value="">All Payment</option>
 								<option value="Pending">Unpaid</option>
