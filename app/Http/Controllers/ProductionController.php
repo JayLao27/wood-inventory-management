@@ -25,11 +25,23 @@ class ProductionController extends Controller
             'overdue' => $workOrders->where('status', 'overdue')->count(),
         ];
 
-        // Pending sales orders: not Delivered, so we can create work orders from them
-        $pendingSalesOrders = SalesOrder::with(['customer', 'items.product'])
+        // Pending sales orders: not Delivered, with only items that don't already have work orders
+        $pendingSalesOrders = SalesOrder::with(['customer', 'items.product', 'workOrders'])
             ->where('status', '!=', 'Delivered')
             ->orderBy('delivery_date')
-            ->get();
+            ->get()
+            ->map(function (SalesOrder $order) {
+                $remainingItems = $order->items->filter(function ($item) use ($order) {
+                    return !$order->workOrders->contains('product_id', $item->product_id);
+                })->values();
+
+                $order->setRelation('items', $remainingItems);
+                return $order;
+            })
+            ->filter(function (SalesOrder $order) {
+                return $order->items->isNotEmpty();
+            })
+            ->values();
 
         return view('Systems.production', compact('workOrders', 'statusCounts', 'pendingSalesOrders'));
     }
@@ -47,6 +59,13 @@ class ProductionController extends Controller
 
         $salesOrder = SalesOrder::with('items')->findOrFail($validated['sales_order_id']);
         $product = Product::with('materials')->findOrFail($validated['product_id']);
+
+        $alreadyExists = WorkOrder::where('sales_order_id', $validated['sales_order_id'])
+            ->where('product_id', $validated['product_id'])
+            ->exists();
+        if ($alreadyExists) {
+            return redirect()->back()->with('error', 'A work order for this product already exists for the selected sales order.');
+        }
 
         // Ensure this product/quantity is from this sales order
         $lineItem = $salesOrder->items->firstWhere('product_id', $validated['product_id']);
