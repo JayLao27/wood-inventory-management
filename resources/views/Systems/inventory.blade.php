@@ -27,9 +27,9 @@
                 <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-slate-300 text-sm font-semibold uppercase tracking-wide">Total Items</p>
-                            <p class="text-4xl font-bold mt-3 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $totalItems ?? 10 }}</p>
-                            <p class="text-slate-300 text-sm font-medium mt-2">{{ $totalItems ?? 10 }} Items</p>
+                            <p class="text-slate-300 text-sm font-semibold uppercase tracking-wide">Total Materials</p>
+                            <p class="text-4xl font-bold mt-3 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $totalMaterials ?? 10 }}</p>
+                            <p class="text-slate-300 text-sm font-medium mt-2">{{ $totalMaterials ?? 10 }} Items</p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm">
                             @include('components.icons.package', ['class' => 'w-8 h-8 text-amber-400'])
@@ -58,7 +58,7 @@
                     <div class="mt-4 pt-4 border-t border-slate-600/50">
                         <div class="w-full bg-slate-600 rounded-full h-2.5 overflow-hidden">
                             <div class="{{ ($lowStockAlerts ?? 3) > 4 ? 'bg-red-500' : 'bg-amber-500' }} h-2.5 rounded-full transition-all duration-500" 
-                                 style="width: {{ min((($lowStockAlerts ?? 3) / max($totalItems ?? 10, 1)) * 100, 100) }}%"></div>
+                                 style="width: {{ min((($lowStockAlerts ?? 3) / max($totalMaterials ?? 10, 1)) * 100, 100) }}%"></div>
                         </div>
                     </div>
                 </div>
