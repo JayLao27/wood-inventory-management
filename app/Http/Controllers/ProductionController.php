@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accounting;
 use App\Models\InventoryMovement;
 use App\Models\Material;
 use App\Models\Product;
@@ -167,6 +168,31 @@ class ProductionController extends Controller
             'status' => 'completed',
             'completion_quantity' => $workOrder->quantity,
         ]);
+
+        $workOrder->loadMissing('product');
+        $laborCost = 0;
+        if ($workOrder->product) {
+            $qty = $workOrder->completion_quantity > 0 ? $workOrder->completion_quantity : $workOrder->quantity;
+            $laborCost = (float) $workOrder->product->production_cost * (int) $qty;
+        }
+
+        if ($laborCost > 0) {
+            $laborRef = 'Labor - Work Order ' . $workOrder->order_number;
+            $alreadyRecorded = Accounting::where('transaction_type', 'Expense')
+                ->where('description', $laborRef)
+                ->exists();
+
+            if (!$alreadyRecorded) {
+                Accounting::create([
+                    'transaction_type' => 'Expense',
+                    'amount' => $laborCost,
+                    'date' => now()->toDateString(),
+                    'description' => $laborRef,
+                    'sales_order_id' => $workOrder->sales_order_id,
+                    'purchase_order_id' => null,
+                ]);
+            }
+        }
         return redirect()->back()->with('success', 'Work order marked as completed.');
     }
 
