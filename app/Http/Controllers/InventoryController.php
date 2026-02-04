@@ -206,28 +206,36 @@ class InventoryController extends Controller
     public function getDetails(Request $request, $id)
     {
         $type = $request->query('type');
-        
+
         if ($type === 'product') {
-            $item = Product::with('inventoryMovements')->findOrFail($id);
+            $item = Product::with('materials')->findOrFail($id);
             $cost = $item->production_cost; // For products, show production cost
+            $materials = $item->materials->map(function ($material) {
+                return [
+                    'name' => $material->name,
+                    'unit' => $material->unit,
+                    'quantity_needed' => $material->pivot->quantity_needed,
+                ];
+            })->values();
+            $movements = [];
         } else {
             $item = Material::with('inventoryMovements')->findOrFail($id);
             $cost = $item->unit_cost; // For materials, show unit cost
+            $materials = [];
+            $movements = $item->inventoryMovements
+                ->sortByDesc('created_at')
+                ->map(function($movement) {
+                    return [
+                        'movement_type' => $movement->movement_type,
+                        'quantity' => $movement->quantity,
+                        'reference_type' => $movement->reference_type,
+                        'reference_id' => $movement->reference_id,
+                        'notes' => $movement->notes,
+                        'created_at' => $movement->created_at,
+                    ];
+                })
+                ->values();
         }
-
-        $movements = $item->inventoryMovements
-            ->sortByDesc('created_at')
-            ->map(function($movement) {
-                return [
-                    'movement_type' => $movement->movement_type,
-                    'quantity' => $movement->quantity,
-                    'reference_type' => $movement->reference_type,
-                    'reference_id' => $movement->reference_id,
-                    'notes' => $movement->notes,
-                    'created_at' => $movement->created_at,
-                ];
-            })
-            ->values();
 
         return response()->json([
             'item' => [
@@ -236,7 +244,10 @@ class InventoryController extends Controller
                 'minimum_stock' => $item->minimum_stock ?? 0,
                 'unit_cost' => $cost ?? 0,
                 'unit' => $item->unit,
+                'production_cost' => $item->production_cost ?? null,
+                'selling_price' => $item->selling_price ?? null,
             ],
+            'materials' => $materials,
             'movements' => $movements
         ]);
     }
