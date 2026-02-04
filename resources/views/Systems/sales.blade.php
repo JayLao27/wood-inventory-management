@@ -274,6 +274,7 @@
 														<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
 													</svg>
 												</button>
+												@if(!in_array($order->payment_status, ['Paid', 'Partial']))
 												<form action="{{ route('sales-orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Cancel this order?')" class="inline">
 													@csrf
 													@method('DELETE')
@@ -283,6 +284,7 @@
 														</svg>
 													</button>
 												</form>
+												@endif
 											</div>
 										</td>
 									</tr>
@@ -1044,16 +1046,16 @@
 			event.preventDefault();
 			exportDropdown.classList.add('hidden');
 			
-			// Get the selected order from the table (if any row is highlighted/selected)
-			const selectedRow = document.querySelector('tr.data-row.selected-row');
+			// Get the first order from the table
+			const firstRow = document.querySelector('tr.data-row');
 			
-			if (!selectedRow) {
-				alert('Please select an order by clicking on a row in the table to export as receipt.');
+			if (!firstRow) {
+				alert('No orders available to export. Please create an order first.');
 				return;
 			}
 			
 			// Extract order number from the selected row
-			const orderNumber = selectedRow.querySelector('td:first-child').textContent.trim();
+			const orderNumber = firstRow.querySelector('td:first-child').textContent.trim();
 			
 			// Open receipt in new tab
 			window.open(`/sales/receipt/${orderNumber}`, '_blank');
