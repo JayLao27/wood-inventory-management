@@ -3,12 +3,16 @@
 @section('main-content')
 	<style>
 		.selected-row {
-			background-color: #4B5563 !important;
-			border-left: 4px solid #F59E0B !important;
+			background-color: #1e40af !important;
+			color: white !important;
+			border-left: 4px solid #f59e0b !important;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 		}
 		.selected-row:hover {
-			background-color: #4B5563 !important;
+			background-color: #1e3a8a !important;
+		}
+		.selected-row td {
+			color: white !important;
 		}
 		.custom-scrollbar::-webkit-scrollbar {
 			width: 8px;
@@ -24,32 +28,12 @@
 		.custom-scrollbar::-webkit-scrollbar-thumb:hover {
 			background: #d97706;
 		}
-	</style>
-	@php
-		$customerTypeBg = [
-			'Wholesale' => '#64B5F6',
-			'Retail' => '#6366F1',
-			'Contractor' => '#BA68C8',
-		];
-		$statusBg = [
-			'In production' => '#FFB74D',
-			'Pending' => '#64B5F6',
-			'Delivered' => '#81C784',
-			'Ready' => '#BA68C8',
-		];
-		$paymentBg = [
-			'Pending' => '#ffffff',
-			'Partial' => '#FFB74D',
-			'Paid' => '#81C784',
-		];
-	@endphp
-	<style>
-		.selected-row {
-			background-color: #4B5563 !important;
-			border-left: 4px solid #F59E0B !important;
+		.data-row {
+			cursor: pointer;
+			transition: all 0.2s;
 		}
-		.selected-row:hover {
-			background-color: #4B5563 !important;
+		.data-row:hover {
+			background-color: #f3f4f6;
 		}
 	</style>
 	@php
@@ -90,17 +74,17 @@
 							</svg>
 						</button>
 						<!-- Export Dropdown -->
-						<div id="exportDropdown" class="hidden fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
+						<div id="exportDropdown" class="hidden absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
 							<div class="py-1">
-								<a href="#" onclick="exportReceipt(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+								<a href="#" onclick="exportReceipt(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
 									<div class="flex items-center gap-2">
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 										</svg>
 										<span>Receipt</span>
 									</div>
-								</a>	
-								<a href="#" onclick="exportSalesReport(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+								</a>
+								<a href="#" onclick="exportSalesReport(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
 									<div class="flex items-center gap-2">
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -108,7 +92,7 @@
 										<span>Sales Report</span>
 									</div>
 								</a>
-								<a href="#" onclick="exportCustomerList(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+								<a href="#" onclick="exportCustomerList(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
 									<div class="flex items-center gap-2">
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -855,7 +839,7 @@
 
 			function applyFilters() {
 				const q = searchInput.value.trim();
-				const sVal = statusFilter.value;
+				const sVal = statusFilter ? statusFilter.value : '';
 				const pVal = paymentFilter.value;
 				const inSales = !salesTable.classList.contains('hidden');
 
@@ -898,7 +882,7 @@
 			}
 
 			searchInput.addEventListener('input', applyFilters);
-			statusFilter.addEventListener('change', applyFilters);
+			if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 			paymentFilter.addEventListener('change', applyFilters);
 
 			// ---- Real-time unit price + line total for New Order modal ----
@@ -1009,97 +993,90 @@
 				emailInput?.addEventListener('blur', () => validateContactMethod(phoneInput, emailInput, contactError));
 			});
 
-			// default: sales tab
-			setMode('sales');
-		})();
+		// default: sales tab
+		setMode('sales');
+	})();
 
-		// Export Dropdown Toggle
-		const exportButton = document.getElementById('exportButton');
-		const exportDropdown = document.getElementById('exportDropdown');
+	// Export Dropdown Toggle - FIXED VERSION
+	const exportButton = document.getElementById('exportButton');
+	const exportDropdown = document.getElementById('exportDropdown');
 
-		if (exportButton && exportDropdown) {
-			exportButton.addEventListener('click', function(e) {
-				e.stopPropagation();
-				const isHidden = exportDropdown.classList.contains('hidden');
-				
-				if (isHidden) {
-					// Position the dropdown below the button
-					const rect = exportButton.getBoundingClientRect();
-					exportDropdown.style.top = (rect.bottom + 8) + 'px';
-					exportDropdown.style.right = (window.innerWidth - rect.right) + 'px';
-					exportDropdown.classList.remove('hidden');
-				} else {
-					exportDropdown.classList.add('hidden');
-				}
-			});
-
-			// Close dropdown when clicking outside
-			document.addEventListener('click', function(e) {
-				if (!exportButton.contains(e.target) && !exportDropdown.contains(e.target)) {
-					exportDropdown.classList.add('hidden');
-				}
-			});
-		}
-
-		// Export Functions
-		function exportReceipt(event) {
-			event.preventDefault();
-			exportDropdown.classList.add('hidden');
+	if (exportButton && exportDropdown) {
+		exportButton.addEventListener('click', function(e) {
+			e.preventDefault(); // Prevent default action
+			e.stopPropagation();
 			
-			// Get the first order from the table
-			const firstRow = document.querySelector('tr.data-row');
+			// Toggle dropdown visibility
+			exportDropdown.classList.toggle('hidden');
+		});
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', function(e) {
+			if (!exportButton.contains(e.target) && !exportDropdown.contains(e.target)) {
+				exportDropdown.classList.add('hidden');
+			}
+		});
+
+		// Prevent dropdown from closing when clicking inside it
+		exportDropdown.addEventListener('click', function(e) {
+			e.stopPropagation();
+		});
+	}
+
+	// Add row selection functionality
+	const salesTbody = document.getElementById('salesTbody');
+	if (salesTbody) {
+		salesTbody.addEventListener('click', function(e) {
+			const row = e.target.closest('tr.data-row');
 			
-			if (!firstRow) {
-				alert('No orders available to export. Please create an order first.');
+			// Ignore clicks on action buttons
+			if (e.target.closest('button') || e.target.closest('form')) {
 				return;
 			}
 			
-			// Extract order number from the selected row
-			const orderNumber = firstRow.querySelector('td:first-child').textContent.trim();
-			
-			// Open receipt in new tab
-			window.open(`/sales/receipt/${orderNumber}`, '_blank');
-		}
-
-		function exportSalesReport(event) {
-			event.preventDefault();
-			exportDropdown.classList.add('hidden');
-			// Implement sales report export (CSV/PDF)
-			window.location.href = '/sales/export/report';
-		}
-
-		function exportCustomerList(event) {
-			event.preventDefault();
-			exportDropdown.classList.add('hidden');
-			// Implement customer list export (CSV/Excel)
-			window.location.href = '/customers/export';
-		}
-
-		// Add row selection functionality
-		document.addEventListener('DOMContentLoaded', function() {
-			const salesTbody = document.getElementById('salesTbody');
-			
-			if (salesTbody) {
-				// Add click event to all data rows
-				salesTbody.addEventListener('click', function(e) {
-					const row = e.target.closest('tr.data-row');
-					
-					// Ignore clicks on action buttons
-					if (e.target.closest('button') || e.target.closest('form')) {
-						return;
-					}
-					
-					if (row) {
-						// Remove selection from all rows
-						const allRows = salesTbody.querySelectorAll('tr.data-row');
-						allRows.forEach(r => r.classList.remove('selected-row'));
-						
-						// Add selection to clicked row
-						row.classList.add('selected-row');
-					}
-				});
+			if (row) {
+				// Remove selection from all rows
+				const allRows = salesTbody.querySelectorAll('tr.data-row');
+				allRows.forEach(r => r.classList.remove('selected-row'));
+				
+				// Add selection to clicked row
+				row.classList.add('selected-row');
 			}
 		});
+	}
+
+	// Export Functions
+	function exportReceipt(event) {
+		event.preventDefault();
+		exportDropdown.classList.add('hidden');
+		
+		// Check if a row is selected
+		const selectedRow = document.querySelector('tr.data-row.selected-row');
+		
+		if (selectedRow) {
+			// Get order number from the selected row
+			const orderNumber = selectedRow.querySelector('td:first-child').textContent.trim();
+			window.open(`/sales/receipt/${orderNumber}`, '_blank');
+			return;
+		}
+		
+		// If no row is selected, prompt user
+		alert('Please select an order by clicking on a row in the table to export as receipt.');
+	}
+
+	function exportSalesReport(event) {
+		event.preventDefault();
+		exportDropdown.classList.add('hidden');
+		// Implement sales report export (CSV/PDF)
+		window.location.href = '/sales/export/report';
+	}
+
+	function exportCustomerList(event) {
+		event.preventDefault();
+		exportDropdown.classList.add('hidden');
+		// Implement customer list export (CSV/Excel)
+		window.location.href = '/customers/export';
+	}
 	</script>
 		</div>
 @endsection
