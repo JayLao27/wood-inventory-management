@@ -247,24 +247,24 @@
 							<div>
 								<div class="flex justify-between items-center mb-2">
 									<span class="text-sm font-medium">Materials</span>
-									<span class="text-sm">Backend materials</span>
+									<span class="text-sm">₱{{ number_format($materialsExpense ?? 0, 2) }}</span>
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full w-[53.5%]"></div>
+									<div class="bg-red-700 h-3 rounded-full" style="width: {{ min($materialsPercent ?? 0, 100) }}%"></div>
 								</div>
-								<p class="text-xs text-slate-400 mt-1">backend</p>
+								<p class="text-xs text-slate-400 mt-1">{{ $materialsPercent ?? 0 }}% of total expenses</p>
 							</div>
 
 							<!-- Labor -->
 							<div>
 								<div class="flex justify-between items-center mb-2">
 									<span class="text-sm font-medium">Labor</span>
-									<span class="text-sm">backend</span>
+									<span class="text-sm">₱{{ number_format($laborExpense ?? 0, 2) }}</span>
 								</div>
 								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full w-[29.5%]"></div>
+									<div class="bg-red-700 h-3 rounded-full" style="width: {{ min($laborPercent ?? 0, 100) }}%"></div>
 								</div>
-								<p class="text-xs text-slate-400 mt-1">29.5% of total expenses</p>
+								<p class="text-xs text-slate-400 mt-1">{{ $laborPercent ?? 0 }}% of total expenses</p>
 							</div>
 
 
