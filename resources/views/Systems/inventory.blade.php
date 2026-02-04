@@ -512,12 +512,12 @@
 
         <!-- Stock View Modal -->
         <div id="stockModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden overflow-y-auto flex items-center justify-center z-50" onclick="if(event.target === this) closeStockModal()">
-            <div class="modal-content bg-amber-50 rounded-2xl max-w-4xl w-[92%] my-8 shadow-2xl transform transition-all border-2 border-slate-700" onclick="event.stopPropagation()">
+            <div id="stockModalContent" class="modal-content bg-amber-50 rounded-2xl max-w-4xl w-[92%] my-6 max-h-[80vh] overflow-y-auto shadow-2xl transform transition-all border-2 border-slate-700" onclick="event.stopPropagation()">
                 <div class="p-8">
                     <!-- Header -->
                     <div class="flex justify-between items-start mb-8 border-b-2 pb-6" style="border-color: #374151;">
                         <div>
-                            <h3 class="text-3xl font-bold" style="color: #374151;">Item Details & Movement History</h3>
+                            <h3 class="text-3xl font-bold" style="color: #374151;">Item Details & Materials Neededy</h3>
                             <p id="itemName" class="text-base mt-2 font-medium" style="color: #666;"></p>
                         </div>
                         <button onclick="closeStockModal()" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all duration-200">
@@ -526,28 +526,47 @@
                     </div>
 
                     <!-- Item Info Cards -->
-                    <div class="grid grid-cols-3 gap-4 mb-8">
-                        <div class="p-6 rounded-xl border-l-4 shadow-lg" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                    <div id="itemInfoGrid" class="grid grid-cols-3 gap-4 mb-8">
+                        <div id="currentStockCard" class="p-6 rounded-xl border-l-4 shadow-lg" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                             <p class="text-base font-semibold" style="color: #374151;">Current Stock</p>
                             <p id="currentStock" class="text-3xl font-bold mt-3" style="color: #374151;">-</p>
                         </div>
-                        <div class="p-6 rounded-xl border-l-4 shadow-lg" style="background-color: rgba(255,255,255,0.7); border-left-color: #F57C00;">
+                        <div id="minimumStockCard" class="p-6 rounded-xl border-l-4 shadow-lg" style="background-color: rgba(255,255,255,0.7); border-left-color: #F57C00;">
                             <p class="text-base font-semibold" style="color: #E65100;">Minimum Stock</p>
                             <p id="minimumStock" class="text-3xl font-bold mt-3" style="color: #E65100;">-</p>
                         </div>
-                        <div class="p-6 rounded-xl border-l-4 shadow-lg" style="background-color: rgba(255,255,255,0.7); border-left-color: #388E3C;">
+                        <div id="unitCostCard" class="p-6 rounded-xl border-l-4 shadow-lg" style="background-color: rgba(255,255,255,0.7); border-left-color: #388E3C;">
                             <p class="text-base font-semibold" style="color: #2E7D32;">Unit Cost</p>
                             <p id="unitCost" class="text-3xl font-bold mt-3" style="color: #2E7D32;">-</p>
                         </div>
+                        <div id="productionCostCard" class="p-6 rounded-xl border-l-4 shadow-lg hidden" style="background-color: rgba(255,255,255,0.7); border-left-color: #7C3AED;">
+                            <p class="text-base font-semibold" style="color: #5B21B6;">Production Cost</p>
+                            <p id="productionCost" class="text-3xl font-bold mt-3" style="color: #5B21B6;">-</p>
+                        </div>
                     </div>
 
-                    <!-- Inventory Movements Table -->
-                    <div class="mb-8">
+                    <!-- Materials Needed (Product View) -->
+                    <div id="productMaterialsSection" class="mb-8 hidden">
+                        <h4 class="text-2xl font-bold mb-4 flex items-center" style="color: #374151;">
+                            <span class="w-1 h-6 rounded mr-3" style="background-color: #374151;"></span>
+                            Materials Needed
+                        </h4>
+                        <div class="rounded-xl shadow-lg" style="border: 2px solid #374151; background: rgba(255,255,255,0.8);">
+                            <div id="productMaterialsList" class="divide-y" style="border-color: #374151;">
+                                <div class="px-6 py-8 text-center font-medium" style="color: #666;">
+                                    Loading materials...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Movement History (Materials Only) -->
+                    <div id="materialMovementsSection" class="mb-8 hidden">
                         <h4 class="text-2xl font-bold mb-4 flex items-center" style="color: #374151;">
                             <span class="w-1 h-6 rounded mr-3" style="background-color: #374151;"></span>
                             Movement History
                         </h4>
-                        <div class="overflow-x-auto rounded-xl shadow-lg" style="border: 2px solid #374151;">
+                        <div class="overflow-x-auto rounded-xl shadow-lg" style="border: 2px solid #374151; background: rgba(255,255,255,0.8);">
                             <table class="w-full text-base">
                                 <thead style="background-color: #374151;" class="text-white">
                                     <tr>
@@ -557,7 +576,7 @@
                                         <th class="px-6 py-4 text-left font-bold">Notes</th>
                                     </tr>
                                 </thead>
-                                <tbody id="movementTableBody" class="divide-y" style="border-color: #374151;">
+                                <tbody id="materialMovementsBody" class="divide-y" style="border-color: #374151;">
                                     <tr>
                                         <td colspan="4" class="px-6 py-8 text-center font-medium" style="color: #666;">
                                             Loading movements...
@@ -901,35 +920,103 @@
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('itemName').textContent = data.item.name || data.item.product_name || 'Item';
-                        document.getElementById('currentStock').textContent = data.item.current_stock + ' ' + (data.item.unit || '');
-                        document.getElementById('minimumStock').textContent = data.item.minimum_stock || '-';
-                        document.getElementById('unitCost').textContent = data.item.unit_cost ? '₱' + parseFloat(data.item.unit_cost).toFixed(2) : 'N/A';
-                        
-                        const tbody = document.getElementById('movementTableBody');
-                        if (data.movements && data.movements.length > 0) {
-                            tbody.innerHTML = data.movements.map(movement => `
-                                <tr class="hover:bg-gray-100 transition-colors">
-                                    <td class="px-6 py-3 text-gray-900 font-medium">${new Date(movement.created_at).toLocaleDateString()}</td>
-                                    <td class="px-6 py-3">
-                                        <span class="px-3 py-1.5 text-xs font-bold rounded-xl ${
-                                            movement.movement_type === 'in' ? 'bg-green-100 text-green-800' :
-                                            movement.movement_type === 'out' ? 'bg-red-100 text-red-800' :
-                                            'bg-blue-100 text-blue-800'
-                                        }">
-                                            ${movement.movement_type.charAt(0).toUpperCase() + movement.movement_type.slice(1)}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-3 text-right font-bold text-gray-900">${movement.quantity}</td>
-                                    <td class="px-6 py-3 text-gray-600">${movement.notes || '-'}</td>
-                                </tr>
-                            `).join('');
+                        const currentStockCard = document.getElementById('currentStockCard');
+                        const minimumStockCard = document.getElementById('minimumStockCard');
+                        const unitCostCard = document.getElementById('unitCostCard');
+                        const productionCostCard = document.getElementById('productionCostCard');
+                        const stockModalContent = document.getElementById('stockModalContent');
+                        const itemInfoGrid = document.getElementById('itemInfoGrid');
+
+                        if (type === 'product') {
+                            stockModalContent.classList.remove('max-w-4xl');
+                            stockModalContent.classList.add('max-w-2xl');
+                            itemInfoGrid.classList.remove('grid-cols-3');
+                            itemInfoGrid.classList.add('grid-cols-2');
+
+                            currentStockCard.classList.add('hidden');
+                            minimumStockCard.classList.add('hidden');
+                            productionCostCard.classList.remove('hidden');
+
+                            document.getElementById('unitCost').textContent = data.item.selling_price
+                                ? '₱' + parseFloat(data.item.selling_price).toFixed(2)
+                                : 'N/A';
+                            document.getElementById('productionCost').textContent = data.item.production_cost
+                                ? '₱' + parseFloat(data.item.production_cost).toFixed(2)
+                                : 'N/A';
                         } else {
-                            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">No movements recorded yet</td></tr>';
+                            stockModalContent.classList.remove('max-w-2xl');
+                            stockModalContent.classList.add('max-w-4xl');
+                            itemInfoGrid.classList.remove('grid-cols-2');
+                            itemInfoGrid.classList.add('grid-cols-3');
+
+                            currentStockCard.classList.remove('hidden');
+                            minimumStockCard.classList.remove('hidden');
+                            productionCostCard.classList.add('hidden');
+
+                            document.getElementById('currentStock').textContent = data.item.current_stock + ' ' + (data.item.unit || '');
+                            document.getElementById('minimumStock').textContent = data.item.minimum_stock || '-';
+                            document.getElementById('unitCost').textContent = data.item.unit_cost
+                                ? '₱' + parseFloat(data.item.unit_cost).toFixed(2)
+                                : 'N/A';
+                        }
+
+                        const materialsSection = document.getElementById('productMaterialsSection');
+                        const materialsList = document.getElementById('productMaterialsList');
+                        const materialMovementsSection = document.getElementById('materialMovementsSection');
+                        const materialMovementsBody = document.getElementById('materialMovementsBody');
+
+                        if (type === 'product') {
+                            materialsSection.classList.remove('hidden');
+                            materialMovementsSection.classList.add('hidden');
+                            materialMovementsBody.innerHTML = '';
+
+                            if (data.materials && data.materials.length > 0) {
+                                materialsList.innerHTML = data.materials.map(material => `
+                                    <div class="flex items-center justify-between px-6 py-4">
+                                        <div class="text-gray-900 font-medium">• ${material.name}</div>
+                                        <div class="text-gray-700 font-bold">${material.quantity_needed} ${material.unit}</div>
+                                    </div>
+                                `).join('');
+                            } else {
+                                materialsList.innerHTML = '<div class="px-6 py-8 text-center font-medium" style="color: #666;">No materials assigned</div>';
+                            }
+                        } else {
+                            materialsSection.classList.add('hidden');
+                            materialsList.innerHTML = '';
+
+                            materialMovementsSection.classList.remove('hidden');
+                            if (data.movements && data.movements.length > 0) {
+                                materialMovementsBody.innerHTML = data.movements.map(movement => `
+                                    <tr class="hover:bg-gray-100 transition-colors">
+                                        <td class="px-6 py-3 text-gray-900 font-medium">${new Date(movement.created_at).toLocaleDateString()}</td>
+                                        <td class="px-6 py-3">
+                                            <span class="px-3 py-1.5 text-xs font-bold rounded-xl ${
+                                                movement.movement_type === 'in' ? 'bg-green-100 text-green-800' :
+                                                movement.movement_type === 'out' ? 'bg-red-100 text-red-800' :
+                                                'bg-blue-100 text-blue-800'
+                                            }">
+                                                ${movement.movement_type.charAt(0).toUpperCase() + movement.movement_type.slice(1)}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-3 text-right font-bold text-gray-900">${movement.quantity}</td>
+                                        <td class="px-6 py-3 text-gray-600">${movement.notes || '-'}</td>
+                                    </tr>
+                                `).join('');
+                            } else {
+                                materialMovementsBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">No movements recorded yet</td></tr>';
+                            }
                         }
                     })
                     .catch(error => {
                         console.error('Error fetching item details:', error);
-                        document.getElementById('movementTableBody').innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-red-500">Error loading data</td></tr>';
+                        const materialsSection = document.getElementById('productMaterialsSection');
+                        const materialsList = document.getElementById('productMaterialsList');
+                        materialsSection.classList.add('hidden');
+                        materialsList.innerHTML = '';
+                        const materialMovementsSection = document.getElementById('materialMovementsSection');
+                        const materialMovementsBody = document.getElementById('materialMovementsBody');
+                        materialMovementsSection.classList.add('hidden');
+                        materialMovementsBody.innerHTML = '';
                     });
             }
 
