@@ -27,7 +27,7 @@
                 </a>
             </li>
 
-            @if(auth()->user()->hasAnyRole(['admin', 'inventory_clerk']))
+            @if(auth()->user()->hasAnyRole(['admin', 'inventory_clerk', 'procurement_officer']))
               <li>
                 <a href="{{ route('inventory') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('inventory') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -58,7 +58,7 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasAnyRole(['admin', 'procurement_officer']))
+            @if(auth()->user()->hasAnyRole(['admin', 'procurement_officer', 'inventory_clerk']))
             <li>
                 <a href="{{ route('procurement') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('procurement') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
