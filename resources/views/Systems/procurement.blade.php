@@ -1374,17 +1374,40 @@
                         },
                         body: formData
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            // Handle HTTP error responses
+                            if (!response.ok) {
+                                return response.json().then(data => {
+                                    throw {
+                                        status: response.status,
+                                        message: data.message || `Error: ${response.statusText}`
+                                    };
+                                }).catch(err => {
+                                    if (err.message) throw err;
+                                    throw {
+                                        status: response.status,
+                                        message: response.status === 404 ? 'Invalid PO. Purchase order not found.' : `Error: ${response.statusText}`
+                                    };
+                                });
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             if (data.success) {
                                 alert(data.message || 'Stock received successfully.');
                                 window.location.reload();
                             } else {
+                                // Exception 1.1: Invalid PO error display
+                                // Exception 2.1: Duplicate receipt error display
+                                // Exception 2.2: Database error display
                                 alert(data.message || 'Failed to receive stock.');
                             }
                         })
-                        .catch(() => {
-                            alert('An error occurred while receiving stock.');
+                        .catch(error => {
+                            // Display exception error messages
+                            const errorMessage = error.message || 'An error occurred while receiving stock.';
+                            alert(errorMessage);
+                            console.error('Stock receive error:', error);
                         });
                 });
             }

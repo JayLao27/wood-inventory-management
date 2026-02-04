@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Supplier;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -254,7 +255,20 @@ class ProcurementController extends Controller
      */
     public function receiveStock(Request $request, $purchaseOrderId)
     {
-        $purchaseOrder = PurchaseOrder::with('items')->findOrFail($purchaseOrderId);
+        // Exception 1.1: Check if PO exists
+        $purchaseOrder = PurchaseOrder::with('items')->find($purchaseOrderId);
+        
+        if (!$purchaseOrder) {
+            Log::warning('Invalid PO attempt', [
+                'po_id' => $purchaseOrderId,
+                'user_id' => auth()->id() ?? 'Guest',
+                'timestamp' => now(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid PO. Purchase order not found.',
+            ], 404);
+        }
 
         $request->validate([
             'received_date' => 'required|date',
@@ -264,7 +278,59 @@ class ProcurementController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($request, $purchaseOrder) {
+        // Exception 2.1: Check for duplicate receipt attempt
+        $receivedDate = $request->input('received_date');
+        $duplicateItems = [];
+        
+        foreach ($request->items as $itemData) {
+            $poItem = $purchaseOrder->items->firstWhere('id', $itemData['purchase_order_item_id'] ?? null);
+            
+            if (!$poItem) {
+                continue;
+            }
+
+            // Check if this exact combination was already received
+            $existingMovement = InventoryMovement::where('item_type', 'material')
+                ->where('item_id', $poItem->material_id)
+                ->where('reference_type', 'purchase_order')
+                ->where('reference_id', $purchaseOrder->id)
+                ->where('movement_type', 'in')
+                ->whereDate('created_at', $receivedDate)
+                ->exists();
+
+            if ($existingMovement) {
+                $material = Material::find($poItem->material_id);
+                $duplicateItems[] = $material->name ?? "Material ID: {$poItem->material_id}";
+            }
+        }
+
+        // If duplicates found, reject and log the attempt
+        if (!empty($duplicateItems)) {
+            Log::warning('Duplicate receipt attempt detected', [
+                'purchase_order_id' => $purchaseOrder->id,
+                'purchase_order_number' => $purchaseOrder->order_number,
+                'received_date' => $receivedDate,
+                'duplicate_items' => $duplicateItems,
+                'user_id' => auth()->id() ?? 'Guest',
+                'timestamp' => now(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Duplicate receipt detected. The following items have already been received on ' . $receivedDate . ': ' . implode(', ', $duplicateItems) . '. Please check the received stock reports.',
+            ], 422);
+        }
+
+        // Exception 2.2: Database retry logic with error logging
+        $maxAttempts = 3;
+        $attempt = 0;
+        $success = false;
+        $lastError = null;
+
+        while ($attempt < $maxAttempts && !$success) {
+            $attempt++;
+            try {
+                DB::transaction(function () use ($request, $purchaseOrder) {
             foreach ($request->items as $itemData) {
                 $poItem = $purchaseOrder->items->firstWhere('id', $itemData['purchase_order_item_id'] ?? null);
 
@@ -336,7 +402,39 @@ class ProcurementController extends Controller
             if ($allFullyReceived) {
                 $purchaseOrder->update(['status' => 'received']);
             }
-        });
+                });
+                
+                $success = true;
+            } catch (\Exception $e) {
+                $lastError = $e;
+                // Log the database error
+                Log::error('Database error during stock receipt (Attempt ' . $attempt . '/' . $maxAttempts . ')', [
+                    'purchase_order_id' => $purchaseOrder->id,
+                    'error' => $e->getMessage(),
+                    'attempt' => $attempt,
+                    'user_id' => auth()->id() ?? 'Guest',
+                    'timestamp' => now(),
+                ]);
+
+                // Retry after a small delay
+                if ($attempt < $maxAttempts) {
+                    sleep(1); // Wait 1 second before retrying
+                }
+            }
+        }
+
+        if (!$success) {
+            Log::error('Stock receipt failed after ' . $maxAttempts . ' attempts', [
+                'purchase_order_id' => $purchaseOrder->id,
+                'final_error' => $lastError->getMessage(),
+                'user_id' => auth()->id() ?? 'Guest',
+                'timestamp' => now(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process stock receipt after multiple attempts. Please try again later.',
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,
