@@ -615,158 +615,454 @@
 					</div>
 				</section>
 
-				<!-- New Order Modal -->
-				<div id="newOrderModal" class="fixed inset-0 bg-black/50 hidden">
-					<div class="bg-white text-gray-900 rounded shadow max-w-2xl w-full mx-auto mt-16 p-6 max-h-[90vh] overflow-y-auto">
-						<div class="flex items-center justify-between mb-4">
-							<h3 class="font-semibold">Create New Order</h3>
-							<button onclick="closeModal('newOrderModal')">✕</button>
+				<!-- New Order Modal - IMPROVED VERSION -->
+				<div id="newOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+					<div class="flex items-center justify-center min-h-screen p-4">
+						<div class="bg-amber-50 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+							<!-- Header -->
+							<div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-6 text-white rounded-t-2xl z-10">
+								<div class="flex justify-between items-center">
+									<div>
+										<h3 class="text-2xl font-bold flex items-center gap-2">
+											<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+											</svg>
+											Create New Order
+										</h3>
+										<p class="text-slate-300 text-sm mt-1">Add a new sales order for a customer</p>
+									</div>
+									<button onclick="closeModal('newOrderModal')" class="text-white hover:text-slate-300 hover:bg-white/10 rounded-xl p-2 transition-all">
+										<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+										</svg>
+									</button>
+								</div>
+							</div>
+
+							<!-- Error Messages -->
+							@if ($errors->any())
+								<div class="mx-6 mt-6 p-4 bg-red-50 border-2 border-red-400 rounded-xl shadow-lg">
+									<div class="flex items-start gap-3">
+										<svg class="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+										</svg>
+										<div class="flex-1">
+											<h4 class="text-red-800 font-bold text-base mb-2">Please fix the following errors:</h4>
+											<ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+												@foreach ($errors->all() as $error)
+													<li>{{ $error }}</li>
+												@endforeach
+											</ul>
+										</div>
+									</div>
+								</div>
+							@endif
+
+							<!-- Form Content -->
+							<div class="p-6">
+								<form method="POST" action="{{ route('sales-orders.store') }}" id="newOrderForm">
+									@csrf
+									<div class="space-y-5">
+										<!-- Customer Selection -->
+										<div>
+											<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+												<svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+													<path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+												</svg>
+												Customer <span class="text-red-500">*</span>
+											</label>
+											<select name="customer_id" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('customer_id') border-red-500 @enderror" required>
+												<option value="">-- Select Customer --</option>
+												@foreach($customers as $c)
+													<option value="{{ $c->id }}" {{ old('customer_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} ({{ $c->customer_type }})</option>
+												@endforeach
+											</select>
+											@error('customer_id')
+												<p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+														<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+													</svg>
+													{{ $message }}
+												</p>
+											@enderror
+										</div>
+
+										<!-- Delivery Date -->
+										<div>
+											<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+												<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+												</svg>
+												Delivery Date <span class="text-red-500">*</span>
+											</label>
+											<input type="date" name="delivery_date" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('delivery_date') border-red-500 @enderror" value="{{ old('delivery_date') }}" required>
+											@error('delivery_date')
+												<p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+													<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+														<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+													</svg>
+													{{ $message }}
+												</p>
+											@enderror
+										</div>
+
+										<!-- Product Selection Section -->
+										<div class="pt-4 border-t-2 border-gray-300">
+											<h4 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+												<span class="w-1 h-6 bg-amber-500 rounded"></span>
+												Order Items
+											</h4>
+											
+											<div class="bg-white rounded-xl border-2 border-slate-300 p-5 shadow-lg">
+												<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+													<!-- Product Selection -->
+													<div>
+														<label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-1">
+															<svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+																<path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+															</svg>
+															Product <span class="text-red-500">*</span>
+														</label>
+														<select id="newItemProduct" name="items[0][product_id]" class="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all @error('items.0.product_id') border-red-500 @enderror" required>
+															<option value="">-- Select Product --</option>
+															@foreach($products as $p)
+																<option value="{{ $p->id }}" data-price="{{ number_format($p->selling_price,2,'.','') }}" data-max="{{ $p->max_producible ?? '' }}">{{ $p->product_name }}</option>
+															@endforeach
+														</select>
+														@error('items.0.product_id')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+														@enderror
+													</div>
+
+													<!-- Quantity -->
+													<div>
+														<label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-1">
+															<svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+																<path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+															</svg>
+															Quantity <span class="text-red-500">*</span>
+														</label>
+														<input id="newItemQty" type="number" min="1" name="items[0][quantity]" class="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-base font-bold focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all @error('items.0.quantity') border-red-500 @enderror" placeholder="1" value="{{ old('items.0.quantity') }}" required>
+														@error('items.0.quantity')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+														@enderror
+														<p id="newItemQtyError" class="text-red-500 text-xs mt-1 hidden"></p>
+													</div>
+
+													<!-- Unit Price -->
+													<div>
+														<label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-1">
+															<svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+																<path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+																<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd" />
+															</svg>
+															Unit Price
+														</label>
+														<input id="newItemUnitPrice" type="text" class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-base font-bold bg-gray-100 text-gray-600" value="" placeholder="Auto-filled" disabled>
+														<input id="newItemUnitPriceHidden" type="hidden" name="items[0][unit_price]" value="">
+													</div>
+												</div>
+
+												<!-- Line Total Display -->
+												<div class="mt-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-lg">
+													<div class="flex items-center justify-between">
+														<span class="text-sm font-bold text-amber-800 flex items-center gap-2">
+															<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+																<path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+															</svg>
+															Line Total:
+														</span>
+														<span id="newItemLineTotal" class="text-xl font-bold text-amber-700">₱0.00</span>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!-- Notes Section -->
+										<div>
+											<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+												<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+												</svg>
+												Additional Notes (Optional)
+											</label>
+											<textarea name="note" rows="3" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" placeholder="Add any special instructions or notes for this order..."></textarea>
+										</div>
+
+										<!-- Action Buttons -->
+										<div class="flex justify-between items-center pt-4 border-t-2 border-gray-300">
+											<div class="text-sm text-gray-600">
+												<span class="font-semibold">Required fields:</span> Customer, Delivery Date, Product
+											</div>
+											<div class="flex space-x-3">
+												<button type="button" class="px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-base hover:bg-gray-100 transition-all shadow-sm" onclick="closeModal('newOrderModal')">
+													Cancel
+												</button>
+												<button type="submit" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-base rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+													</svg>
+													Create Order
+												</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
 						</div>
-						@if ($errors->any())
-							<div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-								<ul class="list-disc list-inside text-sm">
-									@foreach ($errors->all() as $error)
-										<li>{{ $error }}</li>
-									@endforeach
-								</ul>
-							</div>
-						@endif
-						<form method="POST" action="{{ route('sales-orders.store') }}">
-							@csrf
-							<div class="grid gap-4">
-								<div>
-									<label class="text-sm">Customer <span class="text-red-500">*</span></label>
-									<select name="customer_id" class="w-full border rounded px-2 py-1 @error('customer_id') border-red-500 @enderror" required>
-										<option value="">-- Select Customer --</option>
-										@foreach($customers as $c)
-											<option value="{{ $c->id }}" {{ old('customer_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} ({{ $c->customer_type }})</option>
-										@endforeach
-									</select>
-									@error('customer_id')
-										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-									@enderror
-								</div>
-								<div class="grid grid-cols-2 gap-3">
-									<div>
-										<label class="text-sm">Delivery Date <span class="text-red-500">*</span></label>
-										<input type="date" name="delivery_date" class="w-full border rounded px-2 py-1 @error('delivery_date') border-red-500 @enderror" value="{{ old('delivery_date') }}" required>
-										@error('delivery_date')
-											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-										@enderror
-									</div>
-								</div>
-								<div class="grid grid-cols-3 gap-3 items-end">
-									<div>
-										<label class="text-sm">Product <span class="text-red-500">*</span></label>
-										<select id="newItemProduct" name="items[0][product_id]" class="w-full border rounded px-2 py-1 @error('items.0.product_id') border-red-500 @enderror" required>
-											<option value="">-- select product --</option>
-											@foreach($products as $p)
-												<option value="{{ $p->id }}" data-price="{{ number_format($p->selling_price,2,'.','') }}">{{ $p->product_name }}</option>
-											@endforeach
-										</select>
-										@error('items.0.product_id')
-											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-										@enderror
-									</div>
-									<div>
-										<label class="text-sm">Quantity <span class="text-red-500">*</span></label>
-										<input id="newItemQty" type="number" min="1" name="items[0][quantity]" class="w-full border rounded px-2 py-1 @error('items.0.quantity') border-red-500 @enderror" placeholder="1" value="{{ old('items.0.quantity') }}" required>
-										@error('items.0.quantity')
-											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-										@enderror
-									</div>
-									<div>
-										<label class="text-sm">Unit Price</label>
-										<input id="newItemUnitPrice" type="text" class="w-full border rounded px-2 py-1 bg-gray-100" value="" placeholder="auto" disabled>
-										<input id="newItemUnitPriceHidden" type="hidden" name="items[0][unit_price]" value="">
-										<div class="text-xs text-gray-500 mt-1" id="newItemLineTotal">Line total: ₱0.00</div>
-									</div>
-								</div>
-								<div>
-									<label class="text-sm">Notes</label>
-									<textarea name="note" rows="2" class="w-full border rounded px-2 py-1" placeholder="Optional notes..."></textarea>
-								</div>
-								<div class="flex justify-end gap-2 mt-2">
-									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newOrderModal')">Cancel</button>
-									<button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded">Create</button>
-								</div>
-							</div>
-						</form>
 					</div>
 				</div>
 
-				<!-- New Customer Modal -->
-				<div id="newCustomerModal" class="fixed inset-0 bg-black/50 hidden">
-					<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-6">
-						<div class="flex items-center justify-between mb-4">
-							<h3 class="font-semibold">Add New Customer</h3>
-							<button onclick="closeModal('newCustomerModal')">✕</button>
+				<!-- Add New Customer Modal - IMPROVED VERSION -->
+				<div id="newCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+					<div class="flex items-center justify-center min-h-screen p-4">
+						<div class="bg-amber-50 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+							<!-- Header -->
+							<div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-6 text-white rounded-t-2xl z-10">
+								<div class="flex justify-between items-center">
+									<div>
+										<h3 class="text-2xl font-bold flex items-center gap-2">
+											<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+											</svg>
+											Add New Customer
+										</h3>
+										<p class="text-slate-300 text-sm mt-1">Register a new customer to the system</p>
+									</div>
+									<button onclick="closeModal('newCustomerModal')" class="text-white hover:text-slate-300 hover:bg-white/10 rounded-xl p-2 transition-all">
+										<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+										</svg>
+									</button>
+								</div>
+							</div>
+
+							<!-- Error Messages -->
+							@if ($errors->any())
+								<div class="mx-6 mt-6 p-4 bg-red-50 border-2 border-red-400 rounded-xl shadow-lg">
+									<div class="flex items-start gap-3">
+										<svg class="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+										</svg>
+										<div class="flex-1">
+											<h4 class="text-red-800 font-bold text-base mb-2">Please fix the following errors:</h4>
+											<ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+												@foreach ($errors->all() as $error)
+													<li>{{ $error }}</li>
+												@endforeach
+											</ul>
+										</div>
+									</div>
+								</div>
+							@endif
+
+							<!-- Form Content -->
+							<div class="p-6">
+								<form method="POST" action="{{ route('customers.store') }}" id="newCustomerForm">
+									@csrf
+									<div class="space-y-5">
+										<!-- Basic Information Section -->
+										<div>
+											<h4 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+												<span class="w-1 h-6 bg-amber-500 rounded"></span>
+												Basic Information
+											</h4>
+
+											<div class="space-y-4">
+												<!-- Customer Name -->
+												<div>
+													<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+														<svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+															<path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+														</svg>
+														Customer Name <span class="text-red-500 text-lg">*</span>
+													</label>
+													<input type="text" name="name" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('name') border-red-500 @enderror" value="{{ old('name') }}" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes" placeholder="Enter full name (e.g., Juan Dela Cruz)">
+													@error('name')
+														<p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+															<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+																<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+															</svg>
+															{{ $message }}
+														</p>
+													@else
+														<p class="text-gray-500 text-sm mt-2">Enter customer's full name (letters, spaces, hyphens, and apostrophes only)</p>
+													@enderror
+												</div>
+
+												<!-- Customer Type -->
+												<div>
+													<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+														<svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+															<path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+														</svg>
+														Customer Type <span class="text-red-500 text-lg">*</span>
+													</label>
+													<div class="grid grid-cols-3 gap-3">
+														@foreach(['Retail','Contractor','Wholesale'] as $index => $t)
+															<label class="relative flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:border-amber-500 hover:bg-amber-50 @error('customer_type') border-red-500 @else border-gray-300 @enderror">
+																<input type="radio" name="customer_type" value="{{ $t }}" class="peer sr-only" {{ old('customer_type') === $t ? 'checked' : '' }} required>
+																<div class="peer-checked:bg-gradient-to-r peer-checked:from-amber-500 peer-checked:to-orange-600 peer-checked:text-white absolute inset-0 rounded-xl opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+																<div class="relative z-10 flex flex-col items-center">
+																	@if($t === 'Retail')
+																		<svg class="w-8 h-8 mb-2 peer-checked:text-white text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+																			<path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+																		</svg>
+																	@elseif($t === 'Contractor')
+																		<svg class="w-8 h-8 mb-2 peer-checked:text-white text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+																			<path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
+																			<path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
+																		</svg>
+																	@else
+																		<svg class="w-8 h-8 mb-2 peer-checked:text-white text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+																			<path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+																		</svg>
+																	@endif
+																	<span class="font-bold text-sm peer-checked:text-white text-gray-900">{{ $t }}</span>
+																</div>
+															</label>
+														@endforeach
+													</div>
+													@error('customer_type')
+														<p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+															<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+																<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+															</svg>
+															{{ $message }}
+														</p>
+													@else
+														<p class="text-gray-500 text-sm mt-2">Select the customer's business type</p>
+													@enderror
+												</div>
+											</div>
+										</div>
+
+										<!-- Contact Information Section -->
+										<div class="pt-4 border-t-2 border-gray-300">
+											<h4 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+												<span class="w-1 h-6 bg-amber-500 rounded"></span>
+												Contact Information
+											</h4>
+											
+											<!-- Important Notice -->
+											<div class="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-400 rounded-xl p-4 mb-4 shadow-lg">
+												<div class="flex items-start gap-3">
+													<svg class="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+														<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+													</svg>
+													<div>
+														<p class="text-orange-900 text-sm font-bold mb-1">Contact Requirement</p>
+														<p class="text-orange-800 text-sm">At least <span class="font-bold">one contact method</span> (phone number <span class="font-bold">OR</span> email address) is required</p>
+													</div>
+												</div>
+											</div>
+
+											<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+												<!-- Phone Number -->
+												<div class="bg-white rounded-xl border-2 border-gray-300 p-4 shadow-sm transition-all focus-within:border-amber-500 focus-within:shadow-lg @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror">
+													<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+														<svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+															<path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+														</svg>
+														Phone Number
+														<span class="text-orange-500 text-sm font-bold ml-1">**</span>
+													</label>
+													<input type="tel" name="phone" id="newCustomerPhone" class="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all" value="{{ old('phone') }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+													@error('phone')
+														<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
+															<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+																<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+															</svg>
+															{{ $message }}
+														</p>
+													@else
+														<p class="text-gray-500 text-xs mt-2">Up to 12 digits</p>
+													@enderror
+												</div>
+
+												<!-- Email Address -->
+												<div class="bg-white rounded-xl border-2 border-gray-300 p-4 shadow-sm transition-all focus-within:border-amber-500 focus-within:shadow-lg @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror">
+													<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+														<svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+															<path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+															<path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+														</svg>
+														Email Address
+														<span class="text-orange-500 text-sm font-bold ml-1">**</span>
+													</label>
+													<input type="email" name="email" id="newCustomerEmail" class="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all" value="{{ old('email') }}" maxlength="255" title="Please enter a valid email address" placeholder="customer@example.com">
+													@error('email')
+														<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
+															<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+																<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+															</svg>
+															{{ $message }}
+														</p>
+													@enderror
+													@error('contact')
+														<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
+															<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+																<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+															</svg>
+															{{ $message }}
+														</p>
+													@else
+														<p class="text-gray-500 text-xs mt-2">Valid email format</p>
+													@enderror
+												</div>
+											</div>
+
+											<!-- Contact Error Message -->
+											<div id="newCustomerContactError" class="mt-3 p-3 bg-red-50 border-2 border-red-400 rounded-xl hidden">
+												<p class="text-red-600 text-sm font-bold flex items-center gap-2">
+													<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+														<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+													</svg>
+													Please provide at least one contact method (phone or email)
+												</p>
+											</div>
+										</div>
+
+										<!-- Optional Address Section -->
+										<div class="pt-4 border-t-2 border-gray-300">
+											<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+												<svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+													<path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+												</svg>
+												Address (Optional)
+											</label>
+											<textarea name="address" rows="3" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 text-base focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" placeholder="Enter customer's full address (Street, Barangay, City, Province)">{{ old('address') }}</textarea>
+											<p class="text-gray-500 text-sm mt-2">Complete address helps with deliveries and record keeping</p>
+										</div>
+
+										<!-- Action Buttons -->
+										<div class="flex justify-between items-center pt-4 border-t-2 border-gray-300">
+											<div class="flex items-center gap-4 text-sm">
+												<div class="flex items-center gap-1">
+													<span class="text-red-500 font-bold text-lg">*</span>
+													<span class="text-gray-600">Required</span>
+												</div>
+												<div class="flex items-center gap-1">
+													<span class="text-orange-500 font-bold">**</span>
+													<span class="text-gray-600">One required</span>
+												</div>
+											</div>
+											<div class="flex space-x-3">
+												<button type="button" class="px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-base hover:bg-gray-100 transition-all shadow-sm" onclick="closeModal('newCustomerModal')">
+													Cancel
+												</button>
+												<button type="submit" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-base rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+													</svg>
+													Add Customer
+												</button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
 						</div>
-						@if ($errors->any())
-							<div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-								<ul class="list-disc list-inside text-sm">
-									@foreach ($errors->all() as $error)
-										<li>{{ $error }}</li>
-									@endforeach
-								</ul>
-							</div>
-						@endif
-						<form method="POST" action="{{ route('customers.store') }}" id="newCustomerForm">
-							@csrf
-							<div class="grid gap-4">
-								<div>
-									<label class="text-sm">Name <span class="text-red-500">*</span></label>
-									<input type="text" name="name" class="w-full border rounded px-2 py-1 @error('name') border-red-500 @enderror" value="{{ old('name') }}" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
-									@error('name')
-										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-									@else
-										<p class="text-gray-400 text-xs mt-1">This field is required. Enter customer name.</p>
-									@enderror
-								</div>
-								<div class="grid grid-cols-2 gap-3">
-									<div>
-										<label class="text-sm">Type <span class="text-red-500">*</span></label>
-										<select name="customer_type" class="w-full border rounded px-2 py-1 @error('customer_type') border-red-500 @enderror" required>
-											<option value="">-- Select Type --</option>
-											@foreach(['Retail','Contractor','Wholesale'] as $t)
-												<option value="{{ $t }}" {{ old('customer_type') === $t ? 'selected' : '' }}>{{ $t }}</option>
-											@endforeach
-										</select>
-										@error('customer_type')
-											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-										@else
-											<p class="text-gray-400 text-xs mt-1">This field is required. Select a customer type.</p>
-										@enderror
-									</div>
-									<div>
-										<label class="text-sm">Phone <span class="text-orange-500">**</span></label>
-										<input type="tel" name="phone" id="newCustomerPhone" class="w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone') }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
-										@error('phone')
-											<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-										@else
-											<p class="text-gray-400 text-xs mt-1">Enter a phone number (up to 12 digits) or email below.</p>
-										@enderror
-									</div>
-								</div>
-								<div>
-									<label class="text-sm">Email <span class="text-orange-500">**</span></label>
-									<input type="email" name="email" id="newCustomerEmail" class="w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email') }}" maxlength="255" title="Please enter a valid email address">
-									@error('email')
-										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-									@enderror
-									@error('contact')
-										<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-									@else
-										<p class="text-gray-400 text-xs mt-1">** At least one contact method (phone or email) is required</p>
-									@enderror
-									<p id="newCustomerContactError" class="text-red-500 text-xs mt-1 hidden"></p>
-								</div>
-								<div class="flex justify-end gap-2">
-									<button type="button" class="px-3 py-2 border rounded" onclick="closeModal('newCustomerModal')">Cancel</button>
-									<button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded">Create</button>
-								</div>
-							</div>
-						</form>
 					</div>
 				</div>
 			</div>
