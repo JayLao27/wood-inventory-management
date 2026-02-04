@@ -372,6 +372,7 @@ class ProcurementController extends Controller
 
                 $material = Material::findOrFail($poItem->material_id);
 
+                // ⭐ Stock IN Record with timestamps
                 InventoryMovement::create([
                     'item_type' => 'material',
                     'item_id' => $material->id,
@@ -379,7 +380,11 @@ class ProcurementController extends Controller
                     'quantity' => $toReceive,
                     'reference_type' => 'purchase_order',
                     'reference_id' => $purchaseOrder->id,
-                    'notes' => $request->input('notes') ?: 'Received from purchase order ' . $purchaseOrder->order_number,
+                    'notes' => 'Received from PO ' . $purchaseOrder->order_number 
+                        . ' | Received by: ' . (auth()->user()->name ?? 'System')
+                        . ' | Defect Qty: ' . number_format($defect, 2),
+                    // created_at is automatically set by Laravel to NOW()
+                    // This captures the exact timestamp when inventory clerk records receipt
                 ]);
 
                 $material->increment('current_stock', $toReceive);
