@@ -22,7 +22,7 @@
             </div>
 
             <!-- Metrics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Total Items Card -->
                 <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
                     <div class="flex justify-between items-start">
@@ -62,27 +62,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Total Value Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-sm font-semibold uppercase tracking-wide">Total Value</p>
-                            <p class="text-2xl xl:text-3xl font-bold mt-3 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
-                            <p class="text-slate-300 text-sm font-medium mt-2">Raw materials value</p>
-                        </div>
-                     
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-slate-600/50">
-                        <div class="flex items-center gap-1 text-xs text-green-400 font-semibold">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Inventory asset</span>
-                        </div>
-                    </div>
-                </div>
-                
 
                 <!-- New Order Card -->
                 <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
