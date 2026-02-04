@@ -25,32 +25,32 @@ Route::get('/', function () {
     Route::get('/dashboard', [AccountingController::class, 'dashboard'])->name('dashboard');
 
     // Inventory    
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory')->middleware('role:admin,inventory_clerk');
-    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store')->middleware('role:admin,inventory_clerk');
-    Route::get('/inventory/{id}/details', [InventoryController::class, 'getDetails'])->name('inventory.details')->middleware('role:admin,inventory_clerk');
-    Route::get('/inventory/{id}/edit-product', action: [InventoryController::class, 'editProduct'])->name('inventory.edit-product')->middleware('role:admin,inventory_clerk');
-    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update')->middleware('role:admin,inventory_clerk');
-    Route::delete('/inventory/{id}/{type}', [InventoryController::class, 'destroy'])->name('inventory.destroy')->middleware('role:admin,inventory_clerk');
-    Route::post('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('inventory.adjust-stock')->middleware('role:admin,inventory_clerk');
-    Route::get('/inventory/stock-movements/report', [InventoryController::class, 'stockMovementsReport'])->name('inventory.stock-movements-report')->middleware('role:admin,inventory_clerk');
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::get('/inventory/{id}/details', [InventoryController::class, 'getDetails'])->name('inventory.details')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::get('/inventory/{id}/edit-product', action: [InventoryController::class, 'editProduct'])->name('inventory.edit-product')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::delete('/inventory/{id}/{type}', [InventoryController::class, 'destroy'])->name('inventory.destroy')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::post('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('inventory.adjust-stock')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::get('/inventory/stock-movements/report', [InventoryController::class, 'stockMovementsReport'])->name('inventory.stock-movements-report')->middleware('role:admin,inventory_clerk,procurement_officer');
 
     // Procurement
-    Route::get('/procurement', [ProcurementController::class, 'index'])->name('procurement')->middleware('role:admin,procurement_officer');
-    Route::post('/procurement/suppliers', [ProcurementController::class, 'storeSupplier'])->name('procurement.supplier.store')->middleware('role:admin,procurement_officer');
-    Route::post('/procurement/purchase-orders', [ProcurementController::class, 'storePurchaseOrder'])->name('procurement.purchase-order.store')->middleware('role:admin,procurement_officer');
+    Route::get('/procurement', [ProcurementController::class, 'index'])->name('procurement')->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::post('/procurement/suppliers', [ProcurementController::class, 'storeSupplier'])->name('procurement.supplier.store')->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::post('/procurement/purchase-orders', [ProcurementController::class, 'storePurchaseOrder'])->name('procurement.purchase-order.store')->middleware('role:admin,procurement_officer,inventory_clerk');
     Route::get(
         '/procurement/purchase-orders/{purchaseOrder}/items',
         [ProcurementController::class, 'getPurchaseOrderItems']
-    )->name('procurement.purchase-order.items')->middleware('role:admin,procurement_officer');
+    )->name('procurement.purchase-order.items')->middleware('role:admin,procurement_officer,inventory_clerk');
     Route::post(
         '/procurement/purchase-orders/{purchaseOrder}/receive-stock',
         [ProcurementController::class, 'receiveStock']
-    )->name('procurement.purchase-order.receive-stock')->middleware('role:admin,procurement_officer');
-    Route::get('/procurement/received-stock-reports', [ProcurementController::class, 'receivedStockReports'])->name('procurement.received-stock-reports')->middleware('role:admin,procurement_officer');
-    Route::put('/procurement/suppliers/{id}', [ProcurementController::class, 'updateSupplier'])->name('procurement.supplier.update')->middleware('role:admin,procurement_officer');
-    Route::put('/procurement/purchase-orders/{id}', [ProcurementController::class, 'updatePurchaseOrder'])->name('procurement.purchase-order.update')->middleware('role:admin,procurement_officer');
-    Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'removeSupplier'])->name('procurement.supplier.destroy')->middleware('role:admin,procurement_officer');
-    Route::delete('/procurement/purchase-orders/{id}', [ProcurementController::class, 'destroyPurchaseOrder'])->name('procurement.purchase-order.destroy')->middleware('role:admin,procurement_officer');
+    )->name('procurement.purchase-order.receive-stock')->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::get('/procurement/received-stock-reports', [ProcurementController::class, 'receivedStockReports'])->name('procurement.received-stock-reports')->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::put('/procurement/suppliers/{id}', [ProcurementController::class, 'updateSupplier'])->name('procurement.supplier.update')->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::put('/procurement/purchase-orders/{id}', [ProcurementController::class, 'updatePurchaseOrder'])->name('procurement.purchase-order.update')->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::delete('/procurement/suppliers/{id}', [ProcurementController::class, 'removeSupplier'])->name('procurement.supplier.destroy')->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::delete('/procurement/purchase-orders/{id}', [ProcurementController::class, 'destroyPurchaseOrder'])->name('procurement.purchase-order.destroy')->middleware('role:admin,procurement_officer,inventory_clerk');
 
     // Production & Work Orders
     Route::get('/production', [ProductionController::class, 'index'])->name('production')->middleware('role:admin,workshop_staff');
