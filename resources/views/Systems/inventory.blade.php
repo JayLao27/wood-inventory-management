@@ -71,9 +71,7 @@
                             <p class="text-2xl xl:text-3xl font-bold mt-3 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">₱{{ number_format($totalValue ?? 343711.41, 2) }}</p>
                             <p class="text-slate-300 text-sm font-medium mt-2">Raw materials value</p>
                         </div>
-                        <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm">
-                            @include('components.icons.cart', ['class' => 'w-8 h-8 text-green-400']) 
-                        </div>
+                     
                     </div>
                     <div class="mt-4 pt-4 border-t border-slate-600/50">
                         <div class="flex items-center gap-1 text-xs text-green-400 font-semibold">
