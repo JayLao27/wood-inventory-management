@@ -5,6 +5,48 @@
 		.selected-row {
 			background-color: #4B5563 !important;
 			border-left: 4px solid #F59E0B !important;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+		}
+		.selected-row:hover {
+			background-color: #4B5563 !important;
+		}
+		.custom-scrollbar::-webkit-scrollbar {
+			width: 8px;
+		}
+		.custom-scrollbar::-webkit-scrollbar-track {
+			background: #475569;
+			border-radius: 4px;
+		}
+		.custom-scrollbar::-webkit-scrollbar-thumb {
+			background: #f59e0b;
+			border-radius: 4px;
+		}
+		.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+			background: #d97706;
+		}
+	</style>
+	@php
+		$customerTypeBg = [
+			'Wholesale' => '#64B5F6',
+			'Retail' => '#6366F1',
+			'Contractor' => '#BA68C8',
+		];
+		$statusBg = [
+			'In production' => '#FFB74D',
+			'Pending' => '#64B5F6',
+			'Delivered' => '#81C784',
+			'Ready' => '#BA68C8',
+		];
+		$paymentBg = [
+			'Pending' => '#ffffff',
+			'Partial' => '#FFB74D',
+			'Paid' => '#81C784',
+		];
+	@endphp
+	<style>
+		.selected-row {
+			background-color: #4B5563 !important;
+			border-left: 4px solid #F59E0B !important;
 		}
 		.selected-row:hover {
 			background-color: #4B5563 !important;
@@ -57,7 +99,7 @@
 										</svg>
 										<span>Receipt</span>
 									</div>
-								</a>
+								</a>	
 								<a href="#" onclick="exportSalesReport(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
 									<div class="flex items-center gap-2">
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
