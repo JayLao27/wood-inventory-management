@@ -4,7 +4,6 @@ use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProcurementController;
 use App\Http\Controllers\ProductionController;
@@ -23,7 +22,7 @@ Route::get('/', function () {
     Route::middleware('auth')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [AccountingController::class, 'dashboard'])->name('dashboard');
 
     // Inventory    
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
@@ -62,7 +61,7 @@ Route::get('/', function () {
     
     // Sales
     Route::resource('sales-orders', SalesOrderController::class);
-    Route::get('/sales', [DashboardController::class, 'index'])->name('sales');
+    Route::get('/sales', [SalesOrderController::class, 'index'])->name('sales');
     Route::delete('/sales/customers/{id}', [SalesOrderController::class, 'RemoveCustomer'])->name('customers.delete');
     Route::get('/sales/receipt/{orderNumber}', [SalesOrderController::class, 'exportReceipt'])->name('sales.receipt');
     Route::get('/sales/export/report', [SalesOrderController::class, 'exportSalesReport'])->name('sales.export.report');
