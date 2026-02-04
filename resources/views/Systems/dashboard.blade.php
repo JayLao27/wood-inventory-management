@@ -178,7 +178,7 @@
 							</div>
 						</div>
 						<div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
-							@if ($lowStockMaterials->isEmpty() && $lowStockProducts->isEmpty())
+							@if ($lowStockMaterials->isEmpty())
 								<div class="text-center py-12">
 									<svg class="w-16 h-16 text-green-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -208,30 +208,6 @@
 														<span class="text-slate-400 text-sm">/ {{ number_format($m->minimum_stock, 2) }}</span>
 													</div>
 													<span class="text-slate-500 text-xs">{{ $m->unit }}</span>
-												</div>
-											</div>
-										</li>
-									@endforeach
-									@foreach ($lowStockProducts as $p)
-										<li class="group hover:scale-[1.02] transition-transform duration-200">
-											<div class="flex items-center justify-between py-3 px-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 shadow-sm hover:shadow-md transition-shadow">
-												<div class="flex items-center gap-3">
-													<div class="bg-orange-500 text-white p-2 rounded-lg">
-														<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-														</svg>
-													</div>
-													<div>
-														<span class="font-semibold text-gray-800 block">{{ $p->product_name }}</span>
-														<span class="text-slate-500 text-xs">Product</span>
-													</div>
-												</div>
-												<div class="text-right">
-													<div class="flex items-baseline gap-1">
-														<span class="text-red-600 font-bold text-lg">{{ number_format($p->current_stock, 2) }}</span>
-														<span class="text-slate-400 text-sm">/ {{ number_format($p->minimum_stock, 2) }}</span>
-													</div>
-													<span class="text-slate-500 text-xs">{{ $p->unit }}</span>
 												</div>
 											</div>
 										</li>
