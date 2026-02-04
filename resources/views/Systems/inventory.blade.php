@@ -8,7 +8,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <h1 class="text-4xl font-bold text-gray-900">Inventory Management</h1>
-                        <p class="text-base text-gray-700 mt-2 font-medium">Track and manage raw materials and finished products</p>
+                        <p class="text-gray-600 mt-2">Track and manage raw materials and finished products</p>
                     </div>
                     <div class="flex space-x-3">
                         <button onclick="openStockLogsModal()" class="px-5 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
@@ -230,22 +230,16 @@
                             </div>
                         </div>
 
-                        <!-- Materials Needed Section -->
-                        @if($product->materials->count() > 0)
-                        <div class="mt-4 pt-4 border-t border-slate-500">
-                            <span class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Materials Needed:</span>
-                            <div class="mt-2 space-y-1.5">
-                                @foreach($product->materials as $material)
-                                <div class="text-sm text-slate-300 flex justify-between">
-                                    <span>• {{ $material->name }}</span>
-                                    <span class="font-medium text-white">{{ $material->pivot->quantity_needed }} {{ $material->unit }}</span>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-
                         <div class="flex items-center space-x-2 mt-4 justify-end">
+                            <button onclick="event.stopPropagation(); openStockModal('product', {{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group flex items-center space-x-1" title="View Materials & Details">
+                                <svg class="w-5 h-5 text-blue-400 group-hover:text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                </svg>
+                                @if($product->materials->count() > 0)
+                                <span class="text-xs font-bold text-blue-400">{{ $product->materials->count() }}</span>
+                                @endif
+                            </button>
                             <button onclick="event.stopPropagation(); openEditProductModal({{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group" title="Edit">
                                 <svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
