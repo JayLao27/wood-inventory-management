@@ -24,38 +24,8 @@ class AccountingController extends Controller
         $lastMonthNetProfitPercentage = $this->lastMonthNetprofit($netProfit);
         $lastMonthExpensesPercentage = $this->lastMonthTotalExpenses($totalExpenses);
 
-        // Expense Breakdown (Materials + Labor) from accounting transactions only
-        $materialsExpense = (float) Accounting::where('transaction_type', 'Expense')
-            ->whereNotNull('purchase_order_id')
-            ->sum('amount');
-
-        $laborExpense = (float) Accounting::where('transaction_type', 'Expense')
-            ->where('description', 'like', 'Labor - Work Order%')
-            ->sum('amount');
-
-        $totalBreakdown = $materialsExpense + $laborExpense;
-        $materialsPercent = $totalBreakdown > 0 ? round(($materialsExpense / $totalBreakdown) * 100, 1) : 0;
-        $laborPercent = $totalBreakdown > 0 ? round(($laborExpense / $totalBreakdown) * 100, 1) : 0;
-        
-        // Fetch sales orders with accounting transactions for partial payment tracking
-        $salesOrders = SalesOrder::with(['customer', 'accountingTransactions' => function($query) {
-            $query->where('transaction_type', 'Income');
-        }])
-            ->orderBy('order_date', 'desc')
-            ->get()
-            ->map(function($so) {
-                $totalPaid = $so->accountingTransactions->sum('amount');
-                $so->remaining_balance = $so->total_amount - $totalPaid;
-                $so->paid_amount_total = $totalPaid;
-                return $so;
-            })
-            ->filter(function($so) {
-                return $so->remaining_balance > 0;
-            })
-            ->values();
-        
-        // Show only purchase orders with remaining balance (not fully paid)
-        $purchaseOrders = PurchaseOrder::with(['supplier', 'accountingTransactions' => function($query) {
+        // Fetch purchase orders first to calculate pending materials
+        $allPurchaseOrders = PurchaseOrder::with(['supplier', 'accountingTransactions' => function($query) {
             $query->where('transaction_type', 'Expense');
         }])
             ->whereHas('items', function($query) {
@@ -76,7 +46,42 @@ class AccountingController extends Controller
                 $po->remaining_balance = $po->total_amount - $totalPaid;
                 $po->paid_amount_total = $totalPaid;
                 return $po;
+            });
+
+        // Expense Breakdown - Materials (pending/unpaid only) + Labor (already paid)
+        $materialsExpense = (float) $allPurchaseOrders
+            ->filter(function($po) {
+                return $po->remaining_balance > 0;
             })
+            ->sum('remaining_balance');
+
+        $laborExpense = (float) Accounting::where('transaction_type', 'Expense')
+            ->where('description', 'like', 'Labor - Work Order%')
+            ->sum('amount');
+
+        $totalBreakdown = $materialsExpense + $laborExpense;
+        $materialsPercent = ($materialsExpense / 10000) * 100;
+        $laborPercent = ($laborExpense / 10000) * 100;
+        
+        // Fetch sales orders with accounting transactions for partial payment tracking
+        $salesOrders = SalesOrder::with(['customer', 'accountingTransactions' => function($query) {
+            $query->where('transaction_type', 'Income');
+        }])
+            ->orderBy('order_date', 'desc')
+            ->get()
+            ->map(function($so) {
+                $totalPaid = $so->accountingTransactions->sum('amount');
+                $so->remaining_balance = $so->total_amount - $totalPaid;
+                $so->paid_amount_total = $totalPaid;
+                return $so;
+            })
+            ->filter(function($so) {
+                return $so->remaining_balance > 0;
+            })
+            ->values();
+        
+        // Show only purchase orders with remaining balance (not fully paid)
+        $purchaseOrders = $allPurchaseOrders
             ->filter(function($po) {
                 return $po->remaining_balance > 0;
             })
