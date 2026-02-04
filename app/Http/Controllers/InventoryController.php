@@ -19,9 +19,8 @@ class InventoryController extends Controller
         $suppliers = Supplier::orderBy('name')->get();
         
         // Calculate metrics
-        $totalItems = $products->count() + $materials->count();
-        $lowStockAlerts = $products->where('current_stock', '<=', 'minimum_stock')->count() + 
-                         $materials->where('current_stock', '<=', 'minimum_stock')->count(); 
+        $totalMaterials = $materials->count();
+        $lowStockAlerts =  $materials->where('current_stock', '<=', 'minimum_stock')->count(); 
         $totalValue = $materials->sum(function($material) {
             return $material->current_stock * $material->unit_cost;
         });
@@ -29,7 +28,7 @@ class InventoryController extends Controller
         $pendingDeliveries = 0; // This would come from purchase orders
         
         return view('Systems.inventory', compact(
-            'products', 'materials', 'suppliers', 'totalItems', 
+            'products', 'materials', 'suppliers', 
             'lowStockAlerts', 'totalValue', 'newOrders', 'pendingDeliveries'
         ));
     }
