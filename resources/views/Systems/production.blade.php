@@ -2,7 +2,7 @@
 
 @section('main-content')
         <!-- Main Content -->
-        <div class="flex-1 p-8 bg-amber-50">
+        <div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
             <!-- Header Section -->
             <div class="mb-8">
                 @if(session('success'))
@@ -82,15 +82,15 @@
 
             
             <!-- Production Workflow Section -->
-            <div class="bg-slate-700 rounded-lg p-6">
+            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 shadow-xl border border-slate-600">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-xl font-bold text-white">Production Workflow</h2>
-                        <p class="text-slate-300 text-sm mt-1">Manage your raw materials and finished products</p>
+                        <h2 class="text-2xl font-bold text-white">Production Workflow</h2>
+                        <p class="text-slate-300 text-sm font-medium mt-2">Manage your raw materials and finished products</p>
                     </div>
                     <div class="flex space-x-3">
-                        <button onclick="openWorkOrderModal()" class="px-4 py-2 bg-white text-[#374151] rounded-lg hover:bg-[#DEE4EF] flex items-center space-x-2">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <button onclick="openWorkOrderModal()" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                             </svg>
                             <span>Work Orders</span>
@@ -122,85 +122,82 @@
                     </div>
                 </div>
 
-                <!-- Work Orders Table -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-white">
-                        <thead>
-                            <tr class="border-b border-slate-600">
-                                <th class="text-left py-3 px-4 font-medium">Order #</th>
-                                <th class="text-left py-3 px-4 font-medium">Product</th>
-                                <th class="text-left py-3 px-4 font-medium">Quantity</th>
-                                <th class="text-left py-3 px-4 font-medium">Due Date</th>
-                                <th class="text-left py-3 px-4 font-medium">Assigned To</th>
-                                <th class="text-left py-3 px-4 font-medium">Status</th>
-                                <th class="text-left py-3 px-4 font-medium">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-600" id="workOrderTableBody">
-                            @forelse($workOrders ?? [] as $workOrder)
-                            <tr class="hover:bg-slate-600 cursor-pointer work-order-row" data-order-number="{{ $workOrder->order_number }}" data-product-name="{{ $workOrder->product_name }}" data-assigned-to="{{ $workOrder->assigned_to }}" data-status="{{ $workOrder->status }}">
-                                <td class="py-3 px-4">{{ $workOrder->order_number }}</td>
-                                <td class="py-3 px-4">{{ $workOrder->product_name }}</td>
-                                <td class="py-3 px-4">{{ $workOrder->quantity }} pcs</td>
-                                <td class="py-3 px-4">{{ $workOrder->due_date->format('m/d/Y') }}</td>
-                                <td class="py-3 px-4">{{ $workOrder->assigned_to }}</td>
-                                <td class="py-3 px-4">
-                                    @php
-                                        $statusColors = [
-                                            'pending' => 'bg-yellow-500',
-                                            'in_progress' => 'bg-blue-500',
-                                            'quality_check' => 'bg-purple-500',
-                                            'completed' => 'bg-green-500',
-                                            'overdue' => 'bg-red-500'
-                                        ];
-                                        $statusColor = $statusColors[$workOrder->status] ?? 'bg-gray-500';
-                                        $statusLabel = ucwords(str_replace('_', ' ', $workOrder->status));
-                                    @endphp
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold text-white {{ $statusColor }}">
-                                        {{ $statusLabel }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <div class="flex space-x-2">
-                                        <button onclick="viewWorkOrder({{ $workOrder->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                        <button onclick="editWorkOrder({{ $workOrder->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                            </svg>
-                                        </button>
-                                        @if($workOrder->status === 'pending')
-                                        <button onclick="startWorkOrder({{ $workOrder->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                        @elseif($workOrder->status === 'in_progress')
-                                        <button onclick="pauseWorkOrder({{ $workOrder->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                        @endif
-                                        <button onclick="completeWorkOrder({{ $workOrder->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="7" class="py-8 px-4 text-center text-slate-400">No work orders found</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <!-- Work Orders List (Inventory-style) -->
+                <div class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;" id="workOrderTableBody">
+                    @forelse($workOrders ?? [] as $workOrder)
+                    <div class="p-5 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer work-order-row" data-order-number="{{ $workOrder->order_number }}" data-product-name="{{ $workOrder->product_name }}" data-assigned-to="{{ $workOrder->assigned_to }}" data-status="{{ $workOrder->status }}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-white text-lg">{{ $workOrder->order_number }} • {{ $workOrder->product_name }}</h3>
+                                <p class="text-base text-slate-300 font-medium mt-1">Due: {{ $workOrder->due_date->format('m/d/Y') }} • Assigned: {{ $workOrder->assigned_to }}</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                @php
+                                    $statusColors = [
+                                        'pending' => 'bg-yellow-500',
+                                        'in_progress' => 'bg-blue-500',
+                                        'quality_check' => 'bg-purple-500',
+                                        'completed' => 'bg-green-500',
+                                        'overdue' => 'bg-red-500'
+                                    ];
+                                    $statusColor = $statusColors[$workOrder->status] ?? 'bg-gray-500';
+                                    $statusLabel = ucwords(str_replace('_', ' ', $workOrder->status));
+                                @endphp
+                                <span class="px-4 py-2 {{ $statusColor }} text-white text-sm font-bold rounded-xl shadow-lg">
+                                    {{ $statusLabel }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mt-4 text-base">
+                            <div>
+                                <span class="text-slate-400 font-medium text-sm">Quantity</span>
+                                <p class="text-white font-bold text-lg mt-1">{{ $workOrder->quantity }} pcs</p>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-medium text-sm">Due Date</span>
+                                <p class="text-white font-bold text-lg mt-1">{{ $workOrder->due_date->format('m/d/Y') }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2 justify-end">
+                                <button onclick="event.stopPropagation(); viewWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="View">
+                                    <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                                <button onclick="event.stopPropagation(); editWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Edit">
+                                    <svg class="w-5 h-5 text-slate-300" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                    </svg>
+                                </button>
+                                @if($workOrder->status === 'pending')
+                                <button onclick="event.stopPropagation(); startWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Start">
+                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                                @elseif($workOrder->status === 'in_progress')
+                                <button onclick="event.stopPropagation(); pauseWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Pause">
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                                @endif
+                                <button onclick="event.stopPropagation(); completeWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Complete">
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    @endforelse
+                    @php
+                        $hasWorkOrders = ($workOrders ?? collect())->count() > 0;
+                    @endphp
+                    <div id="workOrderEmptyState" class="py-12 px-4 text-center text-slate-400 {{ $hasWorkOrders ? 'hidden' : '' }}">
+                        No work orders found
+                    </div>
                 </div>
             </div>
         </div>
@@ -417,6 +414,24 @@
                     </div>
                 </div>
             </div>
+
+        <!-- Custom Scrollbar Styles -->
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: #475569;
+                border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: #f59e0b;
+                border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: #d97706;
+            }
+        </style>
 
             <script>
             // Modal functions with animations
@@ -698,9 +713,9 @@
                     });
 
                     // Show/hide empty state
-                    const emptyRow = document.querySelector('#workOrderTableBody tr td[colspan]');
-                    if (emptyRow && emptyRow.parentElement) {
-                        emptyRow.parentElement.style.display = visibleCount === 0 ? '' : 'none';
+                    const emptyState = document.getElementById('workOrderEmptyState');
+                    if (emptyState) {
+                        emptyState.classList.toggle('hidden', visibleCount !== 0);
                     }
                 }
 
