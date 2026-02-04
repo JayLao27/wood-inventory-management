@@ -5,7 +5,7 @@ use App\Models\SalesOrder;
 use App\Models\Accounting;
 use App\Models\PurchaseOrder;
 use App\Models\SalesOrderItem;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;    
 
 class AccountingController extends Controller
 {
