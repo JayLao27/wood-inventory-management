@@ -138,7 +138,7 @@ public function RemoveCustomer($id)
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        return view('exports.receipt', compact('salesOrder'));
+        return view('exports.sales-receipt', compact('salesOrder'));
     }
 
     public function exportSalesReport()
