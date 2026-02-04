@@ -184,14 +184,19 @@
 				</div>
 
 				<!-- Sales Management Card -->
-			<section class="bg-slate-700 text-white p-6 rounded-2xl overflow-visible">
-					<header class="flex justify-between items-center mb-4">
-						<div>
-							<h2 class="text-xl font-semibold">Sales Management</h2>
-							<p class="text-gray-300">Manage customer orders and track sales performance</p>
-						</div>
-						<button id="headerBtn" class="px-4 py-2  bg-white text-[#374151] rounded-lg hover:bg-[#DEE4EF]" onclick="openModal('newOrderModal')">+ New Order</button>
-					</header>
+			<section class="bg-gradient-to-br from-slate-700 to-slate-800 text-white p-6 rounded-2xl overflow-visible shadow-xl border border-slate-600">
+				<header class="flex justify-between items-center mb-6">
+					<div>
+						<h2 class="text-2xl font-bold text-white">Sales Management</h2>
+						<p class="text-slate-300 text-sm font-medium mt-2">Manage customer orders and track sales performance</p>
+					</div>
+					<button id="headerBtn" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium" onclick="openModal('newOrderModal')">
+						<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+						</svg>
+						<span>New Order</span>
+					</button>
+				</header>
 
 					<!-- Search + Filters -->
 					<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
@@ -207,9 +212,9 @@
 					</div>
 
 					<!-- Tabs -->
-					<div class="flex justify-center gap-2 mb-6">
-						<button id="salesTab" class="flex-auto px-[240px] py-2 rounded-lg" style="background-color: #FFF1DA; color: #111827;">Orders</button>
-						<button id="customersTab" class="flex-auto px-[240px] py-2 rounded-lg border" style="background-color: #374151; border: 1px solid #FFFFFF; color: #FFFFFF;">Customers</button>
+					<div class="flex space-x-2 w-full mb-6">
+						<button id="salesTab" class="flex-1 px-6 py-3.5 rounded-xl border-2 font-bold text-base transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Orders</button>
+						<button id="customersTab" class="flex-1 px-6 py-3.5 rounded-xl border-2 font-bold text-base transition-all" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Customers</button>
 					</div>
 
 					<!-- Sales Orders Table -->
