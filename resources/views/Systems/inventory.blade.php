@@ -11,6 +11,12 @@
                         <p class="text-gray-600 mt-2">Track and manage raw materials and finished products</p>
                     </div>
                     <div class="flex space-x-3">
+                        <button onclick="openReceiveStockModal()" class="px-5 py-2.5 bg-green-700 text-white rounded-xl hover:bg-green-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Receive Stock
+                        </button>
                         <button onclick="openStockLogsModal()" class="px-5 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -658,25 +664,89 @@
                             </div>
                         </div>
 
-                        <!-- Table -->
-                        <div class="overflow-x-auto rounded-xl border-2 border-slate-700 shadow-lg">
-                            <table class="w-full text-base">
-                                <thead class="bg-slate-700 text-white">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left font-bold">Date & Time</th>
-                                        <th class="px-4 py-3 text-left font-bold">Type</th>
-                                        <th class="px-4 py-3 text-left font-bold">Item</th>
-                                        <th class="px-4 py-3 text-center font-bold">Quantity</th>
-                                        <th class="px-4 py-3 text-left font-bold">Reference</th>
-                                        <th class="px-4 py-3 text-left font-bold">Notes</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="stockLogsTable" class="divide-y divide-slate-300 bg-white">
-                                    <tr>
-                                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">Loading logs...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <!-- Stock IN Section -->
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold text-green-700 mb-3 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Stock IN (Received from Suppliers)
+                            </h4>
+                            <div class="overflow-x-auto rounded-xl border-2 border-green-300 shadow-lg bg-green-50">
+                                <table class="w-full text-base">
+                                    <thead class="bg-green-600 text-white">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-bold">Date & Time</th>
+                                            <th class="px-4 py-3 text-left font-bold">Material</th>
+                                            <th class="px-4 py-3 text-center font-bold">Quantity</th>
+                                            <th class="px-4 py-3 text-left font-bold">From Supplier</th>
+                                            <th class="px-4 py-3 text-left font-bold">Reference (PO)</th>
+                                            <th class="px-4 py-3 text-left font-bold">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stockInTable" class="divide-y divide-green-200 bg-white">
+                                        <tr>
+                                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">No Stock IN records</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Stock OUT Section -->
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold text-red-700 mb-3 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Stock OUT (Used in Work Orders)
+                            </h4>
+                            <div class="overflow-x-auto rounded-xl border-2 border-red-300 shadow-lg bg-red-50">
+                                <table class="w-full text-base">
+                                    <thead class="bg-red-600 text-white">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-bold">Date & Time</th>
+                                            <th class="px-4 py-3 text-left font-bold">Material</th>
+                                            <th class="px-4 py-3 text-center font-bold">Quantity Out</th>
+                                            <th class="px-4 py-3 text-left font-bold">Work Order</th>
+                                            <th class="px-4 py-3 text-left font-bold">Worker / Reference</th>
+                                            <th class="px-4 py-3 text-left font-bold">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stockOutTable" class="divide-y divide-red-200 bg-white">
+                                        <tr>
+                                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">No Stock OUT records</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Stock OUT Summary by Material -->
+                        <div>
+                            <h4 class="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                                Total Stock OUT by Material
+                            </h4>
+                            <div class="overflow-x-auto rounded-xl border-2 border-slate-300 shadow-lg bg-slate-50">
+                                <table class="w-full text-base">
+                                    <thead class="bg-slate-700 text-white">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-bold">Material</th>
+                                            <th class="px-4 py-3 text-center font-bold">Total Quantity Out</th>
+                                            <th class="px-4 py-3 text-left font-bold">Unit</th>
+                                            <th class="px-4 py-3 text-center font-bold">Number of Transactions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stockOutSummaryTable" class="divide-y divide-slate-200 bg-white">
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-6 text-center text-gray-500">No Stock OUT summary data</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1097,44 +1167,306 @@
             }
 
             function displayStockLogs(movements, summary) {
-                const tableBody = document.getElementById('stockLogsTable');
+                const stockInTable = document.getElementById('stockInTable');
+                const stockOutTable = document.getElementById('stockOutTable');
+                const stockOutSummaryTable = document.getElementById('stockOutSummaryTable');
 
                 if (movements.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No stock movements found</td></tr>';
+                    stockInTable.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No Stock IN records</td></tr>';
+                    stockOutTable.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No Stock OUT records</td></tr>';
+                    stockOutSummaryTable.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">No summary data</td></tr>';
                     return;
                 }
 
-                let htmlRows = '';
-                movements.forEach((movement) => {
-                    const typeColor = movement.movement_type === 'in' ? 'bg-green-50' : 
-                                     movement.movement_type === 'out' ? 'bg-red-50' : 'bg-yellow-50';
+                // Separate movements by type
+                let stockInRows = '';
+                let stockOutRows = '';
+                const stockOutByMaterial = {};
 
-                    const row = `
-                        <tr class="hover:${typeColor} transition-colors">
-                            <td class="px-4 py-3">${movement.date} ${movement.time}</td>
-                            <td class="px-4 py-3">
-                                <span class="px-3 py-1 text-xs font-bold rounded-xl ${
-                                    movement.movement_type === 'in' ? 'bg-green-100 text-green-700' :
-                                    movement.movement_type === 'out' ? 'bg-red-100 text-red-700' :
-                                    'bg-yellow-100 text-yellow-700'
-                                }">
-                                    ${movement.movement_label}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3">${movement.item_name}</td>
-                            <td class="px-4 py-3 text-center font-bold">${movement.movement_type === 'out' ? '-' : '+'}${movement.quantity.toFixed(2)} ${movement.unit}</td>
-                            <td class="px-4 py-3">${movement.reference_info}</td>
-                            <td class="px-4 py-3 text-xs max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
-                        </tr>
-                    `;
-                    htmlRows += row;
+                movements.forEach((movement) => {
+                    if (movement.movement_type === 'in') {
+                        // Stock IN row
+                        const inRow = `
+                            <tr class="hover:bg-green-100 transition-colors">
+                                <td class="px-4 py-3 font-semibold text-green-700">${movement.date} ${movement.time}</td>
+                                <td class="px-4 py-3 font-medium">${movement.item_name}</td>
+                                <td class="px-4 py-3 text-center font-bold text-green-700">+${movement.quantity.toFixed(2)} ${movement.unit}</td>
+                                <td class="px-4 py-3 text-sm">${movement.supplier_name || 'Direct Receipt'}</td>
+                                <td class="px-4 py-3 text-sm font-mono">${movement.reference_info || 'N/A'}</td>
+                                <td class="px-4 py-3 text-xs text-gray-600 max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                        stockInRows += inRow;
+                    } else if (movement.movement_type === 'out') {
+                        // Stock OUT row
+                        const outRow = `
+                            <tr class="hover:bg-red-100 transition-colors">
+                                <td class="px-4 py-3 font-semibold text-red-700">${movement.date} ${movement.time}</td>
+                                <td class="px-4 py-3 font-medium">${movement.item_name}</td>
+                                <td class="px-4 py-3 text-center font-bold text-red-700">-${movement.quantity.toFixed(2)} ${movement.unit}</td>
+                                <td class="px-4 py-3 text-sm font-mono">${movement.work_order_ref || 'Manual Adjustment'}</td>
+                                <td class="px-4 py-3 text-sm">${movement.reference_info || 'System'}</td>
+                                <td class="px-4 py-3 text-xs text-gray-600 max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                        stockOutRows += outRow;
+
+                        // Build summary by material
+                        const materialKey = movement.item_name;
+                        if (!stockOutByMaterial[materialKey]) {
+                            stockOutByMaterial[materialKey] = {
+                                name: movement.item_name,
+                                unit: movement.unit,
+                                totalQty: 0,
+                                transactions: 0
+                            };
+                        }
+                        stockOutByMaterial[materialKey].totalQty += parseFloat(movement.quantity);
+                        stockOutByMaterial[materialKey].transactions += 1;
+                    }
                 });
 
-                tableBody.innerHTML = htmlRows;
+                // Display Stock IN
+                if (stockInRows) {
+                    stockInTable.innerHTML = stockInRows;
+                } else {
+                    stockInTable.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No Stock IN records</td></tr>';
+                }
+
+                // Display Stock OUT
+                if (stockOutRows) {
+                    stockOutTable.innerHTML = stockOutRows;
+                } else {
+                    stockOutTable.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No Stock OUT records</td></tr>';
+                }
+
+                // Display Stock OUT Summary by Material
+                if (Object.keys(stockOutByMaterial).length > 0) {
+                    let summaryRows = '';
+                    Object.values(stockOutByMaterial).forEach(material => {
+                        summaryRows += `
+                            <tr class="hover:bg-slate-100 transition-colors">
+                                <td class="px-4 py-3 font-medium">${material.name}</td>
+                                <td class="px-4 py-3 text-center font-bold text-red-700">${material.totalQty.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-sm">${material.unit}</td>
+                                <td class="px-4 py-3 text-center font-semibold text-blue-700">${material.transactions}</td>
+                            </tr>
+                        `;
+                    });
+                    stockOutSummaryTable.innerHTML = summaryRows;
+                } else {
+                    stockOutSummaryTable.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">No summary data</td></tr>';
+                }
 
                 document.getElementById('logTotalIn').textContent = summary.total_in.toFixed(2);
                 document.getElementById('logTotalOut').textContent = summary.total_out.toFixed(2);
                 document.getElementById('logTotalMovements').textContent = summary.total_movements;
+            }
+        </script>
+
+        <!-- Receive Stock Modal -->
+        <div id="receiveStockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Receive Stock</h3>
+                            <button onclick="closeReceiveStockModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="receiveStockForm" method="POST">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Order *</label>
+                                    <select name="purchase_order_id" id="purchaseOrderSelect" onchange="loadPurchaseOrderItems(this.value)" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                        <option value="">Select Purchase Order</option>
+                                        @php
+                                            $purchaseOrders = \App\Models\PurchaseOrder::with('supplier')->where('status', '!=', 'received')->get();
+                                        @endphp
+                                        @foreach($purchaseOrders as $order)
+                                            <option value="{{ $order->id }}" data-order-id="{{ $order->id }}">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }} - {{ $order->supplier->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Received Date *</label>
+                                    <input type="date" name="received_date" value="{{ date('Y-m-d') }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h4 class="text-lg font-medium text-gray-900 mb-4">Items to Receive</h4>
+                                <div id="receiveStockItems" class="overflow-y-auto" style="max-height: 50vh;">
+                                    <p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                <textarea name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Add any notes about this delivery..."></textarea>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" onclick="closeReceiveStockModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Receive Stock
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Receive Stock Modal Functions
+            function openReceiveStockModal() {
+                document.getElementById('receiveStockModal').classList.remove('hidden');
+            }
+
+            function closeReceiveStockModal() {
+                document.getElementById('receiveStockModal').classList.add('hidden');
+                document.getElementById('receiveStockForm').reset();
+                document.getElementById('receiveStockItems').innerHTML = '<p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>';
+            }
+
+            function loadPurchaseOrderItems(orderId) {
+                const container = document.getElementById('receiveStockItems');
+
+                if (!orderId) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>';
+                    return;
+                }
+
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Loading items...</p>';
+
+                fetch(`/procurement/purchase-orders/${orderId}/items`)
+                    .then(response => response.json())  
+                    .then(data => {
+                        if (!data.success || !data.items || data.items.length === 0) {
+                            container.innerHTML = '<p class="text-gray-500 text-center py-8">No remaining items to receive for this purchase order.</p>';
+                            return;
+                        }
+
+                        // Filter out items that are fully received
+                        const itemsToReceive = data.items.filter(item => Number(item.remaining_quantity || 0) > 0);
+                        
+                        if (itemsToReceive.length === 0) {
+                            container.innerHTML = '<p class="text-gray-500 text-center py-8">All items have been fully received for this purchase order.</p>';
+                            return;
+                        }
+
+                        const itemsHtml = itemsToReceive.map((item, index) => `
+                            <div class="bg-gray-50 p-4 rounded-lg mb-3">
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Material</label>
+                                        <p class="text-gray-900 font-medium">${item.material_name}</p>
+                                        <p class="text-xs text-gray-500">${item.unit ? item.unit : ''}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Ordered Qty</label>
+                                        <p class="text-gray-900 font-medium">${Number(item.ordered_quantity).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Already Received</label>
+                                        <p class="text-gray-900 font-medium">${Number(item.already_received).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Remaining</label>
+                                        <p class="text-gray-900 font-medium">${Number(item.remaining_quantity).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Defect Qty</label>
+                                        <input
+                                            type="number"
+                                            name="items[${index}][defect_quantity]"
+                                            step="0.01"
+                                            min="0"
+                                            max="${Number(item.remaining_quantity).toFixed(2)}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="0.00"
+                                        >
+                                        <input type="hidden" name="items[${index}][purchase_order_item_id]" value="${item.id}">
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+
+                        container.innerHTML = `<div class="space-y-4">${itemsHtml}</div>`;
+                    })
+                    .catch(() => {
+                        container.innerHTML = '<p class="text-red-500 text-center py-8">Failed to load items for this purchase order.</p>';
+                    });
+            }
+
+            // Form submission handler
+            const receiveStockForm = document.getElementById('receiveStockForm');
+            if (receiveStockForm) {
+                receiveStockForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const purchaseOrderSelect = document.getElementById('purchaseOrderSelect');
+                    const purchaseOrderId = purchaseOrderSelect ? purchaseOrderSelect.value : null;
+
+                    if (!purchaseOrderId) {
+                        alert('Please select a purchase order first.');
+                        return;
+                    }
+
+                    const formData = new FormData(receiveStockForm);
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    fetch(`/procurement/purchase-orders/${purchaseOrderId}/receive-stock`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                        .then(response => {
+                            // Handle HTTP error responses
+                            if (!response.ok) {
+                                return response.json().then(data => {
+                                    throw {
+                                        status: response.status,
+                                        message: data.message || `Error: ${response.statusText}`
+                                    };
+                                }).catch(err => {
+                                    if (err.message) throw err;
+                                    throw {
+                                        status: response.status,
+                                        message: response.status === 404 ? 'Invalid PO. Purchase order not found.' : `Error: ${response.statusText}`
+                                    };
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message || 'Stock received successfully.');
+                                window.location.reload();
+                            } else {
+                                // Exception 1.1: Invalid PO error display
+                                // Exception 2.1: Duplicate receipt error display
+                                // Exception 2.2: Database error display
+                                alert(data.message || 'Failed to receive stock.');
+                            }
+                        })
+                        .catch(error => {
+                            // Display exception error messages
+                            const errorMessage = error.message || 'An error occurred while receiving stock.';
+                            alert(errorMessage);
+                            console.error('Stock receive error:', error);
+                        });
+                });
             }
         </script>
 

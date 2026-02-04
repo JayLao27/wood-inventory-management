@@ -21,22 +21,52 @@ class DatabaseSeeder extends Seeder
     [
         'name' => 'Admin',
         'password' => Hash::make('admin123'),
+        'role' => 'admin',
     ]
 );
 
 User::updateOrCreate(
-    ['email' => 'manager@rmwoodworks.com'],
+    ['email' => 'inventory@rmwoodworks.com'],
     [
-        'name' => 'Manager',
-        'password' => Hash::make('manager123'),
+        'name' => 'Inventory Clerk',
+        'password' => Hash::make('inventory123'),
+        'role' => 'inventory_clerk',
     ]
 );
 
 User::updateOrCreate(
-    ['email' => 'worker@rmwoodworks.com'],
+    ['email' => 'procurement@rmwoodworks.com'],
     [
-        'name' => 'Worker',
-        'password' => Hash::make('worker123'),
+        'name' => 'Procurement Officer',
+        'password' => Hash::make('procurement123'),
+        'role' => 'procurement_officer',
+    ]
+);
+
+User::updateOrCreate(
+    ['email' => 'workshop@rmwoodworks.com'],
+    [
+        'name' => 'Workshop Staff',
+        'password' => Hash::make('workshop123'),
+        'role' => 'workshop_staff',
+    ]
+);
+
+User::updateOrCreate(
+    ['email' => 'sales@rmwoodworks.com'],
+    [
+        'name' => 'Sales Clerk',
+        'password' => Hash::make('sales123'),
+        'role' => 'sales_clerk',
+    ]
+);
+
+User::updateOrCreate(
+    ['email' => 'accounting@rmwoodworks.com'],
+    [
+        'name' => 'Accounting Staff',
+        'password' => Hash::make('accounting123'),
+        'role' => 'accounting_staff',
     ]
 );
 

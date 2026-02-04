@@ -19,14 +19,6 @@
                     <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
                         Reports
                     </button>
-                    <button onclick="openReceiveStockModal()" class="relative px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
-                        Receive Stock
-                        @if($receiveCount > 0)
-                            <span class="absolute -top-2 -right-2 min-w-[1.5rem] h-6 px-1 rounded-full border-2 border-red-500 text-red-600 bg-white text-xs font-bold flex items-center justify-center">
-                                {{ $receiveCount }}
-                            </span>
-                        @endif
-                    </button>
                 </div>
             </div>
         </div>
@@ -457,64 +449,6 @@
         </div>
     </div>
 
-    <!-- Receive Stock Modal -->
-    <div id="receiveStockModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-gray-900">Receive Stock</h3>
-                        <button onclick="closeReceiveStockModal()" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <form id="receiveStockForm" method="POST">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Order *</label>
-                                <select name="purchase_order_id" id="purchaseOrderSelect" onchange="loadPurchaseOrderItems(this.value)" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                                    <option value="">Select Purchase Order</option>
-                                    @foreach(($openPurchaseOrders ?? $purchaseOrders ?? []) as $order)
-                                        <option value="{{ $order->id }}" data-order-id="{{ $order->id }}">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }} - {{ $order->supplier->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Received Date *</label>
-                                <input type="date" name="received_date" value="{{ date('Y-m-d') }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <h4 class="text-lg font-medium text-gray-900 mb-4">Items to Receive</h4>
-                            <div id="receiveStockItems" class="overflow-y-auto" style="max-height: 50vh;">
-                                <p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                            <textarea name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Add any notes about this delivery..."></textarea>
-                        </div>
-                        
-                        <div class="flex justify-end space-x-3 mt-6">
-                            <button type="button" onclick="closeReceiveStockModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                                Cancel
-                            </button>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                Receive Stock
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- View Order Items Modal -->
     <div id="viewOrderItemsModal" class="fixed inset-0 bg-black/70 hidden overflow-y-auto" style="z-index: 99999;">
         <div class="rounded-lg shadow-2xl max-w-4xl w-[95%] mx-auto my-8 p-8" style="background-color: #FFF1DA;">
@@ -701,86 +635,6 @@
         function closeAddPurchaseOrderModal() {
             document.getElementById('addPurchaseOrderModal').classList.add('hidden');
             document.getElementById('addPurchaseOrderForm').reset();
-        }
-
-        function openReceiveStockModal() {
-            document.getElementById('receiveStockModal').classList.remove('hidden');
-        }
-
-        function closeReceiveStockModal() {
-            document.getElementById('receiveStockModal').classList.add('hidden');
-            document.getElementById('receiveStockForm').reset();
-            document.getElementById('receiveStockItems').innerHTML = '<p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>';
-        }
-
-        function loadPurchaseOrderItems(orderId) {
-            const container = document.getElementById('receiveStockItems');
-
-            if (!orderId) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-8">Please select a purchase order to view items</p>';
-                return;
-            }
-
-            container.innerHTML = '<p class="text-gray-500 text-center py-8">Loading items...</p>';
-
-            fetch(`/procurement/purchase-orders/${orderId}/items`)
-                .then(response => response.json())  
-                .then(data => {
-                    if (!data.success || !data.items || data.items.length === 0) {
-                        container.innerHTML = '<p class="text-gray-500 text-center py-8">No remaining items to receive for this purchase order.</p>';
-                        return;
-                    }
-
-                    // Filter out items that are fully received
-                    const itemsToReceive = data.items.filter(item => Number(item.remaining_quantity || 0) > 0);
-                    
-                    if (itemsToReceive.length === 0) {
-                        container.innerHTML = '<p class="text-gray-500 text-center py-8">All items have been fully received for this purchase order.</p>';
-                        return;
-                    }
-
-                    const itemsHtml = itemsToReceive.map((item, index) => `
-                        <div class="bg-gray-50 p-4 rounded-lg mb-3">
-                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Material</label>
-                                    <p class="text-gray-900 font-medium">${item.material_name}</p>
-                                    <p class="text-xs text-gray-500">${item.unit ? item.unit : ''}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Ordered Qty</label>
-                                    <p class="text-gray-900 font-medium">${Number(item.ordered_quantity).toFixed(2)}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Already Received</label>
-                                    <p class="text-gray-900 font-medium">${Number(item.already_received).toFixed(2)}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Remaining</label>
-                                    <p class="text-gray-900 font-medium">${Number(item.remaining_quantity).toFixed(2)}</p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Defect Qty</label>
-                                    <input
-                                        type="number"
-                                        name="items[${index}][defect_quantity]"
-                                        step="0.01"
-                                        min="0"
-                                        max="${Number(item.remaining_quantity).toFixed(2)}"
-                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="0.00"
-                                    >
-                                    <input type="hidden" name="items[${index}][purchase_order_item_id]" value="${item.id}">
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-
-                    container.innerHTML = `<div class="space-y-4">${itemsHtml}</div>`;
-                })
-                .catch(() => {
-                    container.innerHTML = '<p class="text-red-500 text-center py-8">Failed to load items for this purchase order.</p>';
-                });
         }
 
         function openViewOrderModal(orderId) {
@@ -1349,45 +1203,6 @@
             }
 
             // payment filter removed; no-op
-
-            // Handle Receive Stock form submission (AJAX)
-            const receiveStockForm = document.getElementById('receiveStockForm');
-            if (receiveStockForm) {
-                receiveStockForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    const purchaseOrderSelect = document.getElementById('purchaseOrderSelect');
-                    const purchaseOrderId = purchaseOrderSelect ? purchaseOrderSelect.value : null;
-
-                    if (!purchaseOrderId) {
-                        alert('Please select a purchase order first.');
-                        return;
-                    }
-
-                    const formData = new FormData(receiveStockForm);
-                    formData.append('_token', '{{ csrf_token() }}');
-
-                    fetch(`/procurement/purchase-orders/${purchaseOrderId}/receive-stock`, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: formData
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert(data.message || 'Stock received successfully.');
-                                window.location.reload();
-                            } else {
-                                alert(data.message || 'Failed to receive stock.');
-                            }
-                        })
-                        .catch(() => {
-                            alert('An error occurred while receiving stock.');
-                        });
-                });
-            }
         });
     </script>
 

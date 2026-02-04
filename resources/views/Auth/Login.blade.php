@@ -66,8 +66,11 @@
 				<p class="font-semibold text-[#A0522D] mb-1">Demo accounts:</p>
 				<ul class="text-[#7A3E00] space-y-1">
 					<li><b>Admin:</b> admin@rmwoodworks.com / admin123</li>
-					<li><b>Manager:</b> manager@rmwoodworks.com / manager123</li>
-					<li><b>Worker:</b> worker@rmwoodworks.com / worker123</li>
+					<li><b>Inventory Clerk:</b> inventory@rmwoodworks.com / inventory123</li>
+					<li><b>Procurement Officer:</b> procurement@rmwoodworks.com / procurement123</li>
+					<li><b>Workshop Staff:</b> workshop@rmwoodworks.com / workshop123</li>
+					<li><b>Sales Clerk:</b> sales@rmwoodworks.com / sales123</li>
+					<li><b>Accounting Staff:</b> accounting@rmwoodworks.com / accounting123</li>
 				</ul>
 			</div>
 		</div>
