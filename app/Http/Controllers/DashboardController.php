@@ -51,21 +51,20 @@ class DashboardController extends Controller
             ? round((($netProfitThisMonth - $netProfitLastMonth) / abs($netProfitLastMonth)) * 100, 1)
             : ($netProfitThisMonth != 0 ? 100 : 0);
 
-        // Active orders & new this week
-        $activeStatuses = ['Pending', 'In production', 'Ready'];
-        $activeOrdersCount = SalesOrder::whereIn('status', $activeStatuses)->count();
-        $newOrdersThisWeek = SalesOrder::where('order_date', '>=', $startOfWeek)->count();
-
+       
         // In production (work orders)
         $inProductionCount = WorkOrder::whereIn('status', ['in_progress', 'quality_check'])->count();
         $overdueWorkOrders = WorkOrder::whereNotIn('status', ['completed'])
             ->where('due_date', '<', $now->toDateString())
             ->count();
 
+        // Active/new orders
+        $activeOrdersCount = SalesOrder::whereIn('status', ['Pending', 'In production', 'Ready'])->count();
+        $newOrdersThisWeek = SalesOrder::whereDate('order_date', '>=', $startOfWeek)->count();
+
         // Low stock (materials + products)
         $lowStockMaterials = Material::whereRaw('current_stock <= minimum_stock')->orderBy('current_stock')->get();
-        $lowStockProducts = Product::whereRaw('current_stock <= minimum_stock')->orderBy('current_stock')->get();
-        $lowStockCount = $lowStockMaterials->count() + $lowStockProducts->count();
+        $lowStockCount = $lowStockMaterials->count();
 
         // Sales report: last 6 months by month
         $salesReportMonths = collect();
@@ -103,7 +102,6 @@ class DashboardController extends Controller
             'overdueWorkOrders',
             'lowStockCount',
             'lowStockMaterials',
-            'lowStockProducts',
             'chartLabels',
             'chartRevenue',
             'chartExpenses',
