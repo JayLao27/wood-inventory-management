@@ -23,6 +23,19 @@ class AccountingController extends Controller
         $lastMonthRevenuePercentage = $this->lastMonthRevenue($totalRevenue);
         $lastMonthNetProfitPercentage = $this->lastMonthNetprofit($netProfit);
         $lastMonthExpensesPercentage = $this->lastMonthTotalExpenses($totalExpenses);
+
+        // Expense Breakdown (Materials + Labor) from accounting transactions only
+        $materialsExpense = (float) Accounting::where('transaction_type', 'Expense')
+            ->whereNotNull('purchase_order_id')
+            ->sum('amount');
+
+        $laborExpense = (float) Accounting::where('transaction_type', 'Expense')
+            ->where('description', 'like', 'Labor - Work Order%')
+            ->sum('amount');
+
+        $totalBreakdown = $materialsExpense + $laborExpense;
+        $materialsPercent = $totalBreakdown > 0 ? round(($materialsExpense / $totalBreakdown) * 100, 1) : 0;
+        $laborPercent = $totalBreakdown > 0 ? round(($laborExpense / $totalBreakdown) * 100, 1) : 0;
         
         // Fetch sales orders with accounting transactions for partial payment tracking
         $salesOrders = SalesOrder::with(['customer', 'accountingTransactions' => function($query) {
@@ -74,7 +87,21 @@ class AccountingController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        return view('Systems.accounting', compact('totalRevenue', 'totalExpenses', 'netProfit', 'lastMonthRevenuePercentage', 'lastMonthNetProfitPercentage', 'lastMonthExpensesPercentage', 'salesOrders', 'purchaseOrders', 'transactions'));
+        return view('Systems.accounting', compact(
+            'totalRevenue',
+            'totalExpenses',
+            'netProfit',
+            'lastMonthRevenuePercentage',
+            'lastMonthNetProfitPercentage',
+            'lastMonthExpensesPercentage',
+            'salesOrders',
+            'purchaseOrders',
+            'transactions',
+            'materialsExpense',
+            'laborExpense',
+            'materialsPercent',
+            'laborPercent'
+        ));
     }
 
     public function dashboard()
