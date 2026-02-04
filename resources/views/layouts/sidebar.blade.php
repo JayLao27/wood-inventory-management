@@ -26,6 +26,8 @@
                     <span>Dashboard</span>
                 </a>
             </li>
+
+            @if(auth()->user()->hasAnyRole(['admin', 'inventory_clerk']))
               <li>
                 <a href="{{ route('inventory') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('inventory') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -34,6 +36,9 @@
                     <span>Inventory</span>
                 </a>
             </li>
+            @endif
+
+            @if(auth()->user()->hasAnyRole(['admin', 'workshop_staff']))
             <li>
                 <a href="{{ route('production') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('production') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -42,12 +47,18 @@
                     <span>Production</span>
                 </a>
             </li>
+            @endif
+
+            @if(auth()->user()->hasAnyRole(['admin', 'sales_clerk']))
             <li>
                 <a href="{{ route('sales-orders.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('sales-orders.*') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                    @include('components.icons.cart', ['class' => 'w-5 h-5'])
                     <span>Sales & Orders</span>
                 </a>
             </li>
+            @endif
+
+            @if(auth()->user()->hasAnyRole(['admin', 'procurement_officer']))
             <li>
                 <a href="{{ route('procurement') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('procurement') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -57,6 +68,9 @@
                     <span>Procurement</span>
                 </a>
             </li>
+            @endif
+
+            @if(auth()->user()->hasAnyRole(['admin', 'accounting_staff']))
             <li>
                 <a href="{{ route('accounting') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('accounting') ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-600 hover:text-white' }} transition">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -66,6 +80,7 @@
                     <span>Accounting</span>
                 </a>
             </li>
+            @endif
         </ul>
     </nav>
 
