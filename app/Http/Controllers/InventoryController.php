@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product; 
+use App\Models\Product;
 use App\Models\Material;
 use App\Models\Supplier;
 use App\Models\PurchaseOrder;
@@ -20,7 +20,9 @@ class InventoryController extends Controller
         
         // Calculate metrics
         $totalMaterials = $materials->count();
-        $lowStockAlerts =  $materials->where('current_stock', '<=', 'minimum_stock')->count(); 
+        $lowStockAlerts = $materials->filter(function ($material) {
+            return $material->current_stock <= $material->minimum_stock;
+        })->count();
         $totalValue = $materials->sum(function($material) {
             return $material->current_stock * $material->unit_cost;
         });
