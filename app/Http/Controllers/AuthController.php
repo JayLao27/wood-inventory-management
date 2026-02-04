@@ -11,7 +11,7 @@ class AuthController extends Controller
 	public function showLogin()
 	{
 		if (Auth::check()) {
-			return redirect()->route('dashboard');
+			return redirect($this->getHomeRoute());
 		}
 		return view('auth.login');
 	}
@@ -23,22 +23,31 @@ class AuthController extends Controller
 			'password' => 'required|string',
 		]);
 
-		if (Auth::attempt($credentials, $request->booleDan('remember'))) {
+		if (Auth::attempt($credentials, $request->boolean('remember'))) {
 			$request->session()->regenerate();
-			$user = Auth::user();
 
-			if (!$user || $user->email !== 'admin@rmwoodworks.com') {
-				Auth::logout();
-				$request->session()->invalidate();
-				$request->session()->regenerateToken();
-
-				return back()->withErrors(['email' => 'Only admin accounts can access this system.'])->onlyInput('email');
-			}
-
-			return redirect()->intended(route('dashboard'));
+			return redirect()->intended($this->getHomeRoute());
 		}
 
 		return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
+	}
+
+	/**
+	 * Get the home route based on user role
+	 */
+	private function getHomeRoute(): string
+	{
+		$user = Auth::user();
+		
+		return match($user->role) {
+			'admin' => route('dashboard'),
+			'inventory_clerk' => route('inventory'),
+			'procurement_officer' => route('procurement'),
+			'workshop_staff' => route('production'),
+			'sales_clerk' => route('sales'),
+			'accounting_staff' => route('dashboard'),
+			default => route('dashboard'),
+		};
 	}
 
 	public function logout(Request $request)
