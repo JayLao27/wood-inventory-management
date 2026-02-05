@@ -278,48 +278,9 @@ class ProcurementController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Exception 2.1: Check for duplicate receipt attempt
+        // Exception 2.1: Multiple receipts allowed (for defect replacements, partial deliveries, etc.)
+        // No duplicate check - users can receive additional quantities on the same day
         $receivedDate = $request->input('received_date');
-        $duplicateItems = [];
-        
-        foreach ($request->items as $itemData) {
-            $poItem = $purchaseOrder->items->firstWhere('id', $itemData['purchase_order_item_id'] ?? null);
-            
-            if (!$poItem) {
-                continue;
-            }
-
-            // Check if this exact combination was already received
-            $existingMovement = InventoryMovement::where('item_type', 'material')
-                ->where('item_id', $poItem->material_id)
-                ->where('reference_type', 'purchase_order')
-                ->where('reference_id', $purchaseOrder->id)
-                ->where('movement_type', 'in')
-                ->whereDate('created_at', $receivedDate)
-                ->exists();
-
-            if ($existingMovement) {
-                $material = Material::find($poItem->material_id);
-                $duplicateItems[] = $material->name ?? "Material ID: {$poItem->material_id}";
-            }
-        }
-
-        // If duplicates found, reject and log the attempt
-        if (!empty($duplicateItems)) {
-            Log::warning('Duplicate receipt attempt detected', [
-                'purchase_order_id' => $purchaseOrder->id,
-                'purchase_order_number' => $purchaseOrder->order_number,
-                'received_date' => $receivedDate,
-                'duplicate_items' => $duplicateItems,
-                'user_id' => auth()->id() ?? 'Guest',
-                'timestamp' => now(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Duplicate receipt detected. The following items have already been received on ' . $receivedDate . ': ' . implode(', ', $duplicateItems) . '. Please check the received stock reports.',
-            ], 422);
-        }
 
         // Exception 2.2: Database retry logic with error logging
         $maxAttempts = 3;
