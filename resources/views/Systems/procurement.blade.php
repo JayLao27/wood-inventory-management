@@ -1086,10 +1086,10 @@
             if (tab === 'purchase-orders') {
                 purchaseOrdersTab.style.backgroundColor = '#FFF1DA';
                 purchaseOrdersTab.style.color = '#111827';
-                purchaseOrdersTab.style.border = 'none';
-                suppliersTab.style.backgroundColor = '#374151';
+                purchaseOrdersTab.style.borderColor = '#FDE68A';
+                suppliersTab.style.backgroundColor = '#475569';
                 suppliersTab.style.color = '#FFFFFF';
-                suppliersTab.style.border = '1px solid #FFFFFF';
+                suppliersTab.style.borderColor = '#64748b';
                 purchaseOrdersTable.classList.remove('hidden');
                 suppliersTable.classList.add('hidden');
                 purchaseOrdersButton.classList.remove('hidden');
@@ -1097,10 +1097,10 @@
             } else {
                 suppliersTab.style.backgroundColor = '#FFF1DA';
                 suppliersTab.style.color = '#111827';
-                suppliersTab.style.border = 'none';
-                purchaseOrdersTab.style.backgroundColor = '#374151';
+                suppliersTab.style.borderColor = '#FDE68A';
+                purchaseOrdersTab.style.backgroundColor = '#475569';
                 purchaseOrdersTab.style.color = '#FFFFFF';
-                purchaseOrdersTab.style.border = '1px solid #FFFFFF';
+                purchaseOrdersTab.style.borderColor = '#64748b';
                 suppliersTable.classList.remove('hidden');
                 purchaseOrdersTable.classList.add('hidden');
                 purchaseOrdersButton.classList.add('hidden');
