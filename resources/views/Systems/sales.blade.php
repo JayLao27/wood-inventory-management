@@ -514,7 +514,7 @@
 															</thead>
 															<tbody>
 																@foreach($productsSummary as $productName => $totalQty)
-																	<tr class="border-b hover:bg-slate-50">
+																	<tr class="border-b hover:bg-slate-600 transition cursor-pointer">
 																		<td class="px-3 py-1.5">{{ $productName }}</td>
 																		<td class="px-3 py-1.5 text-right font-medium">{{ $totalQty }} pcs</td>
 																	</tr>
@@ -1333,10 +1333,12 @@
 			if (row) {
 				// Remove selection from all rows
 				const allRows = salesTbody.querySelectorAll('tr.data-row');
-				allRows.forEach(r => r.classList.remove('selected-row'));
+				allRows.forEach(r => {
+					r.classList.remove('!bg-gray-600', 'border-l-4', 'border-amber-500');
+				});
 				
-				// Add selection to clicked row
-				row.classList.add('selected-row');
+				// Add selection to clicked row using Tailwind classes
+				row.classList.add('!bg-gray-600', 'border-l-4', 'border-amber-500');
 			}
 		});
 	}
@@ -1347,7 +1349,7 @@
 		exportDropdown.classList.add('hidden');
 		
 		// Check if a row is selected
-		const selectedRow = document.querySelector('tr.data-row.selected-row');
+		const selectedRow = document.querySelector('tr.data-row.border-amber-500');
 		
 		if (selectedRow) {
 			// Get order number from the selected row
