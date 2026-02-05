@@ -888,7 +888,7 @@
                     </div>
 
                     <!-- Enhanced Summary Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-300 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -917,33 +917,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-green-700 mb-1">Net Quantity</p>
-                                    <p id="netQuantity" class="text-3xl font-bold text-green-900">0</p>
-                                </div>
-                                <div class="bg-green-500 bg-opacity-20 rounded-full p-3">
-                                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-5 border border-orange-300 shadow-sm hover:shadow-md transition-shadow duration-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-orange-700 mb-1">Success Rate</p>
-                                    <p id="successRate" class="text-3xl font-bold text-orange-900">0%</p>
-                                </div>
-                                <div class="bg-orange-500 bg-opacity-20 rounded-full p-3">
-                                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Enhanced Reports Table -->
