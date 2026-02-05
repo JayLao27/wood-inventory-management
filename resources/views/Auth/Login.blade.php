@@ -115,7 +115,7 @@
 	<div class="absolute inset-0 wood-pattern pointer-events-none"></div>
 
 	<!-- Main Container -->
-	<div class="relative z-10 flex w-full max-w-7xl items-center justify-between px-6 py-10 gap-12">
+	<div class="relative z-10 flex w-full max-w-7xl items-center justify-between px-6 py-10 gap-12" style="transform: scale(0.8); transform-origin: center;">
 
 		<!-- Left Branding Section -->
 		<div class="flex-1 hidden lg:flex flex-col items-center justify-center animate-fade-in-up">
