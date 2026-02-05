@@ -121,9 +121,9 @@
 				</div>
 			</div>
 			<!-- Main Content Grid -->
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				<!-- Financial Transactions Section (Left - 2 columns) -->
-				<div class="lg:col-span-2">
+			<div class="grid grid-cols-1 gap-6">
+				<!-- Financial Transactions Section (Full Width) -->
+				<div class="w-full">
 					<div class="bg-slate-700 text-white p-6 rounded-xl">
 						<div class="mb-6">
 							<h2 class="text-xl font-semibold mb-1">Financial Transactions</h2>
@@ -157,9 +157,9 @@
 						</div>
 
 						<!-- Tabs -->
-						<div class="flex space-x-1 mb-6">
-							<button id="transactionTab" class="flex-1 px-4 py-2 rounded-lg bg-slate-600 text-white">Transaction</button>
-							<button id="reportsTab" class="flex-1 px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Reports</button>
+						<div class="flex space-x-2 w-full mb-6">
+							<button onclick="showAccountingTab('transaction')" id="transactionTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Transactions</button>
+							<button onclick="showAccountingTab('reports')" id="reportsTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Reports</button>
 						</div>
 
 						<!-- Transactions Table -->
@@ -229,46 +229,6 @@
 							</table>
 						</div>
 						
-					</div>
-				</div>
-
-				<!-- Expense Breakdown Section (Right - 1 column) -->
-				<div class="lg:col-span-1">
-					<div class="bg-slate-700 text-white p-6 rounded-xl">
-						<div class="flex items-center space-x-2 mb-6">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-							</svg>
-							<h2 class="text-xl font-semibold">Expense Breakdown</h2>
-						</div>
-
-						<div class="space-y-6">
-							<!-- Materials -->
-							<div>
-								<div class="flex justify-between items-center mb-2">
-									<span class="text-sm font-medium">Materials</span>
-									<span class="text-sm">₱{{ number_format($materialsExpense ?? 0, 2) }}</span>
-								</div>
-								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full" style="width: {{ min($materialsPercent ?? 0, 100) }}%"></div>
-								</div>
-								<p class="text-xs text-slate-400 mt-1">{{ $materialsPercent ?? 0 }}% of total expenses</p>
-							</div>
-
-							<!-- Labor -->
-							<div>
-								<div class="flex justify-between items-center mb-2">
-									<span class="text-sm font-medium">Labor</span>
-									<span class="text-sm">₱{{ number_format($laborExpense ?? 0, 2) }}</span>
-								</div>
-								<div class="w-full bg-slate-600 rounded-full h-3">
-									<div class="bg-red-700 h-3 rounded-full" style="width: {{ min($laborPercent ?? 0, 100) }}%"></div>
-								</div>
-								<p class="text-xs text-slate-400 mt-1">{{ $laborPercent ?? 0 }}% of total expenses</p>
-							</div>
-
-
-						</div>
 					</div>
 				</div>
 			</div>
@@ -581,6 +541,45 @@
 				row.classList.add('!bg-gray-600', 'border-l-4', 'border-amber-500');
 			}
 		});
+	}
+
+	// Tab switching functionality
+	function showAccountingTab(tab) {
+		const transactionTab = document.getElementById('transactionTab');
+		const reportsTab = document.getElementById('reportsTab');
+		const unknownTab = document.getElementById('unknownTab');
+		
+		if (tab === 'transaction') {
+			transactionTab.style.backgroundColor = '#FFF1DA';
+			transactionTab.style.color = '#111827';
+			transactionTab.style.borderColor = '#FDE68A';
+			reportsTab.style.backgroundColor = '#475569';
+			reportsTab.style.color = '#FFFFFF';
+			reportsTab.style.borderColor = '#64748b';
+			unknownTab.style.backgroundColor = '#475569';
+			unknownTab.style.color = '#FFFFFF';
+			unknownTab.style.borderColor = '#64748b';
+		} else if (tab === 'reports') {
+			reportsTab.style.backgroundColor = '#FFF1DA';
+			reportsTab.style.color = '#111827';
+			reportsTab.style.borderColor = '#FDE68A';
+			transactionTab.style.backgroundColor = '#475569';
+			transactionTab.style.color = '#FFFFFF';
+			transactionTab.style.borderColor = '#64748b';
+			unknownTab.style.backgroundColor = '#475569';
+			unknownTab.style.color = '#FFFFFF';
+			unknownTab.style.borderColor = '#64748b';
+		} else if (tab === 'unknown') {
+			unknownTab.style.backgroundColor = '#FFF1DA';
+			unknownTab.style.color = '#111827';
+			unknownTab.style.borderColor = '#FDE68A';
+			transactionTab.style.backgroundColor = '#475569';
+			transactionTab.style.color = '#FFFFFF';
+			transactionTab.style.borderColor = '#64748b';
+			reportsTab.style.backgroundColor = '#475569';
+			reportsTab.style.color = '#FFFFFF';
+			reportsTab.style.borderColor = '#64748b';
+		}
 	}
 
 	// Export Functions
