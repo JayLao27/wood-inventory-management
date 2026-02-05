@@ -2,9 +2,9 @@
 
 @section('main-content')
         <!-- Main Content -->
-        <div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
+        <div class="flex-1 p-5 bg-amber-50 overflow-y-auto">
             <!-- Header Section -->
-            <div class="mb-8">
+            <div class="mb-5">
                 @if(session('success'))
                     <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg">{{ session('success') }}</div>
                 @endif
@@ -13,68 +13,67 @@
                 @endif
                 <div class="flex justify-between items-start">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Production Management</h1>
+                        <h1 class="text-xl font-bold text-gray-900">Production Management</h1>
                         <p class="text-gray-600 mt-2">Plan, track, and manage furniture production workflow</p>
                     </div>
                 </div>
             </div>
 
             <!-- Status Overview Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
                 <!-- Pending Card -->
-                <div class="bg-slate-700 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-slate-300 text-sm">Pending</p>
-                            <p class="text-3xl font-bold mt-2">{{ $statusCounts['pending'] ?? 0 }}</p>
+                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Pending</p>
+                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">{{ $statusCounts['pending'] ?? 0 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Awaiting start</p>
                         </div>
-                        <div >
-                                @include('components.icons.time', ['class' => 'icon-time'])  
+                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                                @include('components.icons.time', ['class' => 'w-5 h-5 text-yellow-400'])  
                         </div>
                     </div>
                 </div>
 
                 <!-- In Progress Card -->
-                <div class="bg-slate-700 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-slate-300 text-sm">In Progress</p>
-                            <p class="text-3xl font-bold mt-2">{{ $statusCounts['in_progress'] ?? 0 }}</p>
+                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">In Progress</p>
+                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">{{ $statusCounts['in_progress'] ?? 0 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Currently working</p>
                         </div>
-                        <div>
-                            @include('components.icons.tool', ['class' => 'icon-time'])
-                           
-                    </div>
+                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                            @include('components.icons.tool', ['class' => 'w-5 h-5 text-blue-400'])
+                        </div>
                     </div>
                 </div>
 
 
                 <!-- Completed Card -->
-                <div class="bg-slate-700 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-slate-300 text-sm">Completed</p>
-                            <p class="text-3xl font-bold mt-2">{{ $statusCounts['completed'] ?? 0 }}</p>
+                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Completed</p>
+                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-green-300 to-green-100 bg-clip-text text-transparent">{{ $statusCounts['completed'] ?? 0 }}</p>
                             <p class="text-slate-400 text-xs mt-1">This month</p>
                         </div>
-                        <div >
-                            @include('components.icons.checkmark', ['class' => 'icon-time'])
+                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                            @include('components.icons.checkmark', ['class' => 'w-5 h-5 text-green-400'])
                         </div>
                     </div>
                 </div>
 
                 <!-- Overdue Card -->
-                <div class="bg-slate-700 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-slate-300 text-sm">Overdue</p>
-                            <p class="text-3xl font-bold mt-2">{{ $statusCounts['overdue'] ?? 0 }}</p>
+                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Overdue</p>
+                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">{{ $statusCounts['overdue'] ?? 0 }}</p>
                             <p class="text-slate-400 text-xs mt-1">Requires attention</p>
                         </div>
-                        <div >
-                           @include('components.icons.alert', ['class' => 'icon-alert'])
+                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                           @include('components.icons.alert', ['class' => 'w-5 h-5 text-red-400'])
                         </div>
                     </div>
                 </div>
@@ -82,15 +81,15 @@
 
             
             <!-- Production Workflow Section -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 shadow-xl border border-slate-600">
+            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 shadow-xl border border-slate-600">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-white">Production Workflow</h2>
-                        <p class="text-slate-300 text-sm font-medium mt-2">Manage your raw materials and finished products</p>
+                        <h2 class="text-xl font-bold text-white">Production Workflow</h2>
+                        <p class="text-slate-300 text-xs font-medium mt-2">Manage your raw materials and finished products</p>
                     </div>
                     <div class="flex space-x-3">
-                        <button onclick="openWorkOrderModal()" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <button onclick="openWorkOrderModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                             </svg>
                             <span>Work Orders</span>
@@ -143,47 +142,47 @@
                                     $statusColor = $statusColors[$workOrder->status] ?? 'bg-gray-500';
                                     $statusLabel = ucwords(str_replace('_', ' ', $workOrder->status));
                                 @endphp
-                                <span class="px-4 py-2 {{ $statusColor }} text-white text-sm font-bold rounded-xl shadow-lg">
+                                <span class="px-4 py-2 {{ $statusColor }} text-white text-xs font-bold rounded-xl shadow-lg">
                                     {{ $statusLabel }}
                                 </span>
                             </div>
                         </div>
                         <div class="grid grid-cols-3 gap-4 mt-4 text-base">
                             <div>
-                                <span class="text-slate-400 font-medium text-sm">Quantity</span>
+                                <span class="text-slate-400 font-medium text-xs">Quantity</span>
                                 <p class="text-white font-bold text-lg mt-1">{{ $workOrder->quantity }} pcs</p>
                             </div>
                             <div>
-                                <span class="text-slate-400 font-medium text-sm">Due Date</span>
+                                <span class="text-slate-400 font-medium text-xs">Due Date</span>
                                 <p class="text-white font-bold text-lg mt-1">{{ $workOrder->due_date->format('m/d/Y') }}</p>
                             </div>
                             <div class="flex items-center space-x-2 justify-end">
                                 <button onclick="event.stopPropagation(); viewWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="View">
-                                    <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                         <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                                     </svg>
                                 </button>
                                 <button onclick="event.stopPropagation(); editWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Edit">
-                                    <svg class="w-5 h-5 text-slate-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3.5 h-3.5 text-slate-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
                                     </svg>
                                 </button>
                                 @if($workOrder->status === 'pending')
                                 <button onclick="event.stopPropagation(); startWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Start">
-                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
                                     </svg>
                                 </button>
                                 @elseif($workOrder->status === 'in_progress')
                                 <button onclick="event.stopPropagation(); pauseWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Pause">
-                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                     </svg>
                                 </button>
                                 @endif
                                 <button onclick="event.stopPropagation(); completeWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Complete">
-                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
                                 </button>
@@ -204,15 +203,15 @@
 
         <!-- Add Work Order Modal -->
         <div id="workOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50" onclick="if(event.target === this) closeWorkOrderModal()">
-            <div class="modal-content bg-amber-50 rounded-2xl max-w-2xl w-[92%] shadow-2xl transform transition-all" onclick="event.stopPropagation()">
-                <div class="p-8">
+            <div class="modal-content bg-amber-50 rounded-xl max-w-2xl w-[92%] shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+                <div class="p-5">
                     <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300">
                         <div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Create Work Order</h3>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Create Work Order</h3>
                             <p class="text-gray-600 text-base">Select a sales order to assign to a team.</p>
                         </div>
                         <button onclick="closeWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
 
@@ -226,13 +225,13 @@
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <h3 class="font-semibold text-gray-800">{{ $salesOrder->order_number }} - {{ $salesOrder->customer->name }}</h3>
-                                        <p class="text-sm text-gray-600 mt-1">Items: 
+                                        <p class="text-xs text-gray-600 mt-1">Items: 
                                             @foreach($salesOrder->items as $item)
                                                 {{ $item->product->product_name ?? 'Product' }} ({{ $item->quantity }}), 
                                             @endforeach
                                         </p>
                                     </div>
-                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">{{ $salesOrder->items->count() }} items</span>
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">{{ $salesOrder->items->count() }} items</span>
                                 </div>
                                 <p class="text-xs text-gray-500 mt-2">Delivery: {{ \Carbon\Carbon::parse($salesOrder->delivery_date)->format('M d, Y') }}</p>
                             </div>
@@ -262,7 +261,7 @@
                             <!-- Order Summary -->
                             <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
                                 <h3 class="font-semibold text-gray-800 mb-3">Order Summary</h3>
-                                <div class="space-y-2 text-sm">
+                                <div class="space-y-2 text-xs">
                                     <div class="flex justify-between">
                                         <span class="text-gray-600">Order #:</span>
                                         <span id="summaryOrderNumber" class="font-semibold text-gray-800">-</span>
@@ -309,15 +308,15 @@
 
         <!-- Edit Work Order Modal -->
         <div id="editWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50" onclick="if(event.target === this) closeEditWorkOrderModal()">
-            <div class="modal-content bg-amber-50 rounded-2xl max-w-lg w-[92%] shadow-2xl transform transition-all" onclick="event.stopPropagation()">
-                <div class="p-8">
+            <div class="modal-content bg-amber-50 rounded-xl max-w-lg w-[92%] shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+                <div class="p-5">
                     <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300">
                         <div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Update Work Order</h3>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Update Work Order</h3>
                             <p class="text-gray-600 text-base">Update the status and completion details.</p>
                         </div>
                         <button onclick="closeEditWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
                         
@@ -358,51 +357,51 @@
 
             <!-- View Work Order Modal -->
             <div id="viewWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden overflow-y-auto flex items-center justify-center z-50" onclick="if(event.target === this) closeViewWorkOrderModal()">
-                <div class="modal-content bg-amber-50 rounded-2xl max-w-2xl w-[92%] my-8 shadow-2xl transform transition-all" onclick="event.stopPropagation()">
-                    <div class="p-8">
+                <div class="modal-content bg-amber-50 rounded-xl max-w-2xl w-[92%] my-8 shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+                    <div class="p-5">
                         <!-- Header -->
-                        <div class="flex items-center justify-between mb-8 border-b-2 pb-6" style="border-color: #374151;">
+                        <div class="flex items-center justify-between mb-5 border-b-2 pb-6" style="border-color: #374151;">
                             <div>
-                                <h3 class="text-3xl font-bold" style="color: #374151;">Work Order Details</h3>
+                                <h3 class="text-xl font-bold" style="color: #374151;">Work Order Details</h3>
                                 <p class="text-base mt-1" style="color: #666;">Summary and status for the selected work order.</p>
                             </div>
                             <button onclick="closeViewWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
 
                         <!-- Work Order Information Cards -->
-                        <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="grid grid-cols-2 gap-4 mb-5">
                             <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                                <p class="text-sm font-semibold" style="color: #374151;">Order #</p>
+                                <p class="text-xs font-semibold" style="color: #374151;">Order #</p>
                                 <p id="vw_orderNumber" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
                             </div>
                             <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                                <p class="text-sm font-semibold" style="color: #374151;">Product</p>
+                                <p class="text-xs font-semibold" style="color: #374151;">Product</p>
                                 <p id="vw_productName" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
                             </div>
                             <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #F57C00;">
-                                <p class="text-sm font-semibold" style="color: #E65100;">Quantity</p>
+                                <p class="text-xs font-semibold" style="color: #E65100;">Quantity</p>
                                 <p id="vw_quantity" class="text-lg font-bold mt-2" style="color: #E65100;">-</p>
                             </div>
                             <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #C2185B;">
-                                <p class="text-sm font-semibold" style="color: #880E4F;">Due Date</p>
+                                <p class="text-xs font-semibold" style="color: #880E4F;">Due Date</p>
                                 <p id="vw_dueDate" class="text-lg font-bold mt-2" style="color: #880E4F;">-</p>
                             </div>
                             <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                                <p class="text-sm font-semibold" style="color: #374151;">Assigned To</p>
+                                <p class="text-xs font-semibold" style="color: #374151;">Assigned To</p>
                                 <p id="vw_assignedTo" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
                             </div>
                             <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #0097A7;">
-                                <p class="text-sm font-semibold" style="color: #00838F;">Status</p>
+                                <p class="text-xs font-semibold" style="color: #00838F;">Status</p>
                                 <p id="vw_status" class="text-lg font-bold mt-2 px-2 py-1 rounded text-white text-center" style="background-color: #00838F;">-</p>
                             </div>
                         </div>
 
                         <!-- Notes Section -->
-                        <div class="mb-8 p-5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                            <p class="text-sm font-semibold mb-2" style="color: #374151;">Notes / Details</p>
-                            <p id="vw_notes" class="text-sm" style="color: #666;">-</p>
+                        <div class="mb-5 p-5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                            <p class="text-xs font-semibold mb-2" style="color: #374151;">Notes / Details</p>
+                            <p id="vw_notes" class="text-xs" style="color: #666;">-</p>
                         </div>
 
                         <!-- Close Button -->
@@ -731,3 +730,4 @@
             });
         </script>
 @endsection
+
