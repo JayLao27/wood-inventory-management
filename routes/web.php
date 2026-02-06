@@ -25,8 +25,12 @@ Route::get('/', function () {
     Route::get('/dashboard', [AccountingController::class, 'dashboard'])->name('dashboard');
 
     // Inventory    
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory')->middleware('role:admin,inventory_clerk,procurement_officer');
-    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store')->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::get('/inventory', [InventoryController::class, 'index'])
+    ->name('inventory')
+    ->middleware('role:admin,inventory_clerk,procurement_officer');
+    Route::post('/inventory', [InventoryController::class, 'store'])
+    ->name('inventory.store')
+    ->middleware('role:admin,inventory_clerk,procurement_officer');
     Route::get('/inventory/{id}/details', [InventoryController::class, 'getDetails'])->name('inventory.details')->middleware('role:admin,inventory_clerk,procurement_officer');
     Route::get('/inventory/{id}/edit-product', action: [InventoryController::class, 'editProduct'])->name('inventory.edit-product')->middleware('role:admin,inventory_clerk,procurement_officer');
     Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update')->middleware('role:admin,inventory_clerk,procurement_officer');
