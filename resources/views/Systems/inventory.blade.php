@@ -138,16 +138,14 @@
                 <!-- Search + Filters -->
                 @php
                     $inventoryCategories = collect($materials ?? [])->pluck('category')->filter()->unique()->values();
+                    $productCategories = collect($products ?? [])->pluck('category')->filter()->unique()->values();
                 @endphp
                 <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
                     <input type="search" id="searchInput" placeholder="Search items..." class="bg-white/95 backdrop-blur-sm w-full md:w-3/4 rounded-xl px-3.5 py-1.5.5 text-gray-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-lg">
                     <div class="flex gap-2">
                         <select id="categoryFilter" class="flex items-center space-x-2 px-3.5 py-1.5.5 bg-slate-600 text-white text-sm font-medium rounded-xl hover:bg-slate-500 transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
                             <option value="">All Categories</option>
-                            @foreach($inventoryCategories as $category)
-                                <option value="{{ $category }}">{{ $category }}</option>
-                            @endforeach
-                            <option value="Products">Products</option>
+                            <!-- Options populated dynamically based on active tab -->
                         </select>
                     </div>
                 </div>
@@ -158,115 +156,103 @@
                     <button onclick="showTab('products')" id="products-tab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Products</button>
                 </div>
 
-                <!-- Materials Table -->
-                <div id="materials-table" class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;">
-                    @forelse($materials ?? [] as $material)
-                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm" data-name="{{ $material->name }}" data-category="{{ $material->category }}">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-white text-lg">{{ $material->name }}</h3>
-                                <p class="text-sm text-slate-300 font-medium mt-1">{{ $material->supplier->name ?? 'N/A' }} • {{ $material->unit }}</p>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                @if($material->isLowStock())
-                                    <span class="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-xl shadow-lg">Low Stock</span>
-                                @else
-                                    <span class="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold rounded-xl shadow-lg">In Stock</span>
-                                @endif
-                                <span class="text-white font-bold text-lg">₱{{ number_format($material->unit_cost, 2) }}</span>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4 mt-2 text-sm">
-                            <div>
-                                <span class="text-slate-400 font-medium text-xs">Current Stock</span>
-                                <p class="text-white font-bold text-lg mt-1">{{ $material->current_stock }} {{ $material->unit }}</p>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 font-medium text-xs">Min Stock</span>
-                                <p class="text-white font-bold text-lg mt-1">{{ $material->minimum_stock }} {{ $material->unit }}</p>
-                            </div>
-                            <div class="flex items-center space-x-2 justify-end">
-                                <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all flex items-center space-x-2 group" title="View Items">
-                                    <svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="text-xs font-bold text-white">View</span>
-                                </button>
-                                <button onclick="event.stopPropagation(); openDeleteModal('material', {{ $material->id }}, '{{ addslashes($material->name) }}')" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
-                                    <svg class="w-5 h-5 text-red-400 group-hover:text-red-300" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="py-12 px-3 text-center">
-                        <svg class="w-16 h-16 text-slate-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-1.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                        </svg>
-                        <p class="text-slate-300 text-lg font-medium">No materials found</p>
-                        <p class="text-slate-400 text-xs mt-1.5">Add your first material to get started</p>
-                    </div>
-                    @endforelse
+                <!-- Materials Table (list view with columns) -->
+                <div id="materials-table" class="overflow-y-auto custom-scrollbar" style="max-height:60vh;">
+                    <table class="w-full border-collapse text-left text-sm text-white">
+                        <thead class="bg-slate-800 text-slate-300 sticky top-0">
+                            <tr>
+                                <th class="px-3 py-3 font-medium">Name</th>
+                                <th class="px-3 py-3 font-medium">Supplier</th>
+                                <th class="px-3 py-3 font-medium">Category</th>
+                                <th class="px-3 py-3 font-medium">Unit</th>
+                                <th class="px-3 py-3 font-medium">Current Stock</th>
+                                <th class="px-3 py-3 font-medium">Min Stock</th>
+                                <th class="px-3 py-3 font-medium">Unit Cost</th>
+                                <th class="px-3 py-3 font-medium">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materialsTbody" class="divide-y divide-slate-600">
+                            @forelse($materials ?? [] as $material)
+                                <tr class="data-row hover:bg-slate-600 transition cursor-pointer" data-name="{{ strtolower($material->name) }}" data-category="{{ $material->category }}">
+                                    <td class="px-3 py-3 text-slate-300 font-medium">{{ $material->name }}</td>
+                                    <td class="px-3 py-3 text-slate-300">{{ $material->supplier->name ?? 'N/A' }}</td>
+                                    <td class="px-3 py-3 text-slate-300">{{ $material->category }}</td>
+                                    <td class="px-3 py-3 text-slate-300">{{ $material->unit }}</td>
+                                    <td class="px-3 py-3 text-white font-bold">{{ $material->current_stock }} {{ $material->unit }}</td>
+                                    <td class="px-3 py-3 text-white font-bold">{{ $material->minimum_stock }} {{ $material->unit }}</td>
+                                    <td class="px-3 py-3 text-white font-bold">₱{{ number_format($material->unit_cost, 2) }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group" title="View Items">
+                                                <svg class="w-4 h-4 text-blue-400 group-hover:text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
+                                            <button onclick="event.stopPropagation(); openDeleteModal('material', {{ $material->id }}, '{{ addslashes($material->name) }}')" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
+                                                <svg class="w-4 h-4 text-red-400 group-hover:text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="8" class="py-12 px-3 text-center text-slate-300">No materials found — add your first material to get started</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
 
-                <!-- Products Table -->
-                <div id="products-table" class="space-y-3 overflow-y-auto custom-scrollbar hidden" style="max-height:60vh;">
-                    @forelse($products ?? [] as $product)
-                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm" data-name="{{ $product->product_name }}" data-category="Products">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-white text-lg">{{ $product->product_name }}</h3>
-                                <p class="text-sm text-slate-300 font-medium mt-1">Finished Product</p>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-white font-bold text-lg">₱{{ number_format($product->selling_price, 2) }}</span>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 mt-2 text-sm">
-                            <div>
-                                <span class="text-slate-400 font-medium text-xs">Production Cost</span>
-                                <p class="text-white font-bold text-lg mt-1">₱{{ number_format($product->production_cost, 2) }}</p>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 font-medium text-xs">Selling Price</span>
-                                <p class="text-white font-bold text-lg mt-1">₱{{ number_format($product->selling_price, 2) }}</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-2 mt-2 justify-end">
-                            <button onclick="event.stopPropagation(); openStockModal('product', {{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group flex items-center space-x-1" title="View Materials & Details">
-                                <svg class="w-5 h-5 text-blue-400 group-hover:text-blue-300" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                </svg>
-                                @if($product->materials->count() > 0)
-                                <span class="text-xs font-bold text-blue-400">{{ $product->materials->count() }}</span>
-                                @endif
-                            </button>
-                            <button onclick="event.stopPropagation(); openEditProductModal({{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group" title="Edit">
-                                <svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button onclick="event.stopPropagation(); openDeleteModal('product', {{ $product->id }}, '{{ addslashes($product->product_name) }}')" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
-                                <svg class="w-5 h-5 text-red-400 group-hover:text-red-300" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="py-12 px-3 text-center">
-                        <svg class="w-16 h-16 text-slate-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                        <p class="text-slate-300 text-lg font-medium">No products found</p>
-                        <p class="text-slate-400 text-xs mt-1.5">Add your first product to get started</p>
-                    </div>
-                    @endforelse
+                <!-- Products Table (table view) -->
+                <div id="products-table" class="overflow-y-auto custom-scrollbar hidden" style="max-height:60vh;">
+                    <table class="w-full border-collapse text-left text-sm text-white">
+                        <thead class="bg-slate-800 text-slate-300 sticky top-0">
+                            <tr>
+                                <th class="px-3 py-3 font-medium">Product</th>
+                                <th class="px-3 py-3 font-medium">Category</th>
+                                <th class="px-3 py-3 font-medium">Unit</th>
+                                <th class="px-3 py-3 font-medium">Production Cost</th>
+                                <th class="px-3 py-3 font-medium">Selling Price</th>
+                                <th class="px-3 py-3 font-medium">Materials</th>
+                                <th class="px-3 py-3 font-medium">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTbody" class="divide-y divide-slate-600">
+                            @forelse($products ?? [] as $product)
+                                <tr class="data-row hover:bg-slate-600 transition cursor-pointer" data-name="{{ strtolower($product->product_name) }}" data-category="Products">
+                                    <td class="px-3 py-3 text-slate-300 font-medium">{{ $product->product_name }}</td>
+                                    <td class="px-3 py-3 text-slate-300">{{ $product->category }}</td>
+                                    <td class="px-3 py-3 text-slate-300">{{ $product->unit ?? 'pcs' }}</td>
+                                    <td class="px-3 py-3 text-white font-bold">₱{{ number_format($product->production_cost, 2) }}</td>
+                                    <td class="px-3 py-3 text-white font-bold">₱{{ number_format($product->selling_price, 2) }}</td>
+                                    <td class="px-3 py-3 text-slate-300">{{ $product->materials->count() }}</td>
+                                    <td class="px-3 py-3">
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="event.stopPropagation(); openStockModal('product', {{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group" title="View Materials & Details">
+                                                <svg class="w-4 h-4 text-blue-400 group-hover:text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
+                                            <button onclick="event.stopPropagation(); openEditProductModal({{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group" title="Edit">
+                                                <svg class="w-4 h-4 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </button>
+                                            <button onclick="event.stopPropagation(); openDeleteModal('product', {{ $product->id }}, '{{ addslashes($product->product_name) }}')" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
+                                                <svg class="w-4 h-4 text-red-400 group-hover:text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="py-12 px-3 text-center text-slate-300">No products found — add your first product to get started</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -859,7 +845,7 @@
                 const categoryFilter = document.getElementById('categoryFilter');
                 
                 if (searchInput) {
-                    searchInput.addEventListener('keyup', applyInventoryFilters);
+                    searchInput.addEventListener('input', applyInventoryFilters);
                     searchInput.addEventListener('change', applyInventoryFilters);
                 }
                 
@@ -867,6 +853,24 @@
                     categoryFilter.addEventListener('change', applyInventoryFilters);
                 }
             });
+
+            // Category lists populated from server-side collections
+            const materialCategories = @json($inventoryCategories->values());
+            const productCategories = @json($productCategories->values());
+
+            function updateCategoryOptions(tab) {
+                const sel = document.getElementById('categoryFilter');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">All Categories</option>';
+                const list = (tab === 'products') ? productCategories : materialCategories;
+                list.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.textContent = cat;
+                    sel.appendChild(opt);
+                });
+                sel.dispatchEvent(new Event('change'));
+            }
 
             // Tab functionality
             function showTab(tab) {
@@ -901,6 +905,9 @@
                     productsButton.classList.remove('hidden');
                 }
 
+                // Update category options for the active tab
+                updateCategoryOptions(tab);
+
                 // Save active tab to localStorage
                 localStorage.setItem('activeInventoryTab', tab);
                 applyInventoryFilters();
@@ -913,29 +920,53 @@
             });
 
             function applyInventoryFilters() {
-                const searchValue = (document.getElementById('searchInput')?.value || '').toLowerCase();
+                const searchValue = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
                 const categoryValue = document.getElementById('categoryFilter')?.value || '';
 
                 const materialsTable = document.getElementById('materials-table');
                 const productsTable = document.getElementById('products-table');
 
-                const cards = [];
-                if (materialsTable && !materialsTable.classList.contains('hidden')) {
-                    cards.push(...materialsTable.querySelectorAll('[data-name]'));
-                }
-                if (productsTable && !productsTable.classList.contains('hidden')) {
-                    cards.push(...productsTable.querySelectorAll('[data-name]'));
-                }
+                // Helper to test a row/card element
+                function testElement(el) {
+                    const name = (el.getAttribute('data-name') || '').toLowerCase();
+                    const category = (el.getAttribute('data-category') || '').toString();
+                    const text = (el.textContent || '').toLowerCase();
 
-                cards.forEach(card => {
-                    const name = (card.getAttribute('data-name') || '').toLowerCase();
-                    const category = card.getAttribute('data-category') || '';
-
-                    const matchesSearch = !searchValue || name.includes(searchValue);
+                    const matchesSearch = !searchValue || name.includes(searchValue) || text.includes(searchValue);
                     const matchesCategory = !categoryValue || category === categoryValue;
 
-                    card.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
-                });
+                    el.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
+                }
+
+                // Materials (table rows or legacy cards)
+                if (materialsTable && !materialsTable.classList.contains('hidden')) {
+                    // prefer table rows
+                    const tbody = materialsTable.querySelector('tbody');
+                    if (tbody) {
+                        tbody.querySelectorAll('tr').forEach(row => testElement(row));
+                    } else {
+                        materialsTable.querySelectorAll('[data-name]').forEach(el => testElement(el));
+                    }
+                }
+
+                // Products (table rows or legacy cards)
+                if (productsTable && !productsTable.classList.contains('hidden')) {
+                    const tbody = productsTable.querySelector('tbody');
+                    if (tbody) {
+                        tbody.querySelectorAll('tr').forEach(row => testElement(row));
+                    } else {
+                        productsTable.querySelectorAll('[data-name]').forEach(el => testElement(el));
+                    }
+                }
+            }
+
+            // Helper to select category from pills
+            function selectCategory(category) {
+                const sel = document.getElementById('categoryFilter');
+                if (!sel) return;
+                sel.value = category;
+                // trigger change listeners
+                applyInventoryFilters();
             }
 
             // Modal functions
