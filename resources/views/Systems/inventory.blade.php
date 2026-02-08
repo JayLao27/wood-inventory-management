@@ -193,7 +193,7 @@
                                     </svg>
                                     <span class="text-xs font-bold text-white">View</span>
                                 </button>
-                                <button onclick="event.stopPropagation(); deleteItem('material', {{ $material->id }})" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
+                                <button onclick="event.stopPropagation(); openDeleteModal('material', {{ $material->id }}, '{{ addslashes($material->name) }}')" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
                                     <svg class="w-5 h-5 text-red-400 group-hover:text-red-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                     </svg>
@@ -251,7 +251,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </button>
-                            <button onclick="event.stopPropagation(); deleteItem('product', {{ $product->id }})" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
+                            <button onclick="event.stopPropagation(); openDeleteModal('product', {{ $product->id }}, '{{ addslashes($product->product_name) }}')" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
                                 <svg class="w-5 h-5 text-red-400 group-hover:text-red-300" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                 </svg>
@@ -753,6 +753,105 @@
             </div>
         </div>
 
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteConfirmationModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+            <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl overflow-hidden border-2 border-red-200">
+                <!-- Header with Destructive Theme -->
+                <div class="bg-gradient-to-r from-red-50 to-red-100 px-6 py-4 border-b-2 border-red-200">
+                    <div class="flex items-center space-x-3">
+                        <!-- Warning Triangle Icon -->
+                        <svg class="w-7 h-7 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <h3 id="deleteItemTitle" class="text-lg font-bold text-red-900">Delete Item?</h3>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="px-6 py-5">
+                    <!-- Impact Explanation -->
+                    <div class="mb-4">
+                        <p class="text-gray-700 text-sm font-medium mb-3">
+                            You are about to delete:
+                        </p>
+                        <div class="bg-red-50 border-l-4 border-red-600 px-4 py-2 rounded">
+                            <p id="deleteItemName" class="text-red-900 font-bold text-sm">Item Name</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Messages -->
+                    <div class="space-y-2 mb-5 text-xs text-gray-600">
+                        <div class="flex items-start space-x-2">
+                            <span class="text-red-600 font-bold mt-0.5">•</span>
+                            <span><strong>This action cannot be undone.</strong></span>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <span class="text-red-600 font-bold mt-0.5">•</span>
+                            <span>All associated data will be permanently removed from the system.</span>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Text Input -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-700 mb-2">
+                            Type <span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-red-600">DELETE</span> to confirm:
+                        </label>
+                        <input 
+                            type="text" 
+                            id="deleteConfirmationInput" 
+                            placeholder="Type DELETE" 
+                            class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm font-medium"
+                        />
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 px-6 py-4 bg-gray-50 border-t border-gray-200">
+                    <!-- Cancel Button (Left/Secondary) -->
+                    <button 
+                        onclick="closeDeleteModal()" 
+                        class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-bold text-sm hover:bg-gray-100 hover:border-gray-400 transition-all"
+                    >
+                        Cancel
+                    </button>
+                    <!-- Delete Button (Right/Primary - Destructive) -->
+                    <button 
+                        id="deleteConfirmButton"
+                        onclick="confirmDelete()" 
+                        disabled
+                        class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold text-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+                    >
+                        Delete Permanently
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generic Confirmation Modal (reused for add/update/remove actions) -->
+        <div id="genericConfirmModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex">
+            <div class="flex items-center justify-center min-h-screen p-3 w-full">
+                <div id="genericConfirmContainer" class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
+                    <div id="genericConfirmHeader" class="sticky top-0 bg-gradient-to-r from-red-600 to-red-700 p-3 text-white rounded-t-xl z-10">
+                        <div class="flex items-center justify-between">
+                            <h3 id="genericConfirmTitle" class="text-lg font-bold">Confirm</h3>
+                            <button onclick="closeGenericConfirm()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p id="genericConfirmMessage" class="text-slate-700 mb-6">Are you sure?</p>
+                        <div class="flex gap-3">
+                            <button onclick="closeGenericConfirm()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">Cancel</button>
+                            <button id="genericConfirmButton" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold shadow-lg hover:shadow-xl">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             // Initialize search and filter listeners on page load
             document.addEventListener('DOMContentLoaded', function() {
@@ -896,7 +995,9 @@
             function removeMaterialRow(rowId) {
                 const row = document.getElementById(rowId);
                 if (row) {
-                    row.remove();
+                    openGenericConfirm('Remove Material', 'Remove this material from the product?', function() {
+                        row.remove();
+                    });
                 }
             }
 
@@ -971,7 +1072,9 @@
             function removeEditMaterialRow(rowId) {
                 const row = document.getElementById(rowId);
                 if (row) {
-                    row.remove();
+                    openGenericConfirm('Remove Material', 'Remove this material from the product?', function() {
+                        row.remove();
+                    });
                 }
             }
 
@@ -1094,28 +1197,62 @@
                 document.getElementById('stockModal').classList.add('hidden');
             }
 
-            function deleteItem(type, id) {
-                if (confirm('Are you sure you want to delete this item?')) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/inventory/${id}/${type}`;
-                    
-                    const methodInput = document.createElement('input');
-                    methodInput.type = 'hidden';
-                    methodInput.name = '_method';
-                    methodInput.value = 'DELETE';
-                    
-                    const tokenInput = document.createElement('input');
-                    tokenInput.type = 'hidden';
-                    tokenInput.name = '_token';
-                    tokenInput.value = '{{ csrf_token() }}';
-                    
-                    form.appendChild(methodInput);
-                    form.appendChild(tokenInput);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+            let deleteConfirmState = {
+                type: null,
+                id: null,
+                name: null
+            };
+
+            function openDeleteModal(type, id, name) {
+                deleteConfirmState = { type, id, name };
+                document.getElementById('deleteConfirmationModal').classList.remove('hidden');
+                document.getElementById('deleteConfirmationInput').value = '';
+                document.getElementById('deleteConfirmButton').disabled = true;
+                
+                // Update modal header with specific item name
+                const itemLabel = type === 'material' ? 'Material' : 'Product';
+                document.getElementById('deleteItemTitle').textContent = `Delete ${itemLabel}: "${name}"?`;
+                document.getElementById('deleteItemName').textContent = name;
             }
+
+            function closeDeleteModal() {
+                document.getElementById('deleteConfirmationModal').classList.add('hidden');
+                deleteConfirmState = { type: null, id: null, name: null };
+                document.getElementById('deleteConfirmationInput').value = '';
+                document.getElementById('deleteConfirmButton').disabled = true;
+            }
+
+            function confirmDelete() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/inventory/${deleteConfirmState.id}/${deleteConfirmState.type}`;
+                
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+                
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '_token';
+                tokenInput.value = '{{ csrf_token() }}';
+                
+                form.appendChild(methodInput);
+                form.appendChild(tokenInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Update delete button state based on input
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteInput = document.getElementById('deleteConfirmationInput');
+                const deleteButton = document.getElementById('deleteConfirmButton');
+                if (deleteInput) {
+                    deleteInput.addEventListener('input', function() {
+                        deleteButton.disabled = this.value.trim() !== 'DELETE';
+                    });
+                }
+            });
 
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('fixed')) {
@@ -1134,6 +1271,85 @@
                 }
                 if (categoryFilter) {
                     categoryFilter.addEventListener('change', applyInventoryFilters);
+                }
+            });
+
+            // Generic confirmation modal handlers (replace confirm() with modal)
+            // Modal HTML (will be inserted near script end if not present)
+            function openGenericConfirm(title, message, onConfirm, variant = 'danger') {
+                // ensure modal exists
+                const modal = document.getElementById('genericConfirmModal');
+                if (!modal) return onConfirm();
+
+                document.getElementById('genericConfirmTitle').textContent = title || 'Confirm';
+                document.getElementById('genericConfirmMessage').textContent = message || '';
+                const confirmBtn = document.getElementById('genericConfirmButton');
+                const header = document.getElementById('genericConfirmHeader');
+                const container = document.getElementById('genericConfirmContainer');
+
+                // clear previous handlers
+                confirmBtn.onclick = null;
+                confirmBtn.onclick = function() {
+                    closeGenericConfirm();
+                    if (typeof onConfirm === 'function') onConfirm();
+                };
+
+                // set variant classes: 'danger' -> red (default), 'positive' -> green
+                const baseClasses = 'flex-1 px-4 py-3 rounded-xl transition-all font-bold shadow-lg hover:shadow-xl';
+                if (variant === 'positive') {
+                    confirmBtn.className = baseClasses + ' bg-green-600 text-white hover:bg-green-700';
+                    if (header) header.className = 'sticky top-0 bg-gradient-to-r from-green-600 to-green-700 p-3 text-white rounded-t-xl z-10';
+                    if (container) {
+                        container.className = 'bg-green-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-green-700';
+                    }
+                } else {
+                    confirmBtn.className = baseClasses + ' bg-red-600 text-white hover:bg-red-700';
+                    if (header) header.className = 'sticky top-0 bg-gradient-to-r from-red-600 to-red-700 p-3 text-white rounded-t-xl z-10';
+                    if (container) {
+                        container.className = 'bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700';
+                    }
+                }
+
+                modal.classList.remove('hidden');
+            }
+
+            function closeGenericConfirm() {
+                const modal = document.getElementById('genericConfirmModal');
+                if (!modal) return;
+                modal.classList.add('hidden');
+            }
+
+            // Attach form submit interceptors that open the modal
+            document.addEventListener('DOMContentLoaded', function() {
+                const addForm = document.getElementById('addProductForm');
+                if (addForm) {
+                    addForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        openGenericConfirm('Add Product', 'Are you sure you want to add this product with the listed materials?', function() {
+                            addForm.submit();
+                        }, 'positive');
+                    });
+                }
+
+                // Add Item (material) form confirmation
+                const addItemForm = document.getElementById('addItemForm');
+                if (addItemForm) {
+                    addItemForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        openGenericConfirm('Add Material', 'Are you sure you want to add this material?', function() {
+                            addItemForm.submit();
+                        }, 'positive');
+                    });
+                }
+
+                const editForm = document.getElementById('editProductForm');
+                if (editForm) {
+                    editForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        openGenericConfirm('Update Product', 'Are you sure you want to update this product and its materials?', function() {
+                            editForm.submit();
+                        }, 'positive');
+                    });
                 }
             });
 
