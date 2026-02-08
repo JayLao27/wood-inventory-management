@@ -95,7 +95,7 @@
 		}
 	</style>
 </head>
-<body class="bg-gradient-to-br from-[#FFF1DA] via-[#FFE4B5] to-[#FFDAB9] min-h-screen flex items-center justify-center relative overflow-hidden">
+<body class="bg-gradient-to-br from-[#FFF1DA] via-[#FFE4B5] to-[#FFDAB9] min-h-screen flex items-center justify-center relative overflow-auto">
 
 	<!-- Animated Background Particles -->
 	<div class="absolute inset-0 overflow-hidden pointer-events-none">
