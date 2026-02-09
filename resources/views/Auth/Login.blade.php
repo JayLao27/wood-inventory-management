@@ -236,7 +236,7 @@
 
 					<!-- Submit Button -->
 					<button type="submit"
-						class="w-full bg-gradient-to-r from-[#D2691E] to-[#CD853F] text-white py-3.5 rounded-xl font-semibold text-base
+						class="w-full bg-gradient-to-r from-[#cd9e7c] to-[#21b500] text-white py-3.5 rounded-xl font-semibold text-base
 							hover:from-[#A0522D] hover:to-[#8B4513] 
 							active:scale-[0.98]
 							transition-all duration-200 
