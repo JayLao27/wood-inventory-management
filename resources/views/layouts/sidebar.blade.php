@@ -202,7 +202,7 @@
                 @csrf
                 <button type="submit" 
                         onclick="event.preventDefault(); this.closest('form').submit();" 
-                        class="w-full px-4 py-3 bg-gradient-to-r from-[#923b3b] to-[#5e3030] hover:from-[#5a2e2e] hover:to-[#743838]     text-white rounded-xl transition-all duration-200 font-medium shadow-lg flex items-center group"
+                        class="w-full px-4 py-3 bg-gradient-to-r from-[#ff1818] to-[#4a0707] hover:from-[#5a2e2e] hover:to-[#743838]     text-white rounded-xl transition-all duration-200 font-medium shadow-lg flex items-center group"
                         :class="sidebarOpen ? 'justify-start space-x-3' : 'justify-center'">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
