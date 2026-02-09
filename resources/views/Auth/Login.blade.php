@@ -161,7 +161,7 @@
 			<div class="glass-effect p-8 rounded-3xl shadow-2xl">
 				<!-- Header -->
 				<div class="flex flex-col items-center mb-8">
-					<div class="w-20 h-20 bg-gradient-to-br from-[#D2691E] to-[#8B4513] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+					<div class="w-20 h-20 bg-gradient-to-br from-[#a87958] to-[#9f9690] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
 						<img src="/images/logo.png" alt="RM Wood Works" class="w-14 h-14 object-contain">
 					</div>
 					<h1 class="text-3xl font-bold text-[#5D2E0F] mb-1">RM Wood Works</h1>
