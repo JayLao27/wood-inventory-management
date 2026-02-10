@@ -202,7 +202,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-1">Create Work Order</h3>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-xl font-bold text-gray-800 mb-1">Create Work Order</h3>
+                                @if($pendingItemsCount > 0)
+                                <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                                    {{ $pendingItemsCount }}
+                                </span>
+                                @endif
+                            </div>
                             <p class="text-gray-600 text-sm mt-0.5">Select a sales order and assign to a production team</p>
                         </div>
                     </div>
@@ -525,13 +532,9 @@
                                 <p class="text-xs font-semibold" style="color: #374151;">Assigned To</p>
                                 <p id="vw_assignedTo" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
                             </div>
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #0097A7;">
-                                <p class="text-xs font-semibold" style="color: #00838F;">Status</p>
-                                <p id="vw_status" class="text-lg font-bold mt-2 px-2 py-1 rounded text-white text-center" style="background-color: #00838F;">-</p>
-                                                        <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #C62828;">
-                                                            <p class="text-xs font-semibold" style="color: #B71C1C;">Pending Items</p>
-                                                            <p id="vw_pendingItems" class="text-lg font-bold mt-2" style="color: #B71C1C;">-</p>
-                                                        </div>
+                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #C62828;">
+                                <p class="text-xs font-semibold" style="color: #B71C1C;">Pending Items</p>
+                                <p id="vw_pendingItems" class="text-lg font-bold mt-2" style="color: #B71C1C;">-</p>
                             </div>
                         </div>
 
@@ -913,7 +916,6 @@
                 document.getElementById('vw_startingDate').textContent = wo.starting_date ? new Date(wo.starting_date).toLocaleDateString() : (wo.startingDate ? new Date(wo.startingDate).toLocaleDateString() : 'Not started');
                 document.getElementById('vw_dueDate').textContent = wo.due_date ? new Date(wo.due_date).toLocaleDateString() : (wo.dueDate || '-');
                 document.getElementById('vw_assignedTo').textContent = wo.assigned_to || wo.assignedTo || '-';
-                document.getElementById('vw_status').textContent = wo.status ? String(wo.status).replace('_', ' ') : '-';
                 document.getElementById('vw_notes').value = wo.notes || wo.details || '';
                 document.getElementById('notesForm').action = `/production/${wo.id}`;
                 
