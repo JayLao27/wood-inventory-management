@@ -407,57 +407,65 @@ class ProcurementController extends Controller
             'message' => 'Stock received and inventory updated successfully.',
         ]);
     }
-
     public function receivedStockReports(Request $request)
     {
-        $query = InventoryMovement::where('movement_type', 'in')
-            ->where('item_type', 'material')
-            ->where('reference_type', 'purchase_order');
+        try {
+            $query = InventoryMovement::where('movement_type', 'in')
+                ->where('item_type', 'material')
+                ->where('reference_type', 'purchase_order');
 
-        // Apply date filters
-        if ($request->has('date_from') && $request->date_from) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-
-        if ($request->has('date_to') && $request->date_to) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-
-        // Apply material filter
-        if ($request->has('material') && $request->material) {
-            $query->whereHas('item', function ($q) use ($request) {
-                $q->where('name', $request->material);
-            });
-        }
-
-        $movements = $query->orderBy('created_at', 'desc')->get();
-
-        // Format the data for the frontend
-        $formattedMovements = $movements->map(function ($movement) {
-            $material = Material::find($movement->item_id);
-            $purchaseOrder = PurchaseOrder::find($movement->reference_id);
-            
-            // Get defect quantity from notes if stored there
-            $defectQty = 0;
-            if ($movement->notes && preg_match('/Defect quantity: ([\d.]+)/', $movement->notes, $matches)) {
-                $defectQty = (float) $matches[1];
+            // Apply date filters
+            if ($request->has('date_from') && $request->date_from) {
+                $query->whereDate('created_at', '>=', $request->date_from);
             }
 
-            return [
-                'date' => $movement->created_at->format('Y-m-d H:i'),
-                'po_number' => $purchaseOrder ? ($purchaseOrder->order_number ?? 'PO-' . str_pad($purchaseOrder->id, 6, '0', STR_PAD_LEFT)) : 'N/A',
-                'material_name' => $material ? $material->name : 'Unknown',
-                'quantity' => $movement->quantity,
-                'defect_quantity' => $defectQty,
-                'supplier_name' => $purchaseOrder && $purchaseOrder->supplier ? $purchaseOrder->supplier->name : 'N/A',
-                'status' => $movement->status,
-                'notes' => $movement->notes,
-            ];
-        });
+            if ($request->has('date_to') && $request->date_to) {
+                $query->whereDate('created_at', '<=', $request->date_to);
+            }
 
-        return response()->json([
-            'success' => true,
-            'movements' => $formattedMovements,
-        ]);
+            // Apply material filter
+            if ($request->has('material') && $request->material) {
+                $query->whereHas('item', function ($q) use ($request) {
+                    $q->where('name', $request->material);
+                });
+            }
+
+            $movements = $query->orderBy('created_at', 'desc')->get();
+
+            // Format the data for the frontend
+            $formattedMovements = $movements->map(function ($movement) {
+                $material = Material::find($movement->item_id);
+                $purchaseOrder = PurchaseOrder::find($movement->reference_id);
+                
+                // Get defect quantity from notes if stored there
+                $defectQty = 0;
+                if ($movement->notes && preg_match('/Defect Qty: ([\d.]+)/', $movement->notes, $matches)) {
+                    $defectQty = (float) $matches[1];
+                }
+
+                return [
+                    'date' => $movement->created_at->format('Y-m-d H:i'),
+                    'po_number' => $purchaseOrder ? ($purchaseOrder->order_number ?? 'PO-' . str_pad($purchaseOrder->id, 6, '0', STR_PAD_LEFT)) : 'N/A',
+                    'material_name' => $material ? $material->name : 'Unknown',
+                    'quantity' => $movement->quantity,
+                    'defect_quantity' => $defectQty,
+                    'supplier_name' => $purchaseOrder && $purchaseOrder->supplier ? $purchaseOrder->supplier->name : 'N/A',
+                    'status' => $movement->status,
+                    'notes' => $movement->notes,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'movements' => $formattedMovements,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Received stock reports error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading reports: ' . $e->getMessage(),
+                'movements' => [],
+            ], 500);
+        }
     }
 }
