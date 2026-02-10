@@ -44,7 +44,14 @@ class ProductionController extends Controller
             })
             ->values();
 
-        return view('Systems.production', compact('workOrders', 'statusCounts', 'pendingSalesOrders'));
+        $pendingItemsCount = (int) $pendingSalesOrders->sum(function (SalesOrder $order) {
+            return $order->items->count();
+        });
+
+        // Use pending sales order items count for the Pending status card.
+        $statusCounts['pending'] = $pendingItemsCount;
+
+        return view('Systems.production', compact('workOrders', 'statusCounts', 'pendingSalesOrders', 'pendingItemsCount'));
     }
 
     public function store(Request $request)
@@ -110,7 +117,7 @@ class ProductionController extends Controller
             'due_date' => $validated['due_date'],
             'assigned_to' => $validated['assigned_to'],
             'priority' => $validated['priority'] ?? 'medium',
-            'status' => 'pending',
+            'status' => 'in_progress',
         ]);
 
         // Stock out: create inventory movements (out) and deduct material stock
