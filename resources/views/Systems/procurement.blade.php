@@ -762,7 +762,7 @@
     <!-- Improved Received Stock Reports Modal -->
     <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 backdrop-blur-sm transition-opacity duration-300">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-amber-50 rounded-2xl max-w-7xl w-full max-h-[95vh] shadow-2xl transform transition-all duration-300 scale-95 opacity-0 modal-content overflow-y-auto border-2 border-slate-700">
+            <div class="bg-amber-50 rounded-2xl w-full max-h-[95vh] shadow-2xl transform transition-all duration-300 scale-95 opacity-0 modal-content overflow-y-auto border-2 border-slate-700">
                 
                 <!-- Header -->
                 <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white px-8 py-6 rounded-t-2xl sticky top-0 z-10">
@@ -902,6 +902,7 @@
                                 </div>
                             </div>
                         </div>
+                        
 
                         <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-5 border border-red-200 shadow-sm hover:shadow-md transition-shadow duration-200">
                             <div class="flex items-center justify-between">
@@ -916,12 +917,9 @@
                                 </div>
                             </div>
                         </div>
-
-
-                    </div>
-
+ </div>
                     <!-- Enhanced Reports Table -->
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden w-100%">
                         <div class="overflow-x-auto">
                             <table class="w-full">
                                 <thead>
@@ -1295,10 +1293,12 @@
                         `;
                     }).join('');
 
-                    // Update summary
-                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
-                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
-                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
+                    // Update summary - with null checks
+                    const totalReceivedEl = document.getElementById('totalReceived');
+                    const totalDefectsEl = document.getElementById('totalDefects');
+                    
+                    if (totalReceivedEl) totalReceivedEl.textContent = totalReceived.toFixed(2);
+                    if (totalDefectsEl) totalDefectsEl.textContent = totalDefects.toFixed(2);
 
                     // Populate material filter
                     const materialSelect = document.getElementById('filterMaterial');
@@ -1307,9 +1307,10 @@
                         uniqueMaterials.map(material => `<option value="${material}">${material}</option>`).join('');
                 } else {
                     tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No received stock records found</td></tr>';
-                    document.getElementById('totalReceived').textContent = '0';
-                    document.getElementById('totalDefects').textContent = '0';
-                    document.getElementById('netQuantity').textContent = '0';
+                    const totalReceivedEl = document.getElementById('totalReceived');
+                    const totalDefectsEl = document.getElementById('totalDefects');
+                    if (totalReceivedEl) totalReceivedEl.textContent = '0';
+                    if (totalDefectsEl) totalDefectsEl.textContent = '0';
                 }
             } catch (error) {
                 console.error('Error loading received stock reports:', error);
@@ -1363,15 +1364,18 @@
                         `;
                     }).join('');
 
-                    // Update summary
-                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
-                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
-                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
+                    // Update summary - with null checks
+                    const totalReceivedEl = document.getElementById('totalReceived');
+                    const totalDefectsEl = document.getElementById('totalDefects');
+                    
+                    if (totalReceivedEl) totalReceivedEl.textContent = totalReceived.toFixed(2);
+                    if (totalDefectsEl) totalDefectsEl.textContent = totalDefects.toFixed(2);
                 } else {
                     tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No records found matching the filters</td></tr>';
-                    document.getElementById('totalReceived').textContent = '0';
-                    document.getElementById('totalDefects').textContent = '0';
-                    document.getElementById('netQuantity').textContent = '0';
+                    const totalReceivedEl = document.getElementById('totalReceived');
+                    const totalDefectsEl = document.getElementById('totalDefects');
+                    if (totalReceivedEl) totalReceivedEl.textContent = '0';
+                    if (totalDefectsEl) totalDefectsEl.textContent = '0';
                 }
             } catch (error) {
                 console.error('Error filtering received stock:', error);
@@ -1530,138 +1534,6 @@
                 form.appendChild(csrfToken);
                 form.appendChild(methodField);
                 document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        // Received Stock Reports Modal Functions
-        function openReceivedStockReportsModal() {
-            document.getElementById('receivedStockReportsModal').classList.remove('hidden');
-            loadReceivedStockReports();
-        }
-
-        function closeReceivedStockReportsModal() {
-            document.getElementById('receivedStockReportsModal').classList.add('hidden');
-        }
-
-        async function loadReceivedStockReports() {
-            const tbody = document.getElementById('receivedStockTableBody');
-            tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
-
-            try {
-                const response = await fetch('/procurement/received-stock-reports');
-                const data = await response.json();
-
-                if (data.success && data.movements && data.movements.length > 0) {
-                    let totalReceived = 0;
-                    let totalDefects = 0;
-
-                    tbody.innerHTML = data.movements.map(movement => {
-                        const receivedQty = parseFloat(movement.quantity || 0);
-                        const defectQty = parseFloat(movement.defect_quantity || 0);
-                        totalReceived += receivedQty;
-                        totalDefects += defectQty;
-
-                        return `
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-gray-700">${movement.date}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.po_number || 'N/A'}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.material_name}</td>
-                                <td class="px-4 py-3 text-gray-700">${receivedQty.toFixed(2)}</td>
-                                <td class="px-4 py-3 text-red-600">${defectQty.toFixed(2)}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.supplier_name || 'N/A'}</td>
-                                <td class="px-4 py-3">
-                                    <span class="text-xs font-semibold ${
-                                        movement.status === 'completed' ? 'text-green-600' : 
-                                        movement.status === 'pending' ? 'text-orange-600' : 'text-red-600'
-                                    }">${movement.status || 'N/A'}</span>
-                                </td>
-                                <td class="px-4 py-3 text-gray-700">${movement.notes || '-'}</td>
-                            </tr>
-                        `;
-                    }).join('');
-
-                    // Update summary
-                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
-                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
-                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
-
-                    // Populate material filter
-                    const materialSelect = document.getElementById('filterMaterial');
-                    const uniqueMaterials = [...new Set(data.movements.map(m => m.material_name))];
-                    materialSelect.innerHTML = '<option value="">All Materials</option>' + 
-                        uniqueMaterials.map(material => `<option value="${material}">${material}</option>`).join('');
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No received stock records found</td></tr>';
-                    document.getElementById('totalReceived').textContent = '0';
-                    document.getElementById('totalDefects').textContent = '0';
-                    document.getElementById('netQuantity').textContent = '0';
-                }
-            } catch (error) {
-                console.error('Error loading received stock reports:', error);
-                tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
-            }
-        }
-
-        async function filterReceivedStock() {
-            const dateFrom = document.getElementById('filterDateFrom').value;
-            const dateTo = document.getElementById('filterDateTo').value;
-            const material = document.getElementById('filterMaterial').value;
-
-            const params = new URLSearchParams();
-            if (dateFrom) params.append('date_from', dateFrom);
-            if (dateTo) params.append('date_to', dateTo);
-            if (material) params.append('material', material);
-
-            const tbody = document.getElementById('receivedStockTableBody');
-            tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
-
-            try {
-                const response = await fetch(`/procurement/received-stock-reports?${params.toString()}`);
-                const data = await response.json();
-
-                if (data.success && data.movements && data.movements.length > 0) {
-                    let totalReceived = 0;
-                    let totalDefects = 0;
-
-                    tbody.innerHTML = data.movements.map(movement => {
-                        const receivedQty = parseFloat(movement.quantity || 0);
-                        const defectQty = parseFloat(movement.defect_quantity || 0);
-                        totalReceived += receivedQty;
-                        totalDefects += defectQty;
-
-                        return `
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-gray-700">${movement.date}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.po_number || 'N/A'}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.material_name}</td>
-                                <td class="px-4 py-3 text-gray-700">${receivedQty.toFixed(2)}</td>
-                                <td class="px-4 py-3 text-red-600">${defectQty.toFixed(2)}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.supplier_name || 'N/A'}</td>
-                                <td class="px-4 py-3">
-                                    <span class="text-xs font-semibold ${
-                                        movement.status === 'completed' ? 'text-green-600' : 
-                                        movement.status === 'pending' ? 'text-orange-600' : 'text-red-600'
-                                    }">${movement.status || 'N/A'}</span>
-                                </td>
-                                <td class="px-4 py-3 text-gray-700">${movement.notes || '-'}</td>
-                            </tr>
-                        `;
-                    }).join('');
-
-                    // Update summary
-                    document.getElementById('totalReceived').textContent = totalReceived.toFixed(2);
-                    document.getElementById('totalDefects').textContent = totalDefects.toFixed(2);
-                    document.getElementById('netQuantity').textContent = (totalReceived - totalDefects).toFixed(2);
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No records found matching the filters</td></tr>';
-                    document.getElementById('totalReceived').textContent = '0';
-                    document.getElementById('totalDefects').textContent = '0';
-                    document.getElementById('netQuantity').textContent = '0';
-                }
-            } catch (error) {
-                console.error('Error filtering received stock:', error);
-                tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
             }
         }
 
