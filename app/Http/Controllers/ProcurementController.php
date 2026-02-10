@@ -447,6 +447,7 @@ class ProcurementController extends Controller
                     'date' => $movement->created_at->format('Y-m-d H:i'),
                     'po_number' => $purchaseOrder ? ($purchaseOrder->order_number ?? 'PO-' . str_pad($purchaseOrder->id, 6, '0', STR_PAD_LEFT)) : 'N/A',
                     'material_name' => $material ? $material->name : 'Unknown',
+                    'unit' => $material ? $material->unit : '',
                     'quantity' => $movement->quantity,
                     'defect_quantity' => $defectQty,
                     'supplier_name' => $purchaseOrder && $purchaseOrder->supplier ? $purchaseOrder->supplier->name : 'N/A',
