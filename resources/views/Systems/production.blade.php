@@ -532,10 +532,6 @@
                                 <p class="text-xs font-semibold" style="color: #374151;">Assigned To</p>
                                 <p id="vw_assignedTo" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
                             </div>
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #C62828;">
-                                <p class="text-xs font-semibold" style="color: #B71C1C;">Pending Items</p>
-                                <p id="vw_pendingItems" class="text-lg font-bold mt-2" style="color: #B71C1C;">-</p>
-                            </div>
                         </div>
 
                         <!-- Notes Section -->
@@ -918,13 +914,6 @@
                 document.getElementById('vw_assignedTo').textContent = wo.assigned_to || wo.assignedTo || '-';
                 document.getElementById('vw_notes').value = wo.notes || wo.details || '';
                 document.getElementById('notesForm').action = `/production/${wo.id}`;
-                
-                // Calculate pending items
-                const totalQuantity = wo.quantity || 0;
-                const completedQuantity = wo.completion_quantity || wo.completionQuantity || 0;
-                const pendingQuantity = Math.max(0, totalQuantity - completedQuantity);
-                document.getElementById('vw_pendingItems').textContent = pendingQuantity + ' / ' + totalQuantity + ' pcs';
-
                 const modal = document.getElementById('viewWorkOrderModal');
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
