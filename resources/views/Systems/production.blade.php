@@ -495,8 +495,8 @@
         </div>
 
             <!-- View Work Order Modal -->
-            <div id="viewWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden overflow-y-auto flex items-center justify-center z-50" onclick="if(event.target === this) closeViewWorkOrderModal()">
-                <div class="modal-content bg-amber-50 rounded-xl max-w-2xl w-[92%] my-8 shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+            <div id="viewWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeViewWorkOrderModal()">
+                <div class="modal-content bg-amber-50 rounded-2xl max-w-3xl w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
                     <div class="p-5">
                         <!-- Header -->
                         <div class="flex items-center justify-between mb-5 border-b-2 pb-6" style="border-color: #374151;">
