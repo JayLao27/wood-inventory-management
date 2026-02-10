@@ -304,6 +304,15 @@ class InventoryController extends Controller
         // Apply filters if provided
         if ($request->has('movement_type') && $request->movement_type) {
             $query->where('movement_type', $request->movement_type);
+
+            if ($request->movement_type === 'in') {
+                $query->where('reference_type', 'purchase_order');
+            }
+        } else {
+            $query->where(function ($subQuery) {
+                $subQuery->where('movement_type', '!=', 'in')
+                    ->orWhere('reference_type', 'purchase_order');
+            });
         }
 
         if ($request->has('date_from') && $request->date_from) {
@@ -315,6 +324,11 @@ class InventoryController extends Controller
         }
 
         $movements = $query->get();
+
+        $purchaseOrders = PurchaseOrder::with('supplier')
+            ->whereIn('id', $movements->where('reference_type', 'purchase_order')->pluck('reference_id')->unique())
+            ->get()
+            ->keyBy('id');
 
         // Format for response
         $formattedMovements = $movements->map(function ($movement) {
@@ -330,9 +344,17 @@ class InventoryController extends Controller
             };
 
             // Get reference info
+            $referenceLabel = match($movement->reference_type) {
+                'purchase_order' => 'Purchase Order',
+                'work_order' => 'Work Order',
+                'manual_adjustment' => 'Manual Adjustment',
+                'initial_stock' => 'Initial Stock',
+                default => ucfirst(str_replace('_', ' ', (string) $movement->reference_type))
+            };
+
             $referenceInfo = '';
             if ($movement->reference_type === 'purchase_order') {
-                $po = PurchaseOrder::find($movement->reference_id);
+                $po = $purchaseOrders->get($movement->reference_id);
                 $referenceInfo = $po ? "PO: {$po->order_number}" : "PO #" . $movement->reference_id;
             } elseif ($movement->reference_type === 'work_order') {
                 $referenceInfo = "Work Order #" . $movement->reference_id;
@@ -343,6 +365,12 @@ class InventoryController extends Controller
             } else {
                 $referenceInfo = ucfirst(str_replace('_', ' ', $movement->reference_type));
             }
+
+            $purchaseOrder = $movement->reference_type === 'purchase_order'
+                ? $purchaseOrders->get($movement->reference_id)
+                : null;
+            $supplierName = $purchaseOrder?->supplier?->name;
+            $poNumber = $purchaseOrder?->order_number ? 'PO: ' . $purchaseOrder->order_number : null;
 
             return [
                 'id' => $movement->id,
@@ -355,7 +383,10 @@ class InventoryController extends Controller
                 'unit' => $itemUnit,
                 'quantity' => (float) $movement->quantity,
                 'reference_type' => $movement->reference_type,
+                'reference_label' => $referenceLabel,
                 'reference_info' => $referenceInfo,
+                'supplier_name' => $supplierName,
+                'po_number' => $poNumber,
                 'notes' => $movement->notes,
                 'status' => $movement->status ?? 'completed',
                 'created_at' => $movement->created_at
