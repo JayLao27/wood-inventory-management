@@ -138,14 +138,25 @@ class ProductionController extends Controller
     public function update(Request $request, WorkOrder $workOrder)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,in_progress,quality_check,completed,overdue',
+            'status' => 'nullable|in:pending,in_progress,quality_check,completed,overdue',
             'completion_quantity' => 'nullable|integer|min:0',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
-        $workOrder->update([
-            'status' => $validated['status'],
-            'completion_quantity' => $validated['completion_quantity'] ?? $workOrder->completion_quantity,
-        ]);
+        $updateData = [];
+        if (isset($validated['status'])) {
+            $updateData['status'] = $validated['status'];
+        }
+        if (isset($validated['completion_quantity'])) {
+            $updateData['completion_quantity'] = $validated['completion_quantity'];
+        }
+        if (isset($validated['notes'])) {
+            $updateData['notes'] = $validated['notes'];
+        }
+
+        if (!empty($updateData)) {
+            $workOrder->update($updateData);
+        }
 
         return redirect()->back()->with('success', 'Work order updated.');
     }
@@ -155,15 +166,19 @@ class ProductionController extends Controller
         if ($workOrder->status !== 'pending') {
             return redirect()->back()->with('error', 'Only pending work orders can be started.');
         }
-        $workOrder->update(['status' => 'in_progress']);
+        $workOrder->update([
+            'status' => 'in_progress',
+            'starting_date' => now()->toDateString()
+        ]);
         return redirect()->back()->with('success', 'Work order started.');
     }
 
     public function complete(WorkOrder $workOrder)
     {
-        if (!in_array($workOrder->status, ['in_progress', 'quality_check'])) {
-            return redirect()->back()->with('success', 'Work order status updated.');
+        if ($workOrder->status === 'completed') {
+            return redirect()->back()->with('info', 'Work order is already completed.');
         }
+        
         $workOrder->update([
             'status' => 'completed',
             'completion_quantity' => $workOrder->quantity,
