@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Material;
 use App\Models\Supplier;
 use App\Models\PurchaseOrder;
+use App\Models\WorkOrder;
 use App\Models\InventoryMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -304,15 +305,6 @@ class InventoryController extends Controller
         // Apply filters if provided
         if ($request->has('movement_type') && $request->movement_type) {
             $query->where('movement_type', $request->movement_type);
-
-            if ($request->movement_type === 'in') {
-                $query->where('reference_type', 'purchase_order');
-            }
-        } else {
-            $query->where(function ($subQuery) {
-                $subQuery->where('movement_type', '!=', 'in')
-                    ->orWhere('reference_type', 'purchase_order');
-            });
         }
 
         if ($request->has('date_from') && $request->date_from) {
@@ -326,12 +318,16 @@ class InventoryController extends Controller
         $movements = $query->get();
 
         $purchaseOrders = PurchaseOrder::with('supplier')
-            ->whereIn('id', $movements->where('reference_type', 'purchase_order')->pluck('reference_id')->unique())
+            ->whereIn('id', $movements->where('reference_type', PurchaseOrder::class)->pluck('reference_id')->unique())
+            ->get()
+            ->keyBy('id');
+
+        $workOrders = WorkOrder::whereIn('id', $movements->where('reference_type', WorkOrder::class)->pluck('reference_id')->unique())
             ->get()
             ->keyBy('id');
 
         // Format for response
-        $formattedMovements = $movements->map(function ($movement) {
+        $formattedMovements = $movements->map(function ($movement) use ($purchaseOrders, $workOrders) {
             $itemName = $movement->item?->name ?? 'Unknown Material';
             $itemUnit = $movement->item?->unit ?? 'unit';
 
@@ -345,19 +341,20 @@ class InventoryController extends Controller
 
             // Get reference info
             $referenceLabel = match($movement->reference_type) {
-                'purchase_order' => 'Purchase Order',
-                'work_order' => 'Work Order',
+                PurchaseOrder::class => 'Supplier',
+                WorkOrder::class => 'Team Assigned',
                 'manual_adjustment' => 'Manual Adjustment',
                 'initial_stock' => 'Initial Stock',
                 default => ucfirst(str_replace('_', ' ', (string) $movement->reference_type))
             };
 
             $referenceInfo = '';
-            if ($movement->reference_type === 'purchase_order') {
+            if ($movement->reference_type === PurchaseOrder::class) {
                 $po = $purchaseOrders->get($movement->reference_id);
                 $referenceInfo = $po ? "PO: {$po->order_number}" : "PO #" . $movement->reference_id;
-            } elseif ($movement->reference_type === 'work_order') {
-                $referenceInfo = "Work Order #" . $movement->reference_id;
+            } elseif ($movement->reference_type === WorkOrder::class) {
+                $wo = $workOrders->get($movement->reference_id);
+                $referenceInfo = $wo ? $wo->order_number : "WO #" . $movement->reference_id;
             } elseif ($movement->reference_type === 'manual_adjustment') {
                 $referenceInfo = "Manual Adjustment";
             } elseif ($movement->reference_type === 'initial_stock') {
@@ -366,11 +363,17 @@ class InventoryController extends Controller
                 $referenceInfo = ucfirst(str_replace('_', ' ', $movement->reference_type));
             }
 
-            $purchaseOrder = $movement->reference_type === 'purchase_order'
+            $purchaseOrder = $movement->reference_type === PurchaseOrder::class
                 ? $purchaseOrders->get($movement->reference_id)
                 : null;
             $supplierName = $purchaseOrder?->supplier?->name;
             $poNumber = $purchaseOrder?->order_number ? 'PO: ' . $purchaseOrder->order_number : null;
+
+            $workOrder = $movement->reference_type === WorkOrder::class
+                ? $workOrders->get($movement->reference_id)
+                : null;
+            $woId = $workOrder?->order_number;
+            $teamAssigned = $workOrder?->assigned_to;
 
             return [
                 'id' => $movement->id,
@@ -387,6 +390,8 @@ class InventoryController extends Controller
                 'reference_info' => $referenceInfo,
                 'supplier_name' => $supplierName,
                 'po_number' => $poNumber,
+                'wo_id' => $woId,
+                'team_assigned' => $teamAssigned,
                 'notes' => $movement->notes,
                 'status' => $movement->status ?? 'completed',
                 'created_at' => $movement->created_at
