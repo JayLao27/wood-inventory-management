@@ -62,7 +62,7 @@ class ProcurementController extends Controller
 
                 $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
                     ->where('item_id', $item->material_id)
-                    ->where('reference_type', 'purchase_order')
+                    ->where('reference_type', PurchaseOrder::class)
                     ->where('reference_id', $order->id)
                     ->where('movement_type', 'in')
                     ->sum('quantity');
@@ -208,7 +208,7 @@ class ProcurementController extends Controller
 
             $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
                 ->where('item_id', $item->material_id)
-                ->where('reference_type', 'purchase_order')
+                ->where('reference_type', PurchaseOrder::class)
                 ->where('reference_id', $purchaseOrder->id)
                 ->where('movement_type', 'in')
                 ->sum('quantity');
@@ -303,7 +303,7 @@ class ProcurementController extends Controller
 
                 $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
                     ->where('item_id', $poItem->material_id)
-                    ->where('reference_type', 'purchase_order')
+                    ->where('reference_type', PurchaseOrder::class)
                     ->where('reference_id', $purchaseOrder->id)
                     ->where('movement_type', 'in')
                     ->sum('quantity');
@@ -339,7 +339,7 @@ class ProcurementController extends Controller
                     'item_id' => $material->id,
                     'movement_type' => 'in',
                     'quantity' => $toReceive,
-                    'reference_type' => 'purchase_order',
+                    'reference_type' => PurchaseOrder::class,
                     'reference_id' => $purchaseOrder->id,
                     'notes' => 'Received from PO ' . $purchaseOrder->order_number 
                         . ' | Received by: ' . (auth()->user()->name ?? 'System')
@@ -357,7 +357,7 @@ class ProcurementController extends Controller
 
                 $received = (float) InventoryMovement::where('item_type', 'material')
                     ->where('item_id', $item->material_id)
-                    ->where('reference_type', 'purchase_order')
+                    ->where('reference_type', PurchaseOrder::class)
                     ->where('reference_id', $purchaseOrder->id)
                     ->where('movement_type', 'in')
                     ->sum('quantity');
@@ -412,7 +412,7 @@ class ProcurementController extends Controller
         try {
             $query = InventoryMovement::where('movement_type', 'in')
                 ->where('item_type', 'material')
-                ->where('reference_type', 'purchase_order');
+                ->where('reference_type', PurchaseOrder::class);
 
             // Apply date filters
             if ($request->has('date_from') && $request->date_from) {
