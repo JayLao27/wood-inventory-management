@@ -1356,55 +1356,97 @@
                 if (dateFrom) params.append('date_from', dateFrom);
                 if (dateTo) params.append('date_to', dateTo);
 
-                fetch(`{{ route('inventory.stock-movements-report') }}?${params.toString()}`)
+                const stockMovementsUrl = `{{ route('inventory.stock-movements-report') }}?${params.toString()}`;
+                fetch(stockMovementsUrl)
                     .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            displayStockLogs(data.movements, data.summary);
+                    .then(movementData => {
+                        if (movementData.success) {
+                            displayStockLogs(movementData.movements, movementData.summary, movementType);
                         }
                     })
                     .catch(err => console.error('Error loading logs:', err));
             }
 
-            function displayStockLogs(movements, summary) {
-                const tableBody = document.getElementById('stockLogsTable');
+            function displayStockLogs(movements, summary, movementType) {
+                const stockInBody = document.getElementById('stockInTable');
+                const stockOutBody = document.getElementById('stockOutTable');
+                const stockOutSummaryBody = document.getElementById('stockOutSummaryTable');
 
-                if (movements.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="px-3 py-6 text-center text-gray-500">No stock movements found</td></tr>';
-                    return;
+                const stockInRecords = movements.filter(movement => movement.movement_type === 'in');
+                const stockOut = movements.filter(movement => movement.movement_type === 'out');
+
+                if (stockInRecords.length === 0) {
+                    stockInBody.innerHTML = '<tr><td colspan="6" class="px-3 py-6 text-center text-gray-500">No Stock IN records</td></tr>';
+                } else {
+                    stockInBody.innerHTML = stockInRecords.map(movement => {
+                        const supplierName = movement.supplier_name || 'N/A';
+                        const referenceValue = movement.po_number || movement.reference_info || 'N/A';
+                        const quantity = `${Number(movement.quantity).toFixed(2)} ${movement.unit || ''}`.trim();
+                        const dateTime = movement.date ? `${movement.date} ${movement.time || ''}`.trim() : '-';
+
+                        return `
+                            <tr class="hover:bg-green-50 transition-colors">
+                                <td class="px-3 py-1.5">${dateTime}</td>
+                                <td class="px-3 py-1.5">${movement.item_name || 'Unknown Material'}</td>
+                                <td class="px-3 py-1.5 text-center font-bold text-green-700">+${quantity}</td>
+                                <td class="px-3 py-1.5">${supplierName}</td>
+                                <td class="px-3 py-1.5">${referenceValue}</td>
+                                <td class="px-3 py-1.5 text-xs max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
                 }
 
-                let htmlRows = '';
-                movements.forEach((movement) => {
-                    const typeColor = movement.movement_type === 'in' ? 'bg-green-50' : 
-                                     movement.movement_type === 'out' ? 'bg-red-50' : 'bg-yellow-50';
+                if (stockOut.length === 0) {
+                    stockOutBody.innerHTML = '<tr><td colspan="6" class="px-3 py-6 text-center text-gray-500">No Stock OUT records</td></tr>';
+                } else {
+                    stockOutBody.innerHTML = stockOut.map(movement => {
+                        const quantity = `${Number(movement.quantity).toFixed(2)} ${movement.unit || ''}`;
+                        const workOrder = movement.reference_info || '-';
+                        const referenceLabel = movement.reference_label || '-';
 
-                    const row = `
-                        <tr class="hover:${typeColor} transition-colors">
-                            <td class="px-3 py-1.5">${movement.date} ${movement.time}</td>
-                            <td class="px-3 py-1.5">
-                                <span class="px-3 py-1 text-xs font-bold rounded-xl ${
-                                    movement.movement_type === 'in' ? 'bg-green-100 text-green-700' :
-                                    movement.movement_type === 'out' ? 'bg-red-100 text-red-700' :
-                                    'bg-yellow-100 text-yellow-700'
-                                }">
-                                    ${movement.movement_label}
-                                </span>
-                            </td>
-                            <td class="px-3 py-1.5">${movement.item_name}</td>
-                            <td class="px-3 py-1.5 text-center font-bold">${movement.movement_type === 'out' ? '-' : '+'}${movement.quantity.toFixed(2)} ${movement.unit}</td>
-                            <td class="px-3 py-1.5">${movement.reference_info}</td>
-                            <td class="px-3 py-1.5 text-xs max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
-                        </tr>
-                    `;
-                    htmlRows += row;
-                });
+                        return `
+                            <tr class="hover:bg-red-50 transition-colors">
+                                <td class="px-3 py-1.5">${movement.date} ${movement.time}</td>
+                                <td class="px-3 py-1.5">${movement.item_name}</td>
+                                <td class="px-3 py-1.5 text-center font-bold text-red-700">-${quantity}</td>
+                                <td class="px-3 py-1.5">${workOrder}</td>
+                                <td class="px-3 py-1.5">${referenceLabel}</td>
+                                <td class="px-3 py-1.5 text-xs max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
 
-                tableBody.innerHTML = htmlRows;
+                if (stockOut.length === 0) {
+                    stockOutSummaryBody.innerHTML = '<tr><td colspan="4" class="px-3 py-6 text-center text-gray-500">No Stock OUT summary data</td></tr>';
+                } else {
+                    const summaryMap = new Map();
+                    stockOut.forEach(movement => {
+                        const key = `${movement.item_name}||${movement.unit || ''}`;
+                        const existing = summaryMap.get(key) || { total: 0, count: 0 };
+                        summaryMap.set(key, {
+                            total: existing.total + Number(movement.quantity),
+                            count: existing.count + 1
+                        });
+                    });
 
-                document.getElementById('logTotalIn').textContent = summary.total_in.toFixed(2);
-                document.getElementById('logTotalOut').textContent = summary.total_out.toFixed(2);
-                document.getElementById('logTotalMovements').textContent = summary.total_movements;
+                    stockOutSummaryBody.innerHTML = Array.from(summaryMap.entries()).map(([key, value]) => {
+                        const [materialName, unit] = key.split('||');
+                        return `
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-3 py-1.5">${materialName}</td>
+                                <td class="px-3 py-1.5 text-center font-bold">${value.total.toFixed(2)}</td>
+                                <td class="px-3 py-1.5">${unit || '-'}</td>
+                                <td class="px-3 py-1.5 text-center">${value.count}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+                document.getElementById('logTotalIn').textContent = Number(summary?.total_in || 0).toFixed(2);
+                document.getElementById('logTotalOut').textContent = Number(summary?.total_out || 0).toFixed(2);
+                document.getElementById('logTotalMovements').textContent = Number(summary?.total_movements || 0);
             }
         </script>
 
