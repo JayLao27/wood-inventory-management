@@ -24,6 +24,23 @@ class AccountingController extends Controller
         $lastMonthNetProfitPercentage = $this->lastMonthNetprofit($netProfit);
         $lastMonthExpensesPercentage = $this->lastMonthTotalExpenses($totalExpenses);
 
+        $now = Carbon::now();
+        $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
+        $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
+        $lastMonthRevenue = (float) Accounting::where('transaction_type', 'Income')
+            ->whereBetween('date', [$startOfLastMonth, $endOfLastMonth])
+            ->sum('amount');
+        $lastMonthExpenses = (float) Accounting::where('transaction_type', 'Expense')
+            ->whereBetween('date', [$startOfLastMonth, $endOfLastMonth])
+            ->sum('amount');
+        $lastMonthNetProfit = $lastMonthRevenue - $lastMonthExpenses;
+        $monthlyPerformance = [[
+            'month' => $startOfLastMonth->format('M'),
+            'revenue' => $lastMonthRevenue,
+            'expenses' => $lastMonthExpenses,
+            'net_profit' => $lastMonthNetProfit,
+        ]];
+
         // Fetch purchase orders first to calculate pending materials
         $allPurchaseOrders = PurchaseOrder::with(['supplier', 'accountingTransactions' => function($query) {
             $query->where('transaction_type', 'Expense');
@@ -105,7 +122,8 @@ class AccountingController extends Controller
             'materialsExpense',
             'laborExpense',
             'materialsPercent',
-            'laborPercent'
+            'laborPercent',
+            'monthlyPerformance'
         ));
     }
 
