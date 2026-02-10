@@ -94,11 +94,14 @@
                         <p class="text-slate-300 text-xs font-medium mt-2">Manage your raw materials and finished products</p>
                     </div>
                     <div class="flex space-x-3">
-                        <button onclick="openWorkOrderModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                        <button onclick="openWorkOrderModal()" class="relative px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                             </svg>
                             <span>Work Orders</span>
+                            @if($pendingItemsCount > 0)
+                            <span class="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">{{ $pendingItemsCount }}</span>
+                            @endif
                         </button>
                     </div>
                 </div>
@@ -163,26 +166,13 @@
                             </div>
                             <div>
                                 <span class="text-slate-400 font-medium text-xs">Starting Date</span>
-                                <p class="text-white font-bold text-lg mt-1">{{ $workOrder->starting_date ? \Carbon\Carbon::parse($workOrder->starting_date)->format('m/d/Y') : 'Not started' }}</p>
+                                <p class="text-white font-bold text-lg mt-1">{{ $workOrder->created_at ? \Carbon\Carbon::parse($workOrder->created_at)->format('m/d/Y') : 'N/A' }}</p>
                             </div>
                             <div>
                                 <span class="text-slate-400 font-medium text-xs">Due Date</span>
                                 <p class="text-white font-bold text-lg mt-1">{{ $workOrder->due_date->format('m/d/Y') }}</p>
                             </div>
                             <div class="flex items-center space-x-2 justify-end">
-                                @if($workOrder->status === 'pending')
-                                <button onclick="event.stopPropagation(); startWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Start">
-                                    <svg class="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
-                                @elseif($workOrder->status === 'in_progress')
-                                <button onclick="event.stopPropagation(); pauseWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Pause">
-                                    <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
-                                @endif
                                 <button onclick="event.stopPropagation(); completeWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Complete">
                                     <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -538,6 +528,10 @@
                             <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #0097A7;">
                                 <p class="text-xs font-semibold" style="color: #00838F;">Status</p>
                                 <p id="vw_status" class="text-lg font-bold mt-2 px-2 py-1 rounded text-white text-center" style="background-color: #00838F;">-</p>
+                                                        <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #C62828;">
+                                                            <p class="text-xs font-semibold" style="color: #B71C1C;">Pending Items</p>
+                                                            <p id="vw_pendingItems" class="text-lg font-bold mt-2" style="color: #B71C1C;">-</p>
+                                                        </div>
                             </div>
                         </div>
 
@@ -549,7 +543,7 @@
                                 @method('PUT')
                                 <textarea id="vw_notes" name="notes" rows="4" class="w-full bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Add notes or details about this work order..."></textarea>
                                 <div class="flex justify-end">
-                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm font-medium shadow-md hover:shadow-lg">
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm font-medium shadow-md hover:shadow-lg" title="Save notes for this work order">
                                         Save Notes
                                     </button>
                                 </div>
@@ -922,6 +916,12 @@
                 document.getElementById('vw_status').textContent = wo.status ? String(wo.status).replace('_', ' ') : '-';
                 document.getElementById('vw_notes').value = wo.notes || wo.details || '';
                 document.getElementById('notesForm').action = `/production/${wo.id}`;
+                
+                // Calculate pending items
+                const totalQuantity = wo.quantity || 0;
+                const completedQuantity = wo.completion_quantity || wo.completionQuantity || 0;
+                const pendingQuantity = Math.max(0, totalQuantity - completedQuantity);
+                document.getElementById('vw_pendingItems').textContent = pendingQuantity + ' / ' + totalQuantity + ' pcs';
 
                 const modal = document.getElementById('viewWorkOrderModal');
                 modal.classList.remove('hidden');
