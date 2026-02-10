@@ -446,9 +446,14 @@ $paymentBg = [
 					<tbody id="customersTbody" class="divide-y divide-slate-600">
 						@forelse($customers as $customer)
 						<tr class="hover:bg-slate-600 transition cursor-pointer data-row">
-							<td class="px-3 py-3 font-medium text-slate-300">{{ $customer->name }}</td>
-							@php $ctBg = $customerTypeBg[$customer->customer_type] ?? '#e5e7eb'; @endphp
-							<td class="px-3 py-3"><span class="inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span></td>
+							<td class="px-3 py-3">
+								<div class="font-medium text-slate-300">{{ $customer->name }}</div>
+								@php $ctBg = $customerTypeBg[$customer->customer_type] ?? '#e5e7eb'; @endphp
+								<span class="mt-1 inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span>
+							</td>
+							<td class="px-3 py-3">
+								<span class="inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span>
+							</td>
 							<td class="px-3 py-3 text-slate-300">{{ $customer->phone }}</td>
 							<td class="px-3 py-3 text-slate-300">{{ $customer->email }}</td>
 							<td class="px-3 py-3 text-slate-300">{{ $customer->totalOrders() }}</td>
@@ -668,7 +673,7 @@ $paymentBg = [
 
 					<!-- Form Content -->
 					<div class="p-3">
-						<form method="POST" action="{{ route('sales-orders.store') }}" id="newOrderForm">
+						<form method="POST" action="{{ route('sales-orders.store') }}" id="newOrderForm" onsubmit="return confirmSalesOrder(event)">
 							@csrf
 							<div class="space-y-5">
 								<!-- Customer Selection -->
@@ -866,7 +871,7 @@ $paymentBg = [
 
 					<!-- Form Content -->
 					<div class="p-3">
-						<form method="POST" action="{{ route('customers.store') }}" id="newCustomerForm">
+						<form method="POST" action="{{ route('customers.store') }}" id="newCustomerForm" onsubmit="return confirmCustomer(event)">
 							@csrf
 							<div class="space-y-5">
 								<!-- Basic Information Section -->
@@ -1075,6 +1080,66 @@ $paymentBg = [
 		</div>
 	</div>
 </div>
+</div>
+
+<!-- Confirmation Modal for Sales Order -->
+<div id="confirmSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+	<div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all">
+		<!-- Green Header -->
+		<div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-2xl">
+			<div class="flex items-center gap-3">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				</svg>
+				<h3 class="text-xl font-bold">Confirm Sales Order</h3>
+			</div>
+		</div>
+		
+		<!-- Content -->
+		<div class="p-6">
+			<p class="text-gray-700 text-base mb-6">Are you sure you want to create this sales order?</p>
+			
+			<!-- Action Buttons -->
+			<div class="flex gap-3 justify-end">
+				<button type="button" onclick="closeConfirmSalesOrder()" class="px-5 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition-all">
+					Cancel
+				</button>
+				<button type="button" onclick="submitSalesOrder()" class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg">
+					Confirm
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Confirmation Modal for Customer -->
+<div id="confirmCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+	<div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all">
+		<!-- Green Header -->
+		<div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-2xl">
+			<div class="flex items-center gap-3">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				</svg>
+				<h3 class="text-xl font-bold">Confirm New Customer</h3>
+			</div>
+		</div>
+		
+		<!-- Content -->
+		<div class="p-6">
+			<p class="text-gray-700 text-base mb-6">Are you sure you want to add this customer?</p>
+			
+			<!-- Action Buttons -->
+			<div class="flex gap-3 justify-end">
+				<button type="button" onclick="closeConfirmCustomer()" class="px-5 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition-all">
+					Cancel
+				</button>
+				<button type="button" onclick="submitCustomer()" class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg">
+					Confirm
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script>
@@ -1384,6 +1449,46 @@ $paymentBg = [
 		exportDropdown.classList.add('hidden');
 		// Implement customer list export (CSV/Excel)
 		window.location.href = '/customers/export';
+	}
+
+	// Confirmation Modal Functions for Sales Order
+	function confirmSalesOrder(event) {
+		event.preventDefault();
+		document.getElementById('confirmSalesOrderModal').classList.remove('hidden');
+		return false;
+	}
+
+	function closeConfirmSalesOrder() {
+		document.getElementById('confirmSalesOrderModal').classList.add('hidden');
+	}
+
+	function submitSalesOrder() {
+		closeConfirmSalesOrder();
+		// Submit the form
+		const form = document.getElementById('newOrderForm');
+		// Remove the onsubmit to avoid infinite loop
+		form.onsubmit = null;
+		form.submit();
+	}
+
+	// Confirmation Modal Functions for Customer
+	function confirmCustomer(event) {
+		event.preventDefault();
+		document.getElementById('confirmCustomerModal').classList.remove('hidden');
+		return false;
+	}
+
+	function closeConfirmCustomer() {
+		document.getElementById('confirmCustomerModal').classList.add('hidden');
+	}
+
+	function submitCustomer() {
+		closeConfirmCustomer();
+		// Submit the form
+		const form = document.getElementById('newCustomerForm');
+		// Remove the onsubmit to avoid infinite loop
+		form.onsubmit = null;
+		form.submit();
 	}
 </script>
 </div>
