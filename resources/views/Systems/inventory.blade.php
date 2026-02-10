@@ -614,13 +614,8 @@
                         <!-- Filters -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-2">Type</label>
-                                <select id="logMovementTypeFilter" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 transition-all" onchange="loadStockLogs()">
-                                    <option value="">All</option>
-                                    <option value="in">📦 Stock In</option>
-                                    <option value="out">📤 Stock Out</option>
-                                    <option value="adjustment">⚙️ Adjustment</option>
-                                </select>
+                                <label class="block text-sm font-bold text-gray-900 mb-2">Search & Filter</label>
+                                <input type="text" id="logSearchFilter" placeholder="Search by material, supplier, reference..." class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-blue-500 transition-all" oninput="filterStockLogs()">
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-900 mb-2">From Date</label>
@@ -648,90 +643,135 @@
                             </div>
                         </div>
 
-                        <!-- Stock IN Section -->
-                        <div class="mb-5">
-                            <h4 class="text-xl font-bold text-green-700 mb-3 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Stock IN (Received from Suppliers)
-                            </h4>
-                            <div class="overflow-x-auto rounded-xl border-2 border-green-300 shadow-lg bg-green-50">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-green-600 text-white">
-                                        <tr>
-                                            <th class="px-3 py-1.5 text-left font-bold">Date & Time</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Material</th>
-                                            <th class="px-3 py-1.5 text-center font-bold">Quantity</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">From Supplier</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Reference (PO)</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="stockInTable" class="divide-y divide-green-200 bg-white">
-                                        <tr>
-                                            <td colspan="6" class="px-3 py-6 text-center text-gray-500">No Stock IN records</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <!-- Tabs Navigation -->
+                        <div class="mb-6">
+                            <div class="flex gap-2 border-b-2 border-gray-200">
+                                <button onclick="switchTab('stockIn')" id="tabStockIn" class="tab-button active px-6 py-3 font-semibold text-sm transition-all duration-200 border-b-3 -mb-0.5">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        <span>Stock IN</span>
+                                    </div>
+                                </button>
+                                <button onclick="switchTab('stockOut')" id="tabStockOut" class="tab-button px-6 py-3 font-semibold text-sm transition-all duration-200 border-b-3 -mb-0.5">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                        </svg>
+                                        <span>Stock OUT</span>
+                                    </div>
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Stock OUT Section -->
-                        <div class="mb-5">
-                            <h4 class="text-xl font-bold text-red-700 mb-3 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Stock OUT (Used in Work Orders)
-                            </h4>
-                            <div class="overflow-x-auto rounded-xl border-2 border-red-300 shadow-lg bg-red-50">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-red-600 text-white">
-                                        <tr>
-                                            <th class="px-3 py-1.5 text-left font-bold">Date & Time</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Material</th>
-                                            <th class="px-3 py-1.5 text-center font-bold">Quantity Out</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Work Order</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Worker / Reference</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="stockOutTable" class="divide-y divide-red-200 bg-white">
-                                        <tr>
-                                            <td colspan="6" class="px-3 py-6 text-center text-gray-500">No Stock OUT records</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <!-- Tab Content -->
+                        <div class="tab-content-container">
+                            <!-- Stock IN Section -->
+                            <div id="contentStockIn" class="tab-content active">
+                                <div class="mb-4">
+                                    <h4 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-3">
+                                        <div class="p-2 bg-green-100 rounded-lg">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                            </svg>
+                                        </div>
+                                        Stock IN (Received from Suppliers)
+                                    </h4>
+                                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md bg-white">
+                                        <table class="w-full text-sm">
+                                            <thead class="bg-gradient-to-r from-green-600 to-green-500 text-white">
+                                                <tr>
+                                                    <th class="px-4 py-3 text-left font-semibold">Date & Time</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">Material</th>
+                                                    <th class="px-4 py-3 text-center font-semibold">Quantity</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">PO ID</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">From Supplier</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">Notes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="stockInTable" class="divide-y divide-gray-100">
+                                                <tr>
+                                                    <td colspan="6" class="px-4 py-8 text-center text-gray-400 italic">No Stock IN records</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stock OUT Section -->
+                            <div id="contentStockOut" class="tab-content hidden">
+                                <div class="mb-4">
+                                    <h4 class="text-2xl font-bold text-red-700 mb-4 flex items-center gap-3">
+                                        <div class="p-2 bg-red-100 rounded-lg">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                            </svg>
+                                        </div>
+                                        Stock OUT (Used in Work Orders)
+                                    </h4>
+                                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md bg-white">
+                                        <table class="w-full text-sm">
+                                            <thead class="bg-gradient-to-r from-red-600 to-red-500 text-white">
+                                                <tr>
+                                                    <th class="px-4 py-3 text-left font-semibold">Date & Time</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">Material</th>
+                                                    <th class="px-4 py-3 text-center font-semibold">Quantity Out</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">Work Order</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">Team Assigned</th>
+                                                    <th class="px-4 py-3 text-left font-semibold">Notes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="stockOutTable" class="divide-y divide-gray-100">
+                                                <tr>
+                                                    <td colspan="6" class="px-4 py-8 text-center text-gray-400 italic">No Stock OUT records</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Stock OUT Summary by Material -->
-                        <div>
-                            <h4 class="text-xl font-bold text-slate-700 mb-3 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                </svg>
-                                Total Stock OUT by Material
-                            </h4>
-                            <div class="overflow-x-auto rounded-xl border-2 border-slate-300 shadow-lg bg-slate-50">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-slate-700 text-white">
-                                        <tr>
-                                            <th class="px-3 py-1.5 text-left font-bold">Material</th>
-                                            <th class="px-3 py-1.5 text-center font-bold">Total Quantity Out</th>
-                                            <th class="px-3 py-1.5 text-left font-bold">Unit</th>
-                                            <th class="px-3 py-1.5 text-center font-bold">Number of Transactions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="stockOutSummaryTable" class="divide-y divide-slate-200 bg-white">
-                                        <tr>
-                                            <td colspan="4" class="px-3 py-6 text-center text-gray-500">No Stock OUT summary data</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <style>
+                            .tab-button {
+                                color: #6b7280;
+                                background: transparent;
+                                border-bottom: 3px solid transparent;
+                                position: relative;
+                            }
+                            
+                            .tab-button:hover {
+                                color: #374151;
+                                background: #f9fafb;
+                            }
+                            
+                            .tab-button.active {
+                                color: #1f2937;
+                                border-bottom-color: #3b82f6;
+                                background: #eff6ff;
+                            }
+                            
+                            .tab-content {
+                                animation: fadeIn 0.3s ease-in;
+                            }
+                            
+                            .tab-content.hidden {
+                                display: none;
+                            }
+                            
+                            @keyframes fadeIn {
+                                from {
+                                    opacity: 0;
+                                    transform: translateY(10px);
+                                }
+                                to {
+                                    opacity: 1;
+                                    transform: translateY(0);
+                                }
+                            }
+                        </style>
                     </div>
                 </div>
             </div>
@@ -1347,12 +1387,10 @@
             }
 
             function loadStockLogs() {
-                const movementType = document.getElementById('logMovementTypeFilter')?.value || '';
                 const dateFrom = document.getElementById('logDateFromFilter')?.value || '';
                 const dateTo = document.getElementById('logDateToFilter')?.value || '';
 
                 const params = new URLSearchParams();
-                if (movementType) params.append('movement_type', movementType);
                 if (dateFrom) params.append('date_from', dateFrom);
                 if (dateTo) params.append('date_to', dateTo);
 
@@ -1361,13 +1399,80 @@
                     .then(res => res.json())
                     .then(movementData => {
                         if (movementData.success) {
-                            displayStockLogs(movementData.movements, movementData.summary, movementType);
+                            displayStockLogs(movementData.movements, movementData.summary);
                         }
                     })
                     .catch(err => console.error('Error loading logs:', err));
             }
 
-            function displayStockLogs(movements, summary, movementType) {
+            function filterStockLogs() {
+                const searchText = document.getElementById('logSearchFilter')?.value.toLowerCase() || '';
+                const stockInBody = document.getElementById('stockInTable');
+                const stockOutBody = document.getElementById('stockOutTable');
+
+                if (!searchText) {
+                    // If search is empty, show all rows
+                    document.querySelectorAll('#stockInTable tr, #stockOutTable tr').forEach(row => {
+                        if (row.querySelector('td[colspan]')) return; // Skip empty message rows
+                        row.style.display = '';
+                    });
+                    return;
+                }
+
+                // Filter Stock IN table
+                const stockInRows = stockInBody.querySelectorAll('tr:not(:has(td[colspan]))');
+                stockInRows.forEach(row => {
+                    const material = row.cells[1]?.textContent.toLowerCase() || '';
+                    const poId = row.cells[3]?.textContent.toLowerCase() || '';
+                    const supplier = row.cells[4]?.textContent.toLowerCase() || '';
+                    const notes = row.cells[5]?.textContent.toLowerCase() || '';
+                    
+                    const matches = material.includes(searchText) || poId.includes(searchText) || 
+                                  supplier.includes(searchText) || notes.includes(searchText);
+                    row.style.display = matches ? '' : 'none';
+                });
+
+                // Filter Stock OUT table
+                const stockOutRows = stockOutBody.querySelectorAll('tr:not(:has(td[colspan]))');
+                stockOutRows.forEach(row => {
+                    const material = row.cells[1]?.textContent.toLowerCase() || '';
+                    const workOrder = row.cells[3]?.textContent.toLowerCase() || '';
+                    const reference = row.cells[4]?.textContent.toLowerCase() || '';
+                    const notes = row.cells[5]?.textContent.toLowerCase() || '';
+                    
+                    const matches = material.includes(searchText) || workOrder.includes(searchText) || 
+                                  reference.includes(searchText) || notes.includes(searchText);
+                    row.style.display = matches ? '' : 'none';
+                });
+            }
+
+            function switchTab(tabName) {
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                    content.classList.remove('active');
+                });
+                
+                // Remove active class from all tab buttons
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.classList.remove('active');
+                });
+                
+                // Show selected tab content
+                const selectedContent = document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+                if (selectedContent) {
+                    selectedContent.classList.remove('hidden');
+                    selectedContent.classList.add('active');
+                }
+                
+                // Add active class to selected tab button
+                const selectedButton = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+                if (selectedButton) {
+                    selectedButton.classList.add('active');
+                }
+            }
+            
+            function displayStockLogs(movements, summary) {
                 const stockInBody = document.getElementById('stockInTable');
                 const stockOutBody = document.getElementById('stockOutTable');
                 const stockOutSummaryBody = document.getElementById('stockOutSummaryTable');
@@ -1376,69 +1481,47 @@
                 const stockOut = movements.filter(movement => movement.movement_type === 'out');
 
                 if (stockInRecords.length === 0) {
-                    stockInBody.innerHTML = '<tr><td colspan="6" class="px-3 py-6 text-center text-gray-500">No Stock IN records</td></tr>';
+                    stockInBody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 italic">No Stock IN records found</td></tr>';
                 } else {
                     stockInBody.innerHTML = stockInRecords.map(movement => {
-                        const supplierName = movement.supplier_name || 'N/A';
-                        const referenceValue = movement.po_number || movement.reference_info || 'N/A';
+                        const poId = movement.po_number || '-';
+                        const supplierName = movement.supplier_name || '-';
                         const quantity = `${Number(movement.quantity).toFixed(2)} ${movement.unit || ''}`.trim();
                         const dateTime = movement.date ? `${movement.date} ${movement.time || ''}`.trim() : '-';
 
                         return `
-                            <tr class="hover:bg-green-50 transition-colors">
-                                <td class="px-3 py-1.5">${dateTime}</td>
-                                <td class="px-3 py-1.5">${movement.item_name || 'Unknown Material'}</td>
-                                <td class="px-3 py-1.5 text-center font-bold text-green-700">+${quantity}</td>
-                                <td class="px-3 py-1.5">${supplierName}</td>
-                                <td class="px-3 py-1.5">${referenceValue}</td>
-                                <td class="px-3 py-1.5 text-xs max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
+                            <tr class="hover:bg-green-50 transition-all duration-200">
+                                <td class="px-4 py-3 text-gray-700 text-sm">${dateTime}</td>
+                                <td class="px-4 py-3 text-gray-900 font-medium">${movement.item_name || 'Unknown Material'}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block px-3 py-1 font-semibold text-green-700 bg-green-100 rounded-full">+${quantity}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700 font-semibold">${poId}</td>
+                                <td class="px-4 py-3 text-gray-600 text-sm">${supplierName}</td>
+                                <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
                             </tr>
                         `;
                     }).join('');
                 }
 
                 if (stockOut.length === 0) {
-                    stockOutBody.innerHTML = '<tr><td colspan="6" class="px-3 py-6 text-center text-gray-500">No Stock OUT records</td></tr>';
+                    stockOutBody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 italic">No Stock OUT records found</td></tr>';
                 } else {
                     stockOutBody.innerHTML = stockOut.map(movement => {
                         const quantity = `${Number(movement.quantity).toFixed(2)} ${movement.unit || ''}`;
-                        const workOrder = movement.reference_info || '-';
-                        const referenceLabel = movement.reference_label || '-';
+                        const woId = movement.wo_id || '-';
+                        const teamAssigned = movement.team_assigned || '-';
 
                         return `
-                            <tr class="hover:bg-red-50 transition-colors">
-                                <td class="px-3 py-1.5">${movement.date} ${movement.time}</td>
-                                <td class="px-3 py-1.5">${movement.item_name}</td>
-                                <td class="px-3 py-1.5 text-center font-bold text-red-700">-${quantity}</td>
-                                <td class="px-3 py-1.5">${workOrder}</td>
-                                <td class="px-3 py-1.5">${referenceLabel}</td>
-                                <td class="px-3 py-1.5 text-xs max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
-                            </tr>
-                        `;
-                    }).join('');
-                }
-
-                if (stockOut.length === 0) {
-                    stockOutSummaryBody.innerHTML = '<tr><td colspan="4" class="px-3 py-6 text-center text-gray-500">No Stock OUT summary data</td></tr>';
-                } else {
-                    const summaryMap = new Map();
-                    stockOut.forEach(movement => {
-                        const key = `${movement.item_name}||${movement.unit || ''}`;
-                        const existing = summaryMap.get(key) || { total: 0, count: 0 };
-                        summaryMap.set(key, {
-                            total: existing.total + Number(movement.quantity),
-                            count: existing.count + 1
-                        });
-                    });
-
-                    stockOutSummaryBody.innerHTML = Array.from(summaryMap.entries()).map(([key, value]) => {
-                        const [materialName, unit] = key.split('||');
-                        return `
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-3 py-1.5">${materialName}</td>
-                                <td class="px-3 py-1.5 text-center font-bold">${value.total.toFixed(2)}</td>
-                                <td class="px-3 py-1.5">${unit || '-'}</td>
-                                <td class="px-3 py-1.5 text-center">${value.count}</td>
+                            <tr class="hover:bg-red-50 transition-all duration-200">
+                                <td class="px-4 py-3 text-gray-700 text-sm">${movement.date} ${movement.time}</td>
+                                <td class="px-4 py-3 text-gray-900 font-medium">${movement.item_name}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block px-3 py-1 font-semibold text-red-700 bg-red-100 rounded-full">-${quantity}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700 font-semibold">${woId}</td>
+                                <td class="px-4 py-3 text-gray-600 text-sm">${teamAssigned}</td>
+                                <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
                             </tr>
                         `;
                     }).join('');
