@@ -8,6 +8,7 @@
 			'Expense' => '#EF5350',
 			'Income' => '#81C784',
 		];
+		$monthlyPerformance = $monthlyPerformance ?? [];
 	@endphp
 	<!-- Main Content -->
 	<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
@@ -130,41 +131,42 @@
 							<p class="text-slate-300 text-sm">Track all income, expenses, and financial activities</p>
 						</div>
 
-						<!-- Search and Filters -->
-						<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-							<div class="flex-1 max-w-md">
-								<div class="relative">
-									<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-										<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-										</svg>
-									</div>
-									<input type="text" id="searchInput" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-								</div>
-							</div>
-							<div class="flex gap-2">
-								<select id="statusFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-									<option value="all">All Status</option>
-									<option value="paid">Paid</option>
-									<option value="partial">Partial</option>
-								</select>
-								<select id="categoryFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-									<option value="all">All Categories</option>
-									<option value="Income">Income</option>
-									<option value="Expense">Expense</option>
-								</select>
-							</div>
-						</div>
-
 						<!-- Tabs -->
 						<div class="flex space-x-2 w-full mb-6">
 							<button onclick="showAccountingTab('transaction')" id="transactionTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Transactions</button>
 							<button onclick="showAccountingTab('reports')" id="reportsTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Reports</button>
 						</div>
 
-						<!-- Transactions Table -->
-						<div class="overflow-y-auto max-h-[60vh]">
-							<table class="w-full border-collapse text-left text-sm text-white">
+						<div id="transactionContent">
+							<!-- Search and Filters -->
+							<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+								<div class="flex-1 max-w-md">
+									<div class="relative">
+										<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+											<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+											</svg>
+										</div>
+										<input type="text" id="searchInput" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+									</div>
+								</div>
+								<div class="flex gap-2">
+									<select id="statusFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+										<option value="all">All Status</option>
+										<option value="paid">Paid</option>
+										<option value="partial">Partial</option>
+									</select>
+									<select id="categoryFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+										<option value="all">All Categories</option>
+										<option value="Income">Income</option>
+										<option value="Expense">Expense</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- Transactions Table -->
+							<div class="overflow-y-auto max-h-[60vh]">
+								<table class="w-full border-collapse text-left text-sm text-white">
 								<thead class="bg-slate-800 text-slate-300 sticky top-0">
 									<tr>
 										<th class="px-4 py-3 font-medium">Transaction #</th>
@@ -226,7 +228,34 @@
 										</tr>
 									@endforelse
 								</tbody>
-							</table>
+								</table>
+							</div>
+						</div>
+
+						<div id="reportsContent" class="hidden">
+							<div class="bg-slate-800/60 rounded-xl p-6 border border-slate-600">
+								<div class="mb-5">
+									<h3 class="text-lg font-bold text-white">Monthly Performance</h3>
+									<p class="text-slate-300 text-sm">Revenue, expenses, and net profit summary</p>
+								</div>
+								<div class="space-y-4">
+									@foreach($monthlyPerformance as $month)
+										<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-700 pb-4 last:border-b-0 last:pb-0">
+											<div class="flex items-center gap-6">
+												<span class="text-slate-200 font-semibold w-10">{{ $month['month'] }}</span>
+												<div class="text-sm">
+													<p class="text-green-400 font-semibold">Revenue: ₱{{ number_format($month['revenue'], 2) }}</p>
+													<p class="text-red-400 font-semibold">Expenses: ₱{{ number_format($month['expenses'], 2) }}</p>
+												</div>
+											</div>
+											<div class="text-right">
+												<p class="text-blue-400 font-bold text-lg">₱{{ number_format($month['net_profit'], 2) }}</p>
+												<p class="text-slate-300 text-xs">Net Profit</p>
+											</div>
+										</div>
+									@endforeach
+								</div>
+							</div>
 						</div>
 						
 					</div>
@@ -547,7 +576,8 @@
 	function showAccountingTab(tab) {
 		const transactionTab = document.getElementById('transactionTab');
 		const reportsTab = document.getElementById('reportsTab');
-		const unknownTab = document.getElementById('unknownTab');
+		const transactionContent = document.getElementById('transactionContent');
+		const reportsContent = document.getElementById('reportsContent');
 		
 		if (tab === 'transaction') {
 			transactionTab.style.backgroundColor = '#FFF1DA';
@@ -556,9 +586,8 @@
 			reportsTab.style.backgroundColor = '#475569';
 			reportsTab.style.color = '#FFFFFF';
 			reportsTab.style.borderColor = '#64748b';
-			unknownTab.style.backgroundColor = '#475569';
-			unknownTab.style.color = '#FFFFFF';
-			unknownTab.style.borderColor = '#64748b';
+			transactionContent.classList.remove('hidden');
+			reportsContent.classList.add('hidden');
 		} else if (tab === 'reports') {
 			reportsTab.style.backgroundColor = '#FFF1DA';
 			reportsTab.style.color = '#111827';
@@ -566,19 +595,8 @@
 			transactionTab.style.backgroundColor = '#475569';
 			transactionTab.style.color = '#FFFFFF';
 			transactionTab.style.borderColor = '#64748b';
-			unknownTab.style.backgroundColor = '#475569';
-			unknownTab.style.color = '#FFFFFF';
-			unknownTab.style.borderColor = '#64748b';
-		} else if (tab === 'unknown') {
-			unknownTab.style.backgroundColor = '#FFF1DA';
-			unknownTab.style.color = '#111827';
-			unknownTab.style.borderColor = '#FDE68A';
-			transactionTab.style.backgroundColor = '#475569';
-			transactionTab.style.color = '#FFFFFF';
-			transactionTab.style.borderColor = '#64748b';
-			reportsTab.style.backgroundColor = '#475569';
-			reportsTab.style.color = '#FFFFFF';
-			reportsTab.style.borderColor = '#64748b';
+			transactionContent.classList.add('hidden');
+			reportsContent.classList.remove('hidden');
 		}
 	}
 
