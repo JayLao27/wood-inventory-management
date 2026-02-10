@@ -128,8 +128,11 @@
                 </div>
 
                 <!-- Work Orders List -->
+                @php
+                    $visibleWorkOrders = ($workOrders ?? collect())->whereNotIn('status', ['completed']);
+                @endphp
                 <div class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;" id="workOrderTableBody">
-                    @forelse($workOrders->whereNotIn('status', ['completed']) ?? [] as $workOrder)
+                    @forelse($visibleWorkOrders as $workOrder)
                     <div onclick="viewWorkOrder({{ $workOrder->id }})" class="p-5 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer work-order-row" data-order-number="{{ $workOrder->order_number }}" data-product-name="{{ $workOrder->product_name }}" data-assigned-to="{{ $workOrder->assigned_to }}" data-status="{{ $workOrder->status }}">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
@@ -190,11 +193,8 @@
                     </div>
                     @empty
                     @endforelse
-                    @php
-                        $hasWorkOrders = ($workOrders ?? collect())->count() > 0;
-                    @endphp
-                    <div id="workOrderEmptyState" class="py-12 px-4 text-center text-slate-400 {{ $hasWorkOrders ? 'hidden' : '' }}">
-                        No work orders found
+                    <div id="workOrderEmptyState" class="py-12 px-4 text-center text-slate-400 {{ $visibleWorkOrders->count() > 0 ? 'hidden' : '' }}">
+                        No active production found
                     </div>
                 </div>
             </div>
