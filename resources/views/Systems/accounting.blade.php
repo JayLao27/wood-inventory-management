@@ -409,11 +409,8 @@
 	// Attach filter event listeners
 	document.getElementById('searchInput').addEventListener('input', filterTransactions);
 	document.getElementById('categoryFilter').addEventListener('change', filterTransactions);
-			document.getElementById('confirmationSection').classList.add('hidden');
-			document.getElementById('salesOrdersContainer').classList.remove('hidden');
-		}
 
-		function closeAddTransaction() {
+	function closeAddTransaction() {
 			document.getElementById('addTransactionModal').classList.add('hidden');
 			resetSelection();
 		}
