@@ -18,6 +18,7 @@ class WorkOrder extends Model
         'completion_quantity',
         'status',
         'due_date',
+        'starting_date',
         'assigned_to',
         'priority',
         'notes'
@@ -25,6 +26,7 @@ class WorkOrder extends Model
 
     protected $casts = [
         'due_date' => 'date',
+        'starting_date' => 'date',
     ];
 
     // Relationships
