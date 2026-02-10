@@ -161,7 +161,7 @@
                 <!-- Materials Table -->
                 <div id="materials-table" class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;">
                     @forelse($materials ?? [] as $material)
-                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm" data-name="{{ $material->name }}" data-category="{{ $material->category }}">
+                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer" data-name="{{ $material->name }}" data-category="{{ $material->category }}" onclick="openStockModal('material', {{ $material->id }})">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-bold text-white text-lg">{{ $material->name }}</h3>
@@ -186,13 +186,6 @@
                                 <p class="text-white font-bold text-lg mt-1">{{ $material->minimum_stock }} {{ $material->unit }}</p>
                             </div>
                             <div class="flex items-center space-x-2 justify-end">
-                                <button onclick="event.stopPropagation(); openStockModal('material', {{ $material->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all flex items-center space-x-2 group" title="View Items">
-                                    <svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="text-xs font-bold text-white">View</span>
-                                </button>
                                 <button onclick="event.stopPropagation(); openDeleteModal('material', {{ $material->id }}, '{{ addslashes($material->name) }}')" class="p-2.5 hover:bg-red-500/20 rounded-lg transition-all group" title="Delete">
                                     <svg class="w-5 h-5 text-red-400 group-hover:text-red-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -215,7 +208,7 @@
                 <!-- Products Table -->
                 <div id="products-table" class="space-y-3 overflow-y-auto custom-scrollbar hidden" style="max-height:60vh;">
                     @forelse($products ?? [] as $product)
-                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm" data-name="{{ $product->product_name }}" data-category="Products">
+                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer" data-name="{{ $product->product_name }}" data-category="Products" onclick="openStockModal('product', {{ $product->id }})">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-bold text-white text-lg">{{ $product->product_name }}</h3>
@@ -237,15 +230,6 @@
                         </div>
 
                         <div class="flex items-center space-x-2 mt-2 justify-end">
-                            <button onclick="event.stopPropagation(); openStockModal('product', {{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group flex items-center space-x-1" title="View Materials & Details">
-                                <svg class="w-5 h-5 text-blue-400 group-hover:text-blue-300" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                </svg>
-                                @if($product->materials->count() > 0)
-                                <span class="text-xs font-bold text-blue-400">{{ $product->materials->count() }}</span>
-                                @endif
-                            </button>
                             <button onclick="event.stopPropagation(); openEditProductModal({{ $product->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all group" title="Edit">
                                 <svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
