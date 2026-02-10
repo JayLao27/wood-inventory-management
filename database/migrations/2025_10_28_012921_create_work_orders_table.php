@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('completion_quantity')->default(0);
             $table->enum('status', ['pending', 'in_progress', 'quality_check', 'completed', 'overdue'])->default('pending');
             $table->date('due_date');
+            $table->date('starting_date')->nullable();
             $table->string('assigned_to');
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->text('notes')->nullable();
