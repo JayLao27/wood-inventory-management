@@ -24,16 +24,17 @@ class ProductionController extends Controller
             'quality_check' => $workOrders->where('status', 'quality_check')->count(),
             'completed' => $workOrders->where('status', 'completed')->count(),
             'overdue' => $workOrders->where('status', 'overdue')->count(),
+            'cancelled' => $workOrders->where('status', 'cancelled')->count(),
         ];
 
-        // Pending sales orders: not Delivered, with only items that don't already have work orders
+        // Pending sales orders: not Delivered, with only items that don't already have work orders (excluding cancelled)
         $pendingSalesOrders = SalesOrder::with(['customer', 'items.product', 'workOrders'])
             ->where('status', '!=', 'Delivered')
             ->orderBy('delivery_date')
             ->get()
             ->map(function (SalesOrder $order) {
                 $remainingItems = $order->items->filter(function ($item) use ($order) {
-                    return !$order->workOrders->contains('product_id', $item->product_id);
+                    return !$order->workOrders->where('status', '!=', 'cancelled')->contains('product_id', $item->product_id);
                 })->values();
 
                 $order->setRelation('items', $remainingItems);
@@ -56,116 +57,184 @@ class ProductionController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'sales_order_id' => 'required|exists:sales_orders,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-            'due_date' => 'required|date|after_or_equal:today',
-            'assigned_to' => 'required|string|max:255',
-            'priority' => 'nullable|in:low,medium,high',
-        ]);
-
-        $salesOrder = SalesOrder::with('items')->findOrFail($validated['sales_order_id']);
-        $product = Product::with('materials')->findOrFail($validated['product_id']);
-
-        $alreadyExists = WorkOrder::where('sales_order_id', $validated['sales_order_id'])
-            ->where('product_id', $validated['product_id'])
-            ->exists();
-        if ($alreadyExists) {
-            return redirect()->back()->with('error', 'A work order for this product already exists for the selected sales order.');
-        }
-
-        // Ensure this product/quantity is from this sales order
-        $lineItem = $salesOrder->items->firstWhere('product_id', $validated['product_id']);
-        if (!$lineItem || $lineItem->quantity < (int) $validated['quantity']) {
-            return redirect()->back()->with('error', 'Invalid product or quantity for this sales order.');
-        }
-
-        // Check material availability (BOM) and reserve / deduct
-        $materialsNeeded = [];
-        foreach ($product->materials as $material) {
-            $qtyNeeded = (float) $material->pivot->quantity_needed * (int) $validated['quantity'];
-            $materialsNeeded[] = [
-                'material' => $material,
-                'quantity_needed' => $qtyNeeded,
-            ];
-        }
-
-        foreach ($materialsNeeded as $entry) {
-            $material = $entry['material'];
-            $qtyNeeded = $entry['quantity_needed'];
-            if ($material->current_stock < $qtyNeeded) {
-                return redirect()->back()->with('error', sprintf(
-                    'Insufficient stock for "%s". Required: %s %s, Available: %s %s.',
-                    $material->name,
-                    number_format($qtyNeeded, 2),
-                    $material->unit,
-                    number_format($material->current_stock, 2),
-                    $material->unit
-                ));
-            }
-        }
-
-        $orderNumber = $this->generateWorkOrderNumber();
-
-        $workOrder = WorkOrder::create([
-            'order_number' => $orderNumber,
-            'sales_order_id' => $validated['sales_order_id'],
-            'product_id' => $validated['product_id'],
-            'product_name' => $product->product_name,
-            'quantity' => (int) $validated['quantity'],
-            'due_date' => $validated['due_date'],
-            'assigned_to' => $validated['assigned_to'],
-            'priority' => $validated['priority'] ?? 'medium',
-            'status' => 'in_progress',
-        ]);
-
-        // Stock out: create inventory movements (out) and deduct material stock
-        foreach ($materialsNeeded as $entry) {
-            $material = $entry['material'];
-            $qtyNeeded = $entry['quantity_needed'];
-
-            InventoryMovement::create([
-                'item_type' => 'material',
-                'item_id' => $material->id,
-                'movement_type' => 'out',
-                'quantity' => $qtyNeeded,
-                'reference_type' => WorkOrder::class,
-                'reference_id' => $workOrder->id,
-                'notes' => sprintf('Production work order %s – %s x %s', $workOrder->order_number, $product->product_name, $validated['quantity']),
-                'status' => 'completed',
+        try {
+            $validated = $request->validate([
+                'sales_order_id' => 'required|exists:sales_orders,id',
+                'product_id' => 'required|exists:products,id',
+                'quantity' => 'required|integer|min:1',
+                'due_date' => 'required|date|after_or_equal:today',
+                'assigned_to' => 'required|string|max:255',
+                'priority' => 'nullable|in:low,medium,high',
             ]);
 
-            $material->decrement('current_stock', $qtyNeeded);
-        }
+            $salesOrder = SalesOrder::with('items')->findOrFail($validated['sales_order_id']);
+            $product = Product::with('materials')->findOrFail($validated['product_id']);
 
-        return redirect()->back()->with('success', 'Work order ' . $orderNumber . ' created. Materials have been deducted from stock.');
+            // Check for existing active work order (excluding cancelled)
+            $alreadyExists = WorkOrder::where('sales_order_id', $validated['sales_order_id'])
+                ->where('product_id', $validated['product_id'])
+                ->where('status', '!=', 'cancelled')
+                ->exists();
+            if ($alreadyExists) {
+                $message = 'A work order for this product already exists for the selected sales order.';
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $message], 400);
+                }
+                return redirect()->back()->with('error', $message);
+            }
+
+            // Ensure this product/quantity is from this sales order
+            $lineItem = $salesOrder->items->firstWhere('product_id', $validated['product_id']);
+            if (!$lineItem || $lineItem->quantity < (int) $validated['quantity']) {
+                $message = 'Invalid product or quantity for this sales order.';
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $message], 400);
+                }
+                return redirect()->back()->with('error', $message);
+            }
+
+            // Check material availability (BOM) and reserve / deduct
+            $materialsNeeded = [];
+            foreach ($product->materials as $material) {
+                $qtyNeeded = (float) $material->pivot->quantity_needed * (int) $validated['quantity'];
+                $materialsNeeded[] = [
+                    'material' => $material,
+                    'quantity_needed' => $qtyNeeded,
+                ];
+            }
+
+            foreach ($materialsNeeded as $entry) {
+                $material = $entry['material'];
+                $qtyNeeded = $entry['quantity_needed'];
+                if ($material->current_stock < $qtyNeeded) {
+                    $message = sprintf(
+                        'Insufficient stock for "%s". Required: %s %s, Available: %s %s.',
+                        $material->name,
+                        number_format($qtyNeeded, 2),
+                        $material->unit,
+                        number_format($material->current_stock, 2),
+                        $material->unit
+                    );
+                    if ($request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => $message], 400);
+                    }
+                    return redirect()->back()->with('error', $message);
+                }
+            }
+
+            $orderNumber = $this->generateWorkOrderNumber();
+
+            $workOrder = WorkOrder::create([
+                'order_number' => $orderNumber,
+                'sales_order_id' => $validated['sales_order_id'],
+                'product_id' => $validated['product_id'],
+                'product_name' => $product->product_name,
+                'quantity' => (int) $validated['quantity'],
+                'due_date' => $validated['due_date'],
+                'assigned_to' => $validated['assigned_to'],
+                'priority' => $validated['priority'] ?? 'medium',
+                'status' => 'in_progress',
+            ]);
+
+            // Stock out: create inventory movements (out) and deduct material stock
+            foreach ($materialsNeeded as $entry) {
+                $material = $entry['material'];
+                $qtyNeeded = $entry['quantity_needed'];
+
+                InventoryMovement::create([
+                    'item_type' => 'material',
+                    'item_id' => $material->id,
+                    'movement_type' => 'out',
+                    'quantity' => $qtyNeeded,
+                    'reference_type' => WorkOrder::class,
+                    'reference_id' => $workOrder->id,
+                    'notes' => sprintf('Production work order %s – %s x %s', $workOrder->order_number, $product->product_name, $validated['quantity']),
+                    'status' => 'completed',
+                ]);
+
+                $material->decrement('current_stock', $qtyNeeded);
+            }
+
+            $message = 'Work order ' . $orderNumber . ' created. Materials have been deducted from stock.';
+            
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message
+                ]);
+            }
+
+            return redirect()->back()->with('success', $message);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $message = 'Validation failed: ' . implode(', ', array_reduce($e->errors(), function ($carry, $item) {
+                return array_merge($carry, $item);
+            }, []));
+            
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 422);
+            }
+            return redirect()->back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            $message = 'Error creating work order: ' . $e->getMessage();
+            
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 500);
+            }
+            return redirect()->back()->with('error', $message);
+        }
     }
 
     public function update(Request $request, WorkOrder $workOrder)
     {
-        $validated = $request->validate([
-            'status' => 'nullable|in:pending,in_progress,quality_check,completed,overdue',
-            'completion_quantity' => 'nullable|integer|min:0',
-            'notes' => 'nullable|string|max:1000',
-        ]);
+        try {
+            $validated = $request->validate([
+                'status' => 'nullable|in:pending,in_progress,quality_check,completed,overdue,cancelled',
+                'completion_quantity' => 'nullable|integer|min:0',
+                'notes' => 'nullable|string|max:1000',
+            ]);
 
-        $updateData = [];
-        if (isset($validated['status'])) {
-            $updateData['status'] = $validated['status'];
-        }
-        if (isset($validated['completion_quantity'])) {
-            $updateData['completion_quantity'] = $validated['completion_quantity'];
-        }
-        if (isset($validated['notes'])) {
-            $updateData['notes'] = $validated['notes'];
-        }
+            $updateData = [];
+            if (isset($validated['status'])) {
+                $updateData['status'] = $validated['status'];
+            }
+            if (isset($validated['completion_quantity'])) {
+                $updateData['completion_quantity'] = $validated['completion_quantity'];
+            }
+            if (isset($validated['notes'])) {
+                $updateData['notes'] = $validated['notes'];
+            }
 
-        if (!empty($updateData)) {
-            $workOrder->update($updateData);
-        }
+            if (!empty($updateData)) {
+                $workOrder->update($updateData);
+            }
 
-        return redirect()->back()->with('success', 'Work order updated.');
+            $message = 'Work order updated successfully.';
+            
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message
+                ]);
+            }
+
+            return redirect()->back()->with('success', $message);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $message = 'Validation failed: ' . implode(', ', array_reduce($e->errors(), function ($carry, $item) {
+                return array_merge($carry, $item);
+            }, []));
+            
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 422);
+            }
+            return redirect()->back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            $message = 'Error updating work order: ' . $e->getMessage();
+            
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 500);
+            }
+            return redirect()->back()->with('error', $message);
+        }
     }
 
     public function start(WorkOrder $workOrder)
@@ -180,10 +249,17 @@ class ProductionController extends Controller
         return redirect()->back()->with('success', 'Work order started.');
     }
 
-    public function complete(WorkOrder $workOrder)
+    public function complete(WorkOrder $workOrder, Request $request)
     {
         if ($workOrder->status === 'completed') {
-            return redirect()->back()->with('info', 'Work order is already completed.');
+            $message = 'Work order is already completed.';
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 400);
+            }
+            return redirect()->back()->with('info', $message);
         }
         
         $workOrder->update([
@@ -215,7 +291,63 @@ class ProductionController extends Controller
                 ]);
             }
         }
-        return redirect()->back()->with('success', 'Work order marked as completed.');
+        
+        $message = 'Work order marked as completed.';
+        
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        }
+        
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function cancel(WorkOrder $workOrder)
+    {
+        try {
+            if ($workOrder->status === 'completed' || $workOrder->status === 'cancelled') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot cancel a completed or already cancelled work order.'
+                ], 400);
+            }
+
+            $workOrder->update([
+                'status' => 'cancelled',
+                'completion_quantity' => 0,
+            ]);
+
+            // Release reserved materials back to inventory
+            if ($workOrder->product && $workOrder->product->materials) {
+                foreach ($workOrder->product->materials as $material) {
+                    $qtyToRelease = (float) $material->pivot->quantity_needed * (int) $workOrder->quantity;
+                    $material->increment('current_stock', $qtyToRelease);
+
+                    // Record the inventory movement
+                    InventoryMovement::create([
+                        'item_type' => 'App\Models\Material',
+                        'item_id' => $material->id,
+                        'movement_type' => 'Return',
+                        'quantity' => $qtyToRelease,
+                        'reference_type' => 'App\Models\WorkOrder',
+                        'reference_id' => $workOrder->id,
+                        'notes' => 'Materials released from cancelled work order ' . $workOrder->order_number,
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Work order cancelled successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error cancelling work order: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     private function generateWorkOrderNumber(): string
