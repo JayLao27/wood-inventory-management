@@ -6,15 +6,21 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
+use App\Services\CacheService;
 use Illuminate\Http\Request;
 
 class SalesOrderController extends Controller
 {
     public function index()
     {
-        $salesOrders = SalesOrder::with(['customer', 'items.product'])->latest()->get();
-        $customers = Customer::orderBy('name')->get();
-        $products = Product::orderBy('product_name')->get();
+        // Use pagination instead of loading all
+        $salesOrders = SalesOrder::with(['customer', 'items.product'])
+            ->latest()
+            ->paginate(20);
+        
+        // Use cache for reference data
+        $customers = CacheService::getCustomers();
+        $products = CacheService::getProducts();
 
         return view('Systems.sales', compact('salesOrders', 'customers', 'products'));
     }

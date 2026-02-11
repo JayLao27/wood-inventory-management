@@ -62,21 +62,31 @@ class ProcurementController extends Controller
         $pendingPayments = PurchaseOrder::whereIn('payment_status', ['Pending', 'Partial'])
             ->sum(DB::raw('total_amount - COALESCE(paid_amount, 0)'));
 
-        // Get open purchase orders with optimized query
+        // Get open purchase orders with OPTIMIZED query - preload all movements
+        $purchaseOrderIds = PurchaseOrder::where('status', '!=', 'received')
+            ->pluck('id')
+            ->toArray();
+
+        // Preload ALL inventory movements in ONE query instead of N queries
+        $receivedQuantities = InventoryMovement::where('item_type', 'material')
+            ->where('reference_type', 'purchase_order')
+            ->whereIn('reference_id', $purchaseOrderIds)
+            ->where('movement_type', 'in')
+            ->select('reference_id', 'item_id', DB::raw('SUM(quantity) as total_received'))
+            ->groupBy('reference_id', 'item_id')
+            ->get()
+            ->groupBy('reference_id');
+
         $openPurchaseOrders = PurchaseOrder::with(['items.material'])
             ->where('status', '!=', 'received')
             ->whereHas('items')
             ->get()
-            ->filter(function($order) {
-                // Check if any item has remaining quantity
-                return $order->items->contains(function($item) use ($order) {
+            ->filter(function($order) use ($receivedQuantities) {
+                // Use preloaded data instead of running query for each item
+                $received = $receivedQuantities->get($order->id, collect());
+                return $order->items->contains(function($item) use ($received) {
                     $ordered = (float)$item->quantity;
-                    $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
-                        ->where('item_id', $item->material_id)
-                        ->where('reference_type', 'purchase_order')
-                        ->where('reference_id', $order->id)
-                        ->where('movement_type', 'in')
-                        ->sum('quantity');
+                    $alreadyReceived = (float)($received->where('item_id', $item->material_id)->first()->total_received ?? 0);
                     return ($ordered - $alreadyReceived) > 0.001;
                 });
             })

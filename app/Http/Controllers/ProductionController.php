@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\WorkOrder;
+use App\Services\CacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
