@@ -151,7 +151,11 @@
 									</div>
 								</div>
 								<div class="flex gap-2">
-
+									<select id="statusFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+										<option value="all">All Status</option>
+										<option value="paid">Paid</option>
+										<option value="partial">Partial</option>
+									</select>
 									<select id="categoryFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
 										<option value="all">All Categories</option>
 										<option value="Income">Income</option>
@@ -380,37 +384,47 @@
 		function filterTransactions() {
 			const searchInput = document.getElementById('searchInput').value.toLowerCase();
 			const categoryFilter = document.getElementById('categoryFilter').value;
-		const rows = document.querySelectorAll('.transaction-row');
-		
-		rows.forEach(row => {
-			const rowType = row.getAttribute('data-type');
-			const rowStatus = row.getAttribute('data-status');
-			const rowId = row.getAttribute('data-id').toLowerCase();
-			const rowDate = row.getAttribute('data-date').toLowerCase();
-			const rowCategory = row.getAttribute('data-category').toLowerCase();
-			const rowDescription = row.getAttribute('data-description').toLowerCase();
+			const statusFilter = document.getElementById('statusFilter').value;
+			const rows = document.querySelectorAll('.transaction-row');
 			
-			const categoryMatch = categoryFilter === 'all' || rowType === categoryFilter;
-			const searchMatch = searchInput === '' || 
-				rowId.includes(searchInput) ||
-				rowDate.includes(searchInput) ||
-				rowType.toLowerCase().includes(searchInput) ||
-				rowCategory.includes(searchInput) ||
-				rowDescription.includes(searchInput);
-			
-			if (categoryMatch && searchMatch) {
-				row.style.display = '';
-			} else {
-				row.style.display = 'none';
-			}
-		});
-	}
+			rows.forEach(row => {
+				const rowType = row.getAttribute('data-type');
+				const rowStatus = row.getAttribute('data-status');
+				const rowId = row.getAttribute('data-id').toLowerCase();
+				const rowDate = row.getAttribute('data-date').toLowerCase();
+				const rowCategory = row.getAttribute('data-category').toLowerCase();
+				const rowDescription = row.getAttribute('data-description').toLowerCase();
+				
+				const categoryMatch = categoryFilter === 'all' || rowType === categoryFilter;
+				const statusMatch = statusFilter === 'all' || rowStatus === statusFilter;
+				const searchMatch = searchInput === '' || 
+					rowId.includes(searchInput) ||
+					rowDate.includes(searchInput) ||
+					rowType.toLowerCase().includes(searchInput) ||
+					rowCategory.includes(searchInput) ||
+					rowDescription.includes(searchInput);
+				
+				if (categoryMatch && statusMatch && searchMatch) {
+					row.style.display = '';
+				} else {
+					row.style.display = 'none';
+				}
+			});
+		}
 
-	// Attach filter event listeners
-	document.getElementById('searchInput').addEventListener('input', filterTransactions);
-	document.getElementById('categoryFilter').addEventListener('change', filterTransactions);
+		// Attach filter event listeners
+		document.getElementById('searchInput').addEventListener('input', filterTransactions);
+		document.getElementById('categoryFilter').addEventListener('change', filterTransactions);
+		document.getElementById('statusFilter').addEventListener('change', filterTransactions);
 
-	function closeAddTransaction() {
+		// Modal functions
+		function openAddTransaction() {
+			document.getElementById('addTransactionModal').classList.remove('hidden');
+			document.getElementById('confirmationSection').classList.add('hidden');
+			document.getElementById('salesOrdersContainer').classList.remove('hidden');
+		}
+
+		function closeAddTransaction() {
 			document.getElementById('addTransactionModal').classList.add('hidden');
 			resetSelection();
 		}
