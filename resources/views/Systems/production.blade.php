@@ -191,7 +191,6 @@
         </div>
 
         <!-- Add Work Order Modal -->
-<!-- Improved Work Order Modal -->
         <div id="workOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeWorkOrderModal()">
             <div class="modal-content bg-amber-50 rounded-2xl max-w-3xl w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
                 
@@ -493,57 +492,57 @@
 
             <!-- View Work Order Modal -->
             <div id="viewWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeViewWorkOrderModal()">
-                <div class="modal-content bg-amber-50 rounded-2xl max-w-3xl w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-                    <div class="p-5">
+                <div class="modal-content bg-amber-50 rounded-xl max-w-md w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+                    <div class="p-3.5">
                         <!-- Header -->
-                        <div class="flex items-center justify-between mb-5 border-b-2 pb-6" style="border-color: #374151;">
+                        <div class="flex items-center justify-between mb-4 border-b-2 pb-3.5" style="border-color: #374151;">
                             <div>
-                                <h3 class="text-xl font-bold" style="color: #374151;">Work Order Details</h3>
-                                <p class="text-base mt-1" style="color: #666;">Summary and status for the selected work order.</p>
+                                <h3 class="text-base font-bold" style="color: #374151;">Work Order Details</h3>
+                                <p class="text-xs mt-0.5" style="color: #666;">Summary and status</p>
                             </div>
-                            <button onclick="closeViewWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-2 transition-all duration-200">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <button onclick="closeViewWorkOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-1.5 transition-all duration-200">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
 
                         <!-- Work Order Information Cards -->
-                        <div class="grid grid-cols-2 gap-4 mb-5">
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                        <div class="grid grid-cols-2 gap-2.5 mb-4">
+                            <div class="p-2.5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                                 <p class="text-xs font-semibold" style="color: #374151;">Order #</p>
-                                <p id="vw_orderNumber" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
+                                <p id="vw_orderNumber" class="text-base font-bold mt-1.5" style="color: #374151;">-</p>
                             </div>
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                            <div class="p-2.5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                                 <p class="text-xs font-semibold" style="color: #374151;">Product</p>
-                                <p id="vw_productName" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
+                                <p id="vw_productName" class="text-base font-bold mt-1.5" style="color: #374151;">-</p>
                             </div>
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #F57C00;">
+                            <div class="p-2.5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #F57C00;">
                                 <p class="text-xs font-semibold" style="color: #E65100;">Quantity</p>
-                                <p id="vw_quantity" class="text-lg font-bold mt-2" style="color: #E65100;">-</p>
+                                <p id="vw_quantity" class="text-base font-bold mt-1.5" style="color: #E65100;">-</p>
                             </div>
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #1976D2;">
-                                <p class="text-xs font-semibold" style="color: #0D47A1;">Starting Date</p>
-                                <p id="vw_startingDate" class="text-lg font-bold mt-2" style="color: #0D47A1;">-</p>
+                            <div class="p-2.5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #1976D2;">
+                                <p class="text-xs font-semibold" style="color: #0D47A1;">Start Date</p>
+                                <p id="vw_startingDate" class="text-base font-bold mt-1.5" style="color: #0D47A1;">-</p>
                             </div>
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #C2185B;">
+                            <div class="p-2.5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #C2185B;">
                                 <p class="text-xs font-semibold" style="color: #880E4F;">Due Date</p>
-                                <p id="vw_dueDate" class="text-lg font-bold mt-2" style="color: #880E4F;">-</p>
+                                <p id="vw_dueDate" class="text-base font-bold mt-1.5" style="color: #880E4F;">-</p>
                             </div>
-                            <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                            <div class="p-2.5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                                 <p class="text-xs font-semibold" style="color: #374151;">Assigned To</p>
-                                <p id="vw_assignedTo" class="text-lg font-bold mt-2" style="color: #374151;">-</p>
+                                <p id="vw_assignedTo" class="text-base font-bold mt-1.5" style="color: #374151;">-</p>
                             </div>
                         </div>
 
                         <!-- Notes Section -->
-                        <div class="mb-5 p-5 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                            <p class="text-xs font-semibold mb-3" style="color: #374151;">Notes / Details</p>
-                            <form id="notesForm" method="POST" action="" class="space-y-3">
+                        <div class="mb-4 p-3 px-1 rounded-lg border-l-4" style="background-color: rgba(255, 255, 255, 0.7); border-left-color: #374151;">
+                            <p class="text-xs font-semibold mb-2.5" style="color: #374151;">Notes</p>
+                            <form id="notesForm" method="POST" action="" class="space-y-2.5">
                                 @csrf
                                 @method('PUT')
-                                <textarea id="vw_notes" name="notes" rows="4" class="w-full bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Add notes or details about this work order..."></textarea>
+                                <textarea id="vw_notes" name="notes" rows="3" class="w-full bg-white border-2 border-gray-300 rounded-lg px-2.5 py-2 text-gray-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs" placeholder="Add notes..."></textarea>
                                 <div class="flex justify-end">
-                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm font-medium shadow-md hover:shadow-lg" title="Save notes for this work order">
-                                        Save Notes
+                                    <button type="submit" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-xs font-medium shadow-sm hover:shadow-md" title="Save notes">
+                                        Save
                                     </button>
                                 </div>
                             </form>
@@ -551,7 +550,7 @@
 
                         <!-- Close Button -->
                         <div class="flex justify-end">
-                            <button type="button" onclick="closeViewWorkOrderModal()" class="px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 text-base font-medium text-white" style="background-color: #374151;">
+                            <button type="button" onclick="closeViewWorkOrderModal()" class="px-3.5 py-1.5 rounded-lg hover:shadow-lg transition-all duration-200 text-xs font-medium text-white" style="background-color: #374151;">
                                 Close
                             </button>
                         </div>
