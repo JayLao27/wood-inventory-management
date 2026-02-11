@@ -222,7 +222,6 @@ class AccountingController extends Controller
             'chartProfit'
         ));
     }
-    }
 
     public function addTransaction( SalesOrder $salesOrder, PurchaseOrder $purchaseOrder )
     {
