@@ -8,6 +8,7 @@ use App\Models\PurchaseOrder;
 use App\Models\WorkOrder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+    if(app()->environment('production')) {
+        \URL::forceScheme('https');
+    }
+
         Relation::morphMap([
             'material' => Material::class,
             'product' => Product::class,
