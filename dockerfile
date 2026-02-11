@@ -43,10 +43,11 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platfo
 #Copy app code
 COPY . /var/www/html
 
-#Create necessary directories with correct permissions
-RUN mkdir -p /var/www/html/storage/app/public/uploads /var/www/html/bootstrap/cache && \
-    chown -R www-data:www-data /var/www/html && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+#set permissions for storage and bootstrap cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-#Start apache and run artisan commands
-CMD /bin/bash -c "php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground"
+#expose render required port
+EXPOSE 10000
+
+#Start apache
+CMD ["apache2-foreground"]
