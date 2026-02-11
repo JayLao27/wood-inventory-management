@@ -9,6 +9,7 @@ use App\Models\WorkOrder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,11 +25,13 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
+    {   
+        // Register auth view namespace
+        View::addNamespace('auth', resource_path('views/Auth'));
 
-    if(app()->environment('production')) {
-        \URL::forceScheme('https');
-    }
+        if(app()->environment('production')) {
+            \URL::forceScheme('https');
+        }
 
         Relation::morphMap([
             'material' => Material::class,
