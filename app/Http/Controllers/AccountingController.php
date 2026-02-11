@@ -174,17 +174,17 @@ class AccountingController extends Controller
             ->get();
 
         // Accounting report: last 6 months - use raw SQL for efficiency
-        $chartLabels = collect();
-        $chartRevenue = collect();
-        $chartExpenses = collect();
-        $chartProfit = collect();
+        $salesReportMonths = [];
+        $salesReportRevenue = [];
+        $salesReportExpenses = [];
+        $chartProfit = [];
         
         for ($i = 5; $i >= 0; $i--) {
             $month = $now->copy()->subMonths($i);
             $start = $month->copy()->startOfMonth();
             $end = $month->copy()->endOfMonth();
             
-            $chartLabels->push($month->format('M Y'));
+            $salesReportMonths[] = $month->format('M Y');
             
             $monthData = Accounting::selectRaw('
                 SUM(CASE WHEN transaction_type = "Income" THEN amount ELSE 0 END) as revenue,
@@ -196,9 +196,9 @@ class AccountingController extends Controller
             $revenue = (float)($monthData->revenue ?? 0);
             $expenses = (float)($monthData->expenses ?? 0);
             
-            $chartRevenue->push($revenue);
-            $chartExpenses->push($expenses);
-            $chartProfit->push($revenue - $expenses);
+            $salesReportRevenue[] = $revenue;
+            $salesReportExpenses[] = $expenses;
+            $chartProfit[] = $revenue - $expenses;
         }
 
         return view('Systems.dashboard', compact(
@@ -216,9 +216,9 @@ class AccountingController extends Controller
             'overdueWorkOrders',
             'lowStockCount',
             'lowStockMaterials',
-            'chartLabels',
-            'chartRevenue',
-            'chartExpenses',
+            'salesReportMonths',
+            'salesReportRevenue',
+            'salesReportExpenses',
             'chartProfit'
         ));
     }
