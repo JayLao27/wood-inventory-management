@@ -132,7 +132,7 @@
 
                 <!-- Work Orders List -->
                 @php
-                    $visibleWorkOrders = ($workOrders ?? collect())->whereNotIn('status', ['completed']);
+                    $visibleWorkOrders = ($workOrders ?? collect())->whereNotIn('status', ['completed', 'cancelled']);
                 @endphp
                 <div class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;" id="workOrderTableBody">
                     @forelse($visibleWorkOrders as $workOrder)
@@ -149,7 +149,8 @@
                                         'in_progress' => 'bg-blue-500',
                                         'quality_check' => 'bg-purple-500',
                                         'completed' => 'bg-green-500',
-                                        'overdue' => 'bg-red-500'
+                                        'overdue' => 'bg-red-500',
+                                        'cancelled' => 'bg-gray-500'
                                     ];
                                     $statusColor = $statusColors[$workOrder->status] ?? 'bg-gray-500';
                                     $statusLabel = ucwords(str_replace('_', ' ', $workOrder->status));
@@ -173,7 +174,7 @@
                                 <p class="text-white font-bold text-lg mt-1">{{ $workOrder->due_date->format('m/d/Y') }}</p>
                             </div>
                             <div class="flex items-center space-x-2 justify-end">
-                                <button onclick="event.stopPropagation(); completeWorkOrder({{ $workOrder->id }})" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Complete">
+                                <button onclick="event.stopPropagation(); openCompleteConfirmModal({{ $workOrder->id }}, '{{ $workOrder->order_number }}')" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Complete">
                                     <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
@@ -549,7 +550,10 @@
                         </div>
 
                         <!-- Close Button -->
-                        <div class="flex justify-end">
+                        <div class="flex justify-between gap-2">
+                            <button type="button" onclick="openCancelConfirmModal()" class="px-3.5 py-1.5 rounded-lg hover:shadow-lg transition-all duration-200 text-xs font-medium text-white bg-red-600 hover:bg-red-700">
+                                Cancel Order
+                            </button>
                             <button type="button" onclick="closeViewWorkOrderModal()" class="px-3.5 py-1.5 rounded-lg hover:shadow-lg transition-all duration-200 text-xs font-medium text-white" style="background-color: #374151;">
                                 Close
                             </button>
@@ -557,6 +561,70 @@
                     </div>
                 </div>
             </div>
+
+        <!-- Complete Work Order Confirmation Modal -->
+        <div id="completeConfirmModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeCompleteConfirmModal()">
+            <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+                <div class="p-4">
+                    <!-- Icon -->
+                    <div class="flex justify-center mb-3">
+                        <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Message -->
+                    <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Complete Work Order?</h3>
+                    <p class="text-center text-xs mb-4" style="color: #666;">
+                        Mark work order <span id="completeConfirmOrderNumber" class="font-semibold">-</span> as completed?
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="flex justify-center gap-2">
+                        <button type="button" onclick="closeCompleteConfirmModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                            No, Keep Working
+                        </button>
+                        <button type="button" onclick="confirmCompleteWorkOrder()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                            Yes, Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancel Work Order Confirmation Modal -->
+        <div id="cancelConfirmModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeCancelConfirmModal()">
+            <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+                <div class="p-4">
+                    <!-- Icon -->
+                    <div class="flex justify-center mb-3">
+                        <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Message -->
+                    <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Cancel Work Order?</h3>
+                    <p class="text-center text-xs mb-4" style="color: #666;">
+                        Are you sure you want to cancel work order <span id="cancelConfirmOrderNumber" class="font-semibold">-</span>? This will release all reserved materials.
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="flex justify-center gap-2">
+                        <button type="button" onclick="closeCancelConfirmModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                            No, Keep It
+                        </button>
+                        <button type="button" onclick="confirmCancelWorkOrder()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                            Yes, Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Production History Modal -->
         <div id="productionHistoryModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeProductionHistoryModal()">
@@ -905,6 +973,7 @@
             }
 
             function populateAndShowViewModal(wo) {
+                currentWorkOrderId = wo.id;
                 document.getElementById('vw_orderNumber').textContent = wo.order_number || wo.orderNumber || '-';
                 document.getElementById('vw_productName').textContent = wo.product_name || wo.productName || '-';
                 document.getElementById('vw_quantity').textContent = (wo.quantity !== undefined) ? (wo.quantity + ' pcs') : '-';
@@ -922,6 +991,147 @@
                 const modal = document.getElementById('viewWorkOrderModal');
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+            }
+
+            let currentWorkOrderId = null;
+            let currentCompleteOrderId = null;
+
+            function openCompleteConfirmModal(id, orderNumber) {
+                currentCompleteOrderId = id;
+                document.getElementById('completeConfirmOrderNumber').textContent = orderNumber;
+                const modal = document.getElementById('completeConfirmModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function closeCompleteConfirmModal() {
+                const modal = document.getElementById('completeConfirmModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            function confirmCompleteWorkOrder() {
+                const orderNumber = document.getElementById('completeConfirmOrderNumber').textContent;
+                
+                fetch(`/production/${currentCompleteOrderId}/complete`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                    }
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    closeCompleteConfirmModal();
+                    if (data.success) {
+                        showSuccessNotification(`Work Order ${orderNumber} marked as completed!`);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showErrorNotification('Error completing work order: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    closeCompleteConfirmModal();
+                    showErrorNotification('Error completing work order: ' + error.message);
+                });
+            }
+
+            function openCancelConfirmModal() {
+                const orderNumber = document.getElementById('vw_orderNumber').textContent;
+                document.getElementById('cancelConfirmOrderNumber').textContent = orderNumber;
+                const modal = document.getElementById('cancelConfirmModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function closeCancelConfirmModal() {
+                const modal = document.getElementById('cancelConfirmModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            function confirmCancelWorkOrder() {
+                const orderNumber = document.getElementById('vw_orderNumber').textContent;
+                
+                // Make the cancel request
+                fetch(`/production/${currentWorkOrderId}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]')?.value,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    closeCancelConfirmModal();
+                    if (data.success) {
+                        showSuccessNotification(`Work Order ${orderNumber} has been cancelled successfully.`);
+                        closeViewWorkOrderModal();
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showErrorNotification('Error cancelling work order: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    closeCancelConfirmModal();
+                    showErrorNotification('Error cancelling work order: ' + error.message);
+                });
+            }
+
+            function showSuccessNotification(message) {
+                const notif = document.createElement('div');
+                notif.className = 'fixed top-5 right-5 z-[9999] animate-fadeIn';
+                notif.innerHTML = `
+                    <div class="flex items-center gap-3 bg-green-100 border-2 border-green-400 text-green-800 rounded-lg px-6 py-4 shadow-lg">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="font-medium text-sm">${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-green-600 hover:text-green-800 ml-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(notif);
+                setTimeout(() => notif.remove(), 4000);
+            }
+
+            function showErrorNotification(message) {
+                const notif = document.createElement('div');
+                notif.className = 'fixed top-5 right-5 z-[9999] animate-fadeIn';
+                notif.innerHTML = `
+                    <div class="flex items-center gap-3 bg-red-100 border-2 border-red-400 text-red-800 rounded-lg px-6 py-4 shadow-lg">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="font-medium text-sm">${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800 ml-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(notif);
+                setTimeout(() => notif.remove(), 5000);
             }
 
             // Production History Modal Functions
@@ -1061,16 +1271,8 @@
             }
 
             function completeWorkOrder(id) {
-                if (confirm('Mark this work order as completed?')) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/production/' + id + '/complete';
-                    const csrf = document.createElement('input');
-                    csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}';
-                    form.appendChild(csrf);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                // Legacy function - now uses openCompleteConfirmModal
+                // Kept for backward compatibility
             }
 
             // Close modals when clicking outside
@@ -1078,6 +1280,83 @@
                 if (e.target.classList.contains('fixed')) {
                     closeWorkOrderModal();
                     closeEditWorkOrderModal();
+                }
+            });
+
+            // Handle work order form submission with notification
+            document.addEventListener('submit', function(e) {
+                if (e.target.id === 'workOrderForm') {
+                    e.preventDefault();
+                    const form = e.target;
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        // Check content type
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                        }
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessNotification('Work order created successfully!');
+                            closeWorkOrderModal();
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showErrorNotification(data.message || 'Error creating work order');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorNotification('Error creating work order: ' + error.message);
+                    });
+                }
+            });
+
+            // Handle notes form submission with notification
+            document.addEventListener('submit', function(e) {
+                if (e.target.id === 'notesForm') {
+                    e.preventDefault();
+                    const form = e.target;
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: form.method === 'POST' ? 'POST' : 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                        }
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessNotification('Notes saved successfully!');
+                        } else {
+                            showErrorNotification(data.message || 'Error saving notes');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorNotification('Error saving notes: ' + error.message);
+                    });
                 }
             });
 
