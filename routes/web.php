@@ -101,6 +101,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/production/{workOrder}/complete', [ProductionController::class, 'complete'])
         ->name('production.complete')
         ->middleware('role:admin,workshop_staff');
+    Route::post('/production/{workOrder}/cancel', [ProductionController::class, 'cancel'])
+        ->name('production.cancel')
+        ->middleware('role:admin,workshop_staff');
 
     // Sales
     Route::resource('sales-orders', SalesOrderController::class)
