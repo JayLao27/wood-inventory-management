@@ -10,30 +10,42 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\WorkOrder;
 use Carbon\Carbon;
-use Illuminate\Http\Request;    
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;    
 
 class AccountingController extends Controller
 {
     public function index()
     {
-        // Totals derived from existing accounting transactions
-        $totalRevenue = Accounting::where('transaction_type', 'Income')->sum('amount');
-        $totalExpenses = Accounting::where('transaction_type', 'Expense')->sum('amount');
+        // Calculate date range once
+        $now = Carbon::now();
+        $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
+        $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
+
+        // Get all totals in ONE query operation
+        $incomeTransactions = Accounting::where('transaction_type', 'Income')
+            ->selectRaw('SUM(amount) as total, COUNT(*) as count')
+            ->first();
+        $expenseTransactions = Accounting::where('transaction_type', 'Expense')
+            ->selectRaw('SUM(amount) as total, COUNT(*) as count')
+            ->first();
+        $lastMonthData = Accounting::whereBetween('date', [$startOfLastMonth, $endOfLastMonth])
+            ->selectRaw('transaction_type, SUM(amount) as total')
+            ->groupBy('transaction_type')
+            ->get();
+
+        $totalRevenue = (float)($incomeTransactions->total ?? 0);
+        $totalExpenses = (float)($expenseTransactions->total ?? 0);
         $netProfit = $totalRevenue - $totalExpenses;
+
+        $lastMonthRevenue = (float)($lastMonthData->where('transaction_type', 'Income')->first()->total ?? 0);
+        $lastMonthExpenses = (float)($lastMonthData->where('transaction_type', 'Expense')->first()->total ?? 0);
+        $lastMonthNetProfit = $lastMonthRevenue - $lastMonthExpenses;
+
         $lastMonthRevenuePercentage = $this->lastMonthRevenue($totalRevenue);
         $lastMonthNetProfitPercentage = $this->lastMonthNetprofit($netProfit);
         $lastMonthExpensesPercentage = $this->lastMonthTotalExpenses($totalExpenses);
 
-        $now = Carbon::now();
-        $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
-        $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
-        $lastMonthRevenue = (float) Accounting::where('transaction_type', 'Income')
-            ->whereBetween('date', [$startOfLastMonth, $endOfLastMonth])
-            ->sum('amount');
-        $lastMonthExpenses = (float) Accounting::where('transaction_type', 'Expense')
-            ->whereBetween('date', [$startOfLastMonth, $endOfLastMonth])
-            ->sum('amount');
-        $lastMonthNetProfit = $lastMonthRevenue - $lastMonthExpenses;
         $monthlyPerformance = [[
             'month' => $startOfLastMonth->format('M'),
             'revenue' => $lastMonthRevenue,
@@ -41,73 +53,38 @@ class AccountingController extends Controller
             'net_profit' => $lastMonthNetProfit,
         ]];
 
-        // Fetch purchase orders first to calculate pending materials
-        $allPurchaseOrders = PurchaseOrder::with(['supplier', 'accountingTransactions' => function($query) {
-            $query->where('transaction_type', 'Expense');
-        }])
-            ->whereHas('items', function($query) {
-                $query->whereExists(function($subQuery) {
-                    $subQuery->selectRaw(1)
-                        ->from('inventory_movements')
-                        ->whereColumn('inventory_movements.item_id', 'purchase_order_items.material_id')
-                        ->where('inventory_movements.item_type', 'material')
-                        ->where('inventory_movements.movement_type', 'in')
-                        ->whereColumn('inventory_movements.reference_id', 'purchase_order_items.purchase_order_id')
-                        ->where('inventory_movements.reference_type', 'purchase_order');
-                });
-            })
-            ->orderBy('order_date', 'desc')
-            ->get()
-            ->map(function($po) {
-                $totalPaid = $po->accountingTransactions->sum('amount');
-                $po->remaining_balance = $po->total_amount - $totalPaid;
-                $po->paid_amount_total = $totalPaid;
-                return $po;
-            });
-
-        // Expense Breakdown - Materials (pending/unpaid only) + Labor (already paid)
-        $materialsExpense = (float) $allPurchaseOrders
-            ->filter(function($po) {
-                return $po->remaining_balance > 0;
-            })
-            ->sum('remaining_balance');
-
+        // Use raw queries for calculations instead of loading all data
         $laborExpense = (float) Accounting::where('transaction_type', 'Expense')
             ->where('description', 'like', 'Labor - Work Order%')
             ->sum('amount');
 
-        $totalBreakdown = $materialsExpense + $laborExpense;
-        $materialsPercent = ($materialsExpense / 10000) * 100;
-        $laborPercent = ($laborExpense / 10000) * 100;
-        
-        // Fetch sales orders with accounting transactions for partial payment tracking
-        $salesOrders = SalesOrder::with(['customer', 'accountingTransactions' => function($query) {
-            $query->where('transaction_type', 'Income');
-        }])
+        // Get only the pending/partial payment orders with pagination
+        $salesOrders = SalesOrder::with(['customer'])
+            ->whereIn('payment_status', ['Pending', 'Partial'])
             ->orderBy('order_date', 'desc')
-            ->get()
-            ->map(function($so) {
-                $totalPaid = $so->accountingTransactions->sum('amount');
-                $so->remaining_balance = $so->total_amount - $totalPaid;
-                $so->paid_amount_total = $totalPaid;
-                return $so;
-            })
-            ->filter(function($so) {
-                return $so->remaining_balance > 0;
-            })
-            ->values();
-        
-        // Show only purchase orders with remaining balance (not fully paid)
-        $purchaseOrders = $allPurchaseOrders
-            ->filter(function($po) {
-                return $po->remaining_balance > 0;
-            })
-            ->values();
-        
-        // Fetch accounting transactions for the table
+            ->paginate(15);
+
+        // Fetch purchase orders with pagination
+        $purchaseOrders = PurchaseOrder::with(['supplier'])
+            ->whereIn('payment_status', ['Pending', 'Partial'])
+            ->orderBy('order_date', 'desc')
+            ->paginate(15);
+
+        // Calculate materials expense from unpaid orders
+        $materialsExpense = (float) PurchaseOrder::where('payment_status', 'Pending')
+            ->orWhere('payment_status', 'Partial')
+            ->sum(DB::raw('total_amount - COALESCE(paid_amount, 0)'));
+
+        $totalBreakdown = $materialsExpense + $laborExpense;
+        $materialsPercent = $totalBreakdown > 0 ? ($materialsExpense / $totalBreakdown) * 100 : 0;
+        $laborPercent = $totalBreakdown > 0 ? ($laborExpense / $totalBreakdown) * 100 : 0;
+
+        // Fetch pagination-limited transactions with eager loading
         $transactions = Accounting::with(['salesOrder.customer', 'purchaseOrder.supplier'])
             ->orderBy('date', 'desc')
-            ->get();
+            ->paginate(25);
+        
+
 
         return view('Systems.accounting', compact(
             'totalRevenue',
@@ -129,9 +106,8 @@ class AccountingController extends Controller
 
     public function dashboard()
     {
-        $salesOrders = SalesOrder::with(['customer', 'items.product'])->latest()->get();
-        $customers = Customer::orderBy('name')->get();
-        $products = Product::orderBy('product_name')->get();
+        // Only fetch limited data with pagination, not everything
+        $salesOrders = SalesOrder::with(['customer'])->latest()->limit(50)->get();
 
         $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
@@ -140,82 +116,93 @@ class AccountingController extends Controller
         $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
         $startOfWeek = $now->copy()->startOfWeek();
 
-        // Revenue & income (from accounting transactions)
-        $totalRevenue = (float) Accounting::where('transaction_type', 'Income')->sum('amount');
-        $revenueThisMonth = (float) Accounting::where('transaction_type', 'Income')
-            ->whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->sum('amount');
-        $revenueLastMonth = (float) Accounting::where('transaction_type', 'Income')
-            ->whereBetween('date', [$startOfLastMonth, $endOfLastMonth])
-            ->sum('amount');
-        $income = $totalRevenue; // income = revenue from accounting
+        // Use raw queries to get all metrics in one batch
+        $metrics = Accounting::selectRaw('
+            SUM(CASE WHEN transaction_type = "Income" THEN amount ELSE 0 END) as totalRevenue,
+            SUM(CASE WHEN transaction_type = "Income" AND date BETWEEN ? AND ? THEN amount ELSE 0 END) as revenueThisMonth,
+            SUM(CASE WHEN transaction_type = "Income" AND date BETWEEN ? AND ? THEN amount ELSE 0 END) as revenueLastMonth,
+            SUM(CASE WHEN transaction_type = "Expense" THEN amount ELSE 0 END) as totalExpenses,
+            SUM(CASE WHEN transaction_type = "Expense" AND date BETWEEN ? AND ? THEN amount ELSE 0 END) as expensesThisMonth,
+            SUM(CASE WHEN transaction_type = "Expense" AND date BETWEEN ? AND ? THEN amount ELSE 0 END) as expensesLastMonth
+        ')
+        ->setBindings([
+            $startOfMonth, $endOfMonth,
+            $startOfLastMonth, $endOfLastMonth,
+            $startOfMonth, $endOfMonth,
+            $startOfLastMonth, $endOfLastMonth
+        ])
+        ->first();
+
+        $totalRevenue = (float)($metrics->totalRevenue ?? 0);
+        $revenueThisMonth = (float)($metrics->revenueThisMonth ?? 0);
+        $revenueLastMonth = (float)($metrics->revenueLastMonth ?? 0);
+        $totalExpenses = (float)($metrics->totalExpenses ?? 0);
+        $expensesThisMonth = (float)($metrics->expensesThisMonth ?? 0);
+        $expensesLastMonth = (float)($metrics->expensesLastMonth ?? 0);
+
+        $income = $totalRevenue;
+        $netProfit = $totalRevenue - $totalExpenses;
+        $netProfitThisMonth = $revenueThisMonth - $expensesThisMonth;
+        $netProfitLastMonth = $revenueLastMonth - $expensesLastMonth;
 
         $revenueChangePercent = $revenueLastMonth > 0
             ? round((($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth) * 100, 1)
             : ($revenueThisMonth > 0 ? 100 : 0);
-
-        // Expenses (from accounting transactions)
-        $totalExpenses = (float) Accounting::where('transaction_type', 'Expense')->sum('amount');
-        $expensesThisMonth = (float) Accounting::where('transaction_type', 'Expense')
-            ->whereBetween('date', [$startOfMonth, $endOfMonth])
-            ->sum('amount');
-        $expensesLastMonth = (float) Accounting::where('transaction_type', 'Expense')
-            ->whereBetween('date', [$startOfLastMonth, $endOfLastMonth])
-            ->sum('amount');
+        
         $expensesChangePercent = $expensesLastMonth > 0
             ? round((($expensesThisMonth - $expensesLastMonth) / $expensesLastMonth) * 100, 1)
             : ($expensesThisMonth > 0 ? 100 : 0);
-
-        // Net profit
-        $netProfit = $totalRevenue - $totalExpenses;
-        $netProfitThisMonth = $revenueThisMonth - $expensesThisMonth;
-        $netProfitLastMonth = $revenueLastMonth - $expensesLastMonth;
+            
         $netProfitChangePercent = $netProfitLastMonth != 0
             ? round((($netProfitThisMonth - $netProfitLastMonth) / abs($netProfitLastMonth)) * 100, 1)
             : ($netProfitThisMonth != 0 ? 100 : 0);
 
-        // In production (work orders)
+        // Count queries (not full data fetches)
         $inProductionCount = WorkOrder::whereIn('status', ['in_progress', 'quality_check'])->count();
-        $overdueWorkOrders = WorkOrder::whereNotIn('status', ['completed'])
+        $overdueWorkOrders = WorkOrder::where('status', '!=', 'completed')
             ->where('due_date', '<', $now->toDateString())
             ->count();
 
-        // Active/new orders
         $activeOrdersCount = SalesOrder::whereIn('status', ['Pending', 'In production', 'Ready'])->count();
-        $newOrdersThisWeek = SalesOrder::whereDate('order_date', '>=', $startOfWeek)->count();
+        $newOrdersThisWeek = SalesOrder::where('order_date', '>=', $startOfWeek)->count();
 
-        // Low stock (materials + products)
-        $lowStockMaterials = Material::whereRaw('current_stock <= minimum_stock')->orderBy('current_stock')->get();
-        $lowStockCount = $lowStockMaterials->count();
+        // Low stock - only fetch the count and top items
+        $lowStockCount = Material::whereRaw('current_stock <= minimum_stock')->count();
+        $lowStockMaterials = Material::whereRaw('current_stock <= minimum_stock')
+            ->orderBy('current_stock')
+            ->limit(20)
+            ->get();
 
-        // Accounting report: last 6 months by month (based only on accounting transactions)
-        $accountingTransactions = Accounting::select('transaction_type', 'amount', 'date')->get();
-        $salesReportMonths = collect();
-        $salesReportRevenue = collect();
-        $salesReportExpenses = collect();
+        // Accounting report: last 6 months - use raw SQL for efficiency
+        $chartLabels = collect();
+        $chartRevenue = collect();
+        $chartExpenses = collect();
+        $chartProfit = collect();
+        
         for ($i = 5; $i >= 0; $i--) {
             $month = $now->copy()->subMonths($i);
             $start = $month->copy()->startOfMonth();
             $end = $month->copy()->endOfMonth();
-            $salesReportMonths->push($month->format('M Y'));
-            $salesReportRevenue->push((float) $accountingTransactions
-                ->filter(fn ($tx) => $tx->transaction_type === 'Income' && $tx->date && $tx->date->between($start, $end))
-                ->sum('amount'));
-            $salesReportExpenses->push((float) $accountingTransactions
-                ->filter(fn ($tx) => $tx->transaction_type === 'Expense' && $tx->date && $tx->date->between($start, $end))
-                ->sum('amount'));
+            
+            $chartLabels->push($month->format('M Y'));
+            
+            $monthData = Accounting::selectRaw('
+                SUM(CASE WHEN transaction_type = "Income" THEN amount ELSE 0 END) as revenue,
+                SUM(CASE WHEN transaction_type = "Expense" THEN amount ELSE 0 END) as expenses
+            ')
+            ->whereBetween('date', [$start, $end])
+            ->first();
+            
+            $revenue = (float)($monthData->revenue ?? 0);
+            $expenses = (float)($monthData->expenses ?? 0);
+            
+            $chartRevenue->push($revenue);
+            $chartExpenses->push($expenses);
+            $chartProfit->push($revenue - $expenses);
         }
-
-        // Chart data (last 6 months)
-        $chartLabels = $salesReportMonths->toArray();
-        $chartRevenue = $salesReportRevenue->toArray();
-        $chartExpenses = $salesReportExpenses->toArray();
-        $chartProfit = $salesReportRevenue->zip($salesReportExpenses)->map(fn ($p) => $p[0] - $p[1])->values()->toArray();
 
         return view('Systems.dashboard', compact(
             'salesOrders',
-            'customers',
-            'products',
             'totalRevenue',
             'revenueChangePercent',
             'income',
@@ -232,11 +219,9 @@ class AccountingController extends Controller
             'chartLabels',
             'chartRevenue',
             'chartExpenses',
-            'chartProfit',
-            'salesReportMonths',
-            'salesReportRevenue',
-            'salesReportExpenses'
+            'chartProfit'
         ));
+    }
     }
 
     public function addTransaction( SalesOrder $salesOrder, PurchaseOrder $purchaseOrder )

@@ -7,49 +7,58 @@ use App\Models\InventoryMovement;
 use App\Models\Material;
 use App\Models\Product;
 use App\Models\SalesOrder;
+use App\Models\SalesOrderItem;
 use App\Models\WorkOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductionController extends Controller
 {
     public function index()
     {
+        // Paginate work orders instead of loading all
         $workOrders = WorkOrder::with(['salesOrder.customer', 'product'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(25);
 
+        // Get status counts with COUNT queries, not loading all data
         $statusCounts = [
-            'pending' => $workOrders->where('status', 'pending')->count(),
-            'in_progress' => $workOrders->where('status', 'in_progress')->count(),
-            'quality_check' => $workOrders->where('status', 'quality_check')->count(),
-            'completed' => $workOrders->where('status', 'completed')->count(),
-            'overdue' => $workOrders->where('status', 'overdue')->count(),
-            'cancelled' => $workOrders->where('status', 'cancelled')->count(),
+            'pending' => WorkOrder::where('status', 'pending')->count(),
+            'in_progress' => WorkOrder::where('status', 'in_progress')->count(),
+            'quality_check' => WorkOrder::where('status', 'quality_check')->count(),
+            'completed' => WorkOrder::where('status', 'completed')->count(),
+            'overdue' => WorkOrder::where('status', 'overdue')->count(),
+            'cancelled' => WorkOrder::where('status', 'cancelled')->count(),
         ];
 
-        // Pending sales orders: not Delivered, with only items that don't already have work orders (excluding cancelled)
+        // Get pending sales orders with better query filtering
+        // Use DB subquery instead of map/filter in PHP
         $pendingSalesOrders = SalesOrder::with(['customer', 'items.product', 'workOrders'])
             ->where('status', '!=', 'Delivered')
+            ->whereHas('items', function($query) {
+                // Only get orders that have items without corresponding work orders (excluding cancelled)
+                $query->whereNotExists(function($subQuery) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('work_orders')
+                        ->whereColumn('work_orders.product_id', 'sales_order_items.product_id')
+                        ->where('work_orders.status', '!=', 'cancelled');
+                });
+            })
             ->orderBy('delivery_date')
-            ->get()
-            ->map(function (SalesOrder $order) {
-                $remainingItems = $order->items->filter(function ($item) use ($order) {
-                    return !$order->workOrders->where('status', '!=', 'cancelled')->contains('product_id', $item->product_id);
-                })->values();
+            ->paginate(15);
 
-                $order->setRelation('items', $remainingItems);
-                return $order;
-            })
-            ->filter(function (SalesOrder $order) {
-                return $order->items->isNotEmpty();
-            })
-            ->values();
+        $pendingItemsCount = (int) SalesOrderItem::whereHas('salesOrder', function($query) {
+            $query->where('status', '!=', 'Delivered');
+        })
+        ->whereNotExists(function($subQuery) {
+            $subQuery->select(DB::raw(1))
+                ->from('work_orders')
+                ->whereColumn('work_orders.product_id', 'sales_order_items.product_id')
+                ->where('work_orders.status', '!=', 'cancelled');
+        })
+        ->count();
 
-        $pendingItemsCount = (int) $pendingSalesOrders->sum(function (SalesOrder $order) {
-            return $order->items->count();
-        });
-
-        // Use pending sales order items count for the Pending status card.
+        // Use pending items count instead of recalculating from pending orders
         $statusCounts['pending'] = $pendingItemsCount;
 
         return view('Systems.production', compact('workOrders', 'statusCounts', 'pendingSalesOrders', 'pendingItemsCount'));

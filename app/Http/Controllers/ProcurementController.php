@@ -17,62 +17,70 @@ class ProcurementController extends Controller
     public function index()
     {
         $suppliers = Supplier::all();
-        $purchaseOrders = PurchaseOrder::with(['supplier', 'items'])->get();
-        $materials = Material::all();
+        // Add pagination and eager loading
+        $purchaseOrders = PurchaseOrder::with(['supplier', 'items.material'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        $materials = Material::paginate(25);
         
         $totalSpent = PurchaseOrder::sum('total_amount');
         $activeSuppliers = Supplier::where('status', 'active')->count();
         $lowStockAlerts = Material::whereRaw('current_stock <= minimum_stock')->count();
 
-        // Sync payment status from accounting transactions
-        $purchaseOrders->each(function ($order) {
-            $totalPaid = (float) Accounting::where('purchase_order_id', $order->id)
-                ->where('transaction_type', 'Expense')
-                ->sum('amount');
+        // Get all payment data at once with a LEFT JOIN instead of N+1 queries
+        $paymentData = DB::table('purchase_orders')
+            ->leftJoin('accounting', function($join) {
+                $join->on('purchase_orders.id', '=', 'accounting.purchase_order_id')
+                    ->where('accounting.transaction_type', '=', 'Expense');
+            })
+            ->select('purchase_orders.id', DB::raw('COALESCE(SUM(accounting.amount), 0) as total_paid'))
+            ->groupBy('purchase_orders.id')
+            ->get()
+            ->keyBy('id');
 
+        // Update payment status in bulk instead of one by one
+        $updates = [];
+        foreach ($purchaseOrders as $order) {
+            $totalPaid = (float)($paymentData[$order->id]->total_paid ?? 0);
             if ($totalPaid > 0) {
-                $newStatus = $totalPaid >= (float) $order->total_amount ? 'Paid' : 'Partial';
+                $newStatus = $totalPaid >= (float)$order->total_amount ? 'Paid' : 'Partial';
                 if ($order->payment_status !== $newStatus) {
-                    $order->payment_status = $newStatus;
-                    $order->save();
+                    $updates[$order->id] = $newStatus;
                 }
             }
-        });
-
-        $paymentsMade = $purchaseOrders->where('payment_status', 'Paid')->sum('total_amount');
-        $pendingPayments = $purchaseOrders->whereIn('payment_status', ['Pending', 'Partial'])->sum('total_amount');
-
-        // Only show purchase orders that still have remaining quantity to receive
-        // Filter out POs where ALL items have been fully received or status is 'received'
-        $openPurchaseOrders = $purchaseOrders->filter(function ($order) {
-            // Exclude POs that are already marked as 'received'
-            if (strtolower($order->status) === 'received') {
-                return false;
+        }
+        
+        // Bulk update all at once
+        if (!empty($updates)) {
+            foreach ($updates as $orderId => $newStatus) {
+                PurchaseOrder::where('id', $orderId)->update(['payment_status' => $newStatus]);
             }
-            
-            // A PO is "open" if ANY of its items still has remaining quantity
-            // If the order has no items, exclude it
-            if ($order->items->isEmpty()) {
-                return false;
-            }
-            
-            // Check if at least one item has remaining quantity
-            $hasRemainingItems = $order->items->contains(function ($item) use ($order) {
-                $ordered = (float) $item->quantity;
+        }
 
-                $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
-                    ->where('item_id', $item->material_id)
-                    ->where('reference_type', 'purchase_order')
-                    ->where('reference_id', $order->id)
-                    ->where('movement_type', 'in')
-                    ->sum('quantity');
+        // Get summary stats from database
+        $paymentsMade = PurchaseOrder::where('payment_status', 'Paid')->sum('total_amount');
+        $pendingPayments = PurchaseOrder::whereIn('payment_status', ['Pending', 'Partial'])
+            ->sum(DB::raw('total_amount - COALESCE(paid_amount, 0)'));
 
-                $remaining = $ordered - $alreadyReceived;
-                return $remaining > 0.001; // Use small threshold to account for floating point precision
-            });
-            
-            return $hasRemainingItems;
-        })->values();
+        // Get open purchase orders with optimized query
+        $openPurchaseOrders = PurchaseOrder::with(['items.material'])
+            ->where('status', '!=', 'received')
+            ->whereHas('items')
+            ->get()
+            ->filter(function($order) {
+                // Check if any item has remaining quantity
+                return $order->items->contains(function($item) use ($order) {
+                    $ordered = (float)$item->quantity;
+                    $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
+                        ->where('item_id', $item->material_id)
+                        ->where('reference_type', 'purchase_order')
+                        ->where('reference_id', $order->id)
+                        ->where('movement_type', 'in')
+                        ->sum('quantity');
+                    return ($ordered - $alreadyReceived) > 0.001;
+                });
+            })
+            ->values();
         
         return view('Systems.procurement', compact(
             'suppliers',
