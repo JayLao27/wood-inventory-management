@@ -1,28 +1,42 @@
-FROM php:8.2-fpm
-   
-   # Install dependencies
-   RUN apt-get update && apt-get install -y \
-       git \
-       curl \
-       libpng-dev \
-       libonig-dev \
-       libxml2-dev \
-       zip \
-       unzip
-   
-   # Install PHP extensions
-   RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-   
-   # Get Composer
-   COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-   
-   # Set working directory
-   WORKDIR /var/www
-   
-   # Copy application
-   COPY . .
-   
-   # Install dependencies
-   RUN composer install
-   
-   CMD php artisan serve --host=0.0.0.0 --port=8000
+#Use official PHP with Apache
+FROM php:8.2-apache
+
+#install required extensions for laravel
+RUN apt-get update && apt-get install -y \
+    git unzip libpq-dev zip \
+      && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip 
+
+#Enable apache mod_rewrite (needed for laravel)
+RUN a2enmod rewrite
+
+#Set apache DocumentRoot to public ot /var/www/html/public
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf\ 
+&& sed -i 's!/var/www/!/var/www/html/public/!g' /etc/apache2/apache2.conf
+
+#Copy app code
+COPY . /var/www/html
+
+#create uploads directory and set permissions
+RUN mkdir -p /var/www/html/public/uploads \
+ && chown -R www-data:www-data /var/www/html/public/uploads \
+&& chmod -R 775 /var/www/html/storage/app/public/uploads
+
+#set working dir
+WORKDIR /var/www/html
+
+#install composer //changes
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+#install laravel dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+
+#set permissions for storage and bootstrap cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+#expose render required port
+EXPOSE 10000
+
+#Start apache
+CMD ["apache2-foreground"]
+
