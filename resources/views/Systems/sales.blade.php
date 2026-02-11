@@ -64,7 +64,7 @@ $paymentBg = [
 				<p class="text-base text-gray-600 mt-2">Manage customer orders, sales, and deliveries</p>
 			</div>
 			<div class="relative">
-				<button id="exportButton" class="flex items-center gap-1.5 bg-slate-600 hover:bg-slate-500 px-3 py-1.5 rounded-lg text-xs text-white transition">
+				<button id="exportButton" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
 					<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
 					</svg>
@@ -826,7 +826,7 @@ $paymentBg = [
 			</div>
 		</div>
 
-		<!-- Add New Customer Modal - IMPROVED VERSION -->
+		<!-- Add New Customer Modal -->
 		<div id="newCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
 			<div class="flex items-center justify-center min-h-screen p-3">
 				<div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
