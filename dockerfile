@@ -3,8 +3,8 @@ FROM php:8.2-apache
 
 #install required extensions for laravel
 RUN apt-get update && apt-get install -y \
-    git unzip libpq-dev zip curl \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql
+    git unzip libpq-dev zip curl libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip
 
 #Install Node.js (needed to build frontend assets)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
