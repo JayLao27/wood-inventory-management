@@ -34,7 +34,7 @@ class CustomerController extends Controller
 		}
 
 		Customer::create($request->only('name','customer_type','phone','email','address'));
-		return redirect()->route('sales-orders.index')->with('success', 'Customer added.');
+		return redirect()->route('sales-orders.index', ['tab' => 'customers'])->with('success', 'Customer added.');
 	}
 
 	public function update(Request $request, Customer $customer) {
@@ -60,12 +60,17 @@ class CustomerController extends Controller
 		}
 
 		$customer->update($request->only('name','customer_type','phone','email','address'));
-		return redirect()->route('sales-orders.index')->with('success', 'Customer updated.');
+		return redirect()->route('sales-orders.index', ['tab' => 'customers'])->with('success', 'Customer updated.');
 	}
 
 	public function delete(Customer $customer) {
 		$customer->delete();
 		return redirect()->route('sales-orders.index')->with('success', 'Customer deleted.');
+	}
+
+	public function destroy(Customer $customer) {
+		$customer->delete();
+		return redirect()->route('sales-orders.index', ['tab' => 'customers'])->with('success', 'Customer deleted.');
 	}
 
 	public function exportCustomers()
