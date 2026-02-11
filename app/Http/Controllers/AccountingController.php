@@ -177,6 +177,9 @@ class AccountingController extends Controller
         $salesReportMonths = [];
         $salesReportRevenue = [];
         $salesReportExpenses = [];
+        $chartLabels = [];
+        $chartRevenue = [];
+        $chartExpenses = [];
         $chartProfit = [];
         
         for ($i = 5; $i >= 0; $i--) {
@@ -184,7 +187,9 @@ class AccountingController extends Controller
             $start = $month->copy()->startOfMonth();
             $end = $month->copy()->endOfMonth();
             
-            $salesReportMonths[] = $month->format('M Y');
+            $monthLabel = $month->format('M Y');
+            $salesReportMonths[] = $monthLabel;
+            $chartLabels[] = $monthLabel;
             
             $monthData = Accounting::selectRaw('
                 SUM(CASE WHEN transaction_type = "Income" THEN amount ELSE 0 END) as revenue,
@@ -198,6 +203,8 @@ class AccountingController extends Controller
             
             $salesReportRevenue[] = $revenue;
             $salesReportExpenses[] = $expenses;
+            $chartRevenue[] = $revenue;
+            $chartExpenses[] = $expenses;
             $chartProfit[] = $revenue - $expenses;
         }
 
@@ -219,6 +226,9 @@ class AccountingController extends Controller
             'salesReportMonths',
             'salesReportRevenue',
             'salesReportExpenses',
+            'chartLabels',
+            'chartRevenue',
+            'chartExpenses',
             'chartProfit'
         ));
     }

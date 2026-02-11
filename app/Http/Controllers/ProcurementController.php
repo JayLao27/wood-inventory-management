@@ -29,11 +29,11 @@ class ProcurementController extends Controller
 
         // Get all payment data at once with a LEFT JOIN instead of N+1 queries
         $paymentData = DB::table('purchase_orders')
-            ->leftJoin('accounting', function($join) {
-                $join->on('purchase_orders.id', '=', 'accounting.purchase_order_id')
-                    ->where('accounting.transaction_type', '=', 'Expense');
+            ->leftJoin('accountings', function($join) {
+                $join->on('purchase_orders.id', '=', 'accountings.purchase_order_id')
+                    ->where('accountings.transaction_type', '=', 'Expense');
             })
-            ->select('purchase_orders.id', DB::raw('COALESCE(SUM(accounting.amount), 0) as total_paid'))
+            ->select('purchase_orders.id', DB::raw('COALESCE(SUM(accountings.amount), 0) as total_paid'))
             ->groupBy('purchase_orders.id')
             ->get()
             ->keyBy('id');
