@@ -35,6 +35,29 @@
 		background: #f59e0b;
 		border-radius: 4px;
 	}
+
+	.modal-overlay {
+		display: none;
+	}
+
+	.modal-overlay.flex {
+		display: flex;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: scale(0.95);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	.animate-fadeIn {
+		animation: fadeIn 0.2s ease-out;
+	}
 </style>
 @php
 $customerTypeBg = [
@@ -259,15 +282,11 @@ $paymentBg = [
 										</svg>
 									</button>
 									@if(!in_array($order->payment_status, ['Paid', 'Partial']))
-									<form action="{{ route('sales-orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Cancel this order?')" class="inline">
-										@csrf
-										@method('DELETE')
-										<button type="submit" class="p-1 hover:bg-slate-500 rounded" title="Delete">
-											<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-											</svg>
-										</button>
-									</form>
+									<button type="button" onclick="openCancelSalesOrderModal({{ $order->id }}, '{{ $order->order_number }}')" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+										<svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+										</svg>
+									</button>
 									@endif
 								</div>
 							</td>
@@ -471,15 +490,11 @@ $paymentBg = [
 											<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
 										</svg>
 									</button>
-									<form action="{{ route('customers.delete', $customer) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this customer?')" class="inline">
-										@csrf
-										@method('DELETE')
-										<button type="submit" class="p-1 hover:bg-slate-500 rounded" title="Delete">
-											<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-											</svg>
-										</button>
-									</form>
+									<button type="button" onclick="openDeleteCustomerModal({{ $customer->id }}, '{{ $customer->name }}')" class="p-1 hover:bg-slate-500 rounded" title="Delete">
+										<svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+										</svg>
+									</button>
 								</div>
 								<!-- View Customer Modal -->
 								<div id="viewCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/70 hidden" style="z-index: 99999;">
@@ -1082,30 +1097,64 @@ $paymentBg = [
 </div>
 </div>
 
-<!-- Confirmation Modal for Sales Order -->
-<div id="confirmSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50 flex items-center justify-center">
-	<div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all">
-		<!-- Green Header -->
-		<div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-2xl">
-			<div class="flex items-center gap-3">
-				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				</svg>
-				<h3 class="text-xl font-bold">Confirm Sales Order</h3>
+<!-- Confirmation Modal for Sales Order - Add -->
+<div id="confirmSalesOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeConfirmSalesOrder()">
+	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+		<div class="p-4">
+			<!-- Icon -->
+			<div class="flex justify-center mb-3">
+				<div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+					<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					</svg>
+				</div>
+			</div>
+
+			<!-- Message -->
+			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Confirm Sales Order?</h3>
+			<p class="text-center text-xs mb-4" style="color: #666;">
+				Create this new sales order? Please review all details before confirming.
+			</p>
+
+			<!-- Actions -->
+			<div class="flex justify-center gap-2">
+				<button type="button" onclick="closeConfirmSalesOrder()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+					No, Review Again
+				</button>
+				<button type="button" onclick="submitSalesOrder()" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+					Yes, Confirm
+				</button>
 			</div>
 		</div>
-		
-		<!-- Content -->
-		<div class="p-6">
-			<p class="text-gray-700 text-base mb-6">Are you sure you want to create this sales order?</p>
-			
-			<!-- Action Buttons -->
-			<div class="flex gap-3 justify-end">
-				<button type="button" onclick="closeConfirmSalesOrder()" class="px-5 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition-all">
-					Cancel
+	</div>
+</div>
+
+<!-- Confirmation Modal for Cancelling Sales Order -->
+<div id="confirmCancelSalesOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeCancelSalesOrderModal()">
+	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+		<div class="p-4">
+			<!-- Icon -->
+			<div class="flex justify-center mb-3">
+				<div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+					<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					</svg>
+				</div>
+			</div>
+
+			<!-- Message -->
+			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Cancel Sales Order?</h3>
+			<p class="text-center text-xs mb-4" style="color: #666;">
+				Cancel sales order <span id="cancelSalesOrderNumber" class="font-semibold">-</span>? This action cannot be undone.
+			</p>
+
+			<!-- Actions -->
+			<div class="flex justify-center gap-2">
+				<button type="button" onclick="closeCancelSalesOrderModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+					No, Keep It
 				</button>
-				<button type="button" onclick="submitSalesOrder()" class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg">
-					Confirm
+				<button type="button" onclick="submitCancelSalesOrder()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+					Yes, Cancel
 				</button>
 			</div>
 		</div>
@@ -1113,29 +1162,63 @@ $paymentBg = [
 </div>
 
 <!-- Confirmation Modal for Customer -->
-<div id="confirmCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50 flex items-center justify-center">
-	<div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all">
-		<!-- Green Header -->
-		<div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-t-2xl">
-			<div class="flex items-center gap-3">
-				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				</svg>
-				<h3 class="text-xl font-bold">Confirm New Customer</h3>
+<div id="confirmCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeConfirmCustomer()">
+	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+		<div class="p-4">
+			<!-- Icon -->
+			<div class="flex justify-center mb-3">
+				<div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+					<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+					</svg>
+				</div>
+			</div>
+
+			<!-- Message -->
+			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Add New Customer?</h3>
+			<p class="text-center text-xs mb-4" style="color: #666;">
+				Register this new customer to the system? Their information will be saved for future orders.
+			</p>
+
+			<!-- Actions -->
+			<div class="flex justify-center gap-2">
+				<button type="button" onclick="closeConfirmCustomer()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+					No, Cancel
+				</button>
+				<button type="button" onclick="submitCustomer()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+					Yes, Add
+				</button>
 			</div>
 		</div>
-		
-		<!-- Content -->
-		<div class="p-6">
-			<p class="text-gray-700 text-base mb-6">Are you sure you want to add this customer?</p>
-			
-			<!-- Action Buttons -->
-			<div class="flex gap-3 justify-end">
-				<button type="button" onclick="closeConfirmCustomer()" class="px-5 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition-all">
-					Cancel
+	</div>
+</div>
+
+<!-- Delete Customer Confirmation Modal -->
+<div id="deleteCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeDeleteCustomerModal()">
+	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+		<div class="p-4">
+			<!-- Icon -->
+			<div class="flex justify-center mb-3">
+				<div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+					<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					</svg>
+				</div>
+			</div>
+
+			<!-- Message -->
+			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Delete Customer?</h3>
+			<p class="text-center text-xs mb-4" style="color: #666;">
+				Delete <span id="deleteCustomerName" class="font-semibold">-</span>? This action cannot be undone.
+			</p>
+
+			<!-- Actions -->
+			<div class="flex justify-center gap-2">
+				<button type="button" onclick="closeDeleteCustomerModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+					No, Keep
 				</button>
-				<button type="button" onclick="submitCustomer()" class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg">
-					Confirm
+				<button type="button" onclick="submitDeleteCustomer()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+					Yes, Delete
 				</button>
 			</div>
 		</div>
@@ -1455,40 +1538,182 @@ $paymentBg = [
 	function confirmSalesOrder(event) {
 		event.preventDefault();
 		document.getElementById('confirmSalesOrderModal').classList.remove('hidden');
+		document.getElementById('confirmSalesOrderModal').classList.add('flex');
 		return false;
 	}
 
 	function closeConfirmSalesOrder() {
 		document.getElementById('confirmSalesOrderModal').classList.add('hidden');
+		document.getElementById('confirmSalesOrderModal').classList.remove('flex');
 	}
 
 	function submitSalesOrder() {
 		closeConfirmSalesOrder();
-		// Submit the form
+		// Show success notification before submitting form
+		showSuccessNotification('Sales order created successfully!');
+		// Submit the form normally (let Laravel handle it)
 		const form = document.getElementById('newOrderForm');
-		// Remove the onsubmit to avoid infinite loop
-		form.onsubmit = null;
-		form.submit();
+		form.onsubmit = null; // Remove the onsubmit handler
+		setTimeout(() => {
+			form.submit();
+		}, 2000);
+	}
+
+	// Confirmation Modal Functions for Cancelling Sales Order
+	let currentCancelOrderId = null;
+
+	function openCancelSalesOrderModal(id, orderNumber) {
+		currentCancelOrderId = id;
+		document.getElementById('cancelSalesOrderNumber').textContent = orderNumber;
+		const modal = document.getElementById('confirmCancelSalesOrderModal');
+		modal.classList.remove('hidden');
+		modal.classList.add('flex');
+	}
+
+	function closeCancelSalesOrderModal() {
+		const modal = document.getElementById('confirmCancelSalesOrderModal');
+		modal.classList.add('hidden');
+		modal.classList.remove('flex');
+	}
+
+	function submitCancelSalesOrder() {
+		const orderNumber = document.getElementById('cancelSalesOrderNumber').textContent;
+		
+		const form = document.createElement('form');
+		form.method = 'POST';
+		form.action = `/sales-orders/${currentCancelOrderId}`;
+
+		const csrf = document.createElement('input');
+		csrf.type = 'hidden';
+		csrf.name = '_token';
+		csrf.value = document.querySelector('meta[name="csrf-token"]').content;
+
+		const method = document.createElement('input');
+		method.type = 'hidden';
+		method.name = '_method';
+		method.value = 'DELETE';
+
+		form.appendChild(csrf);
+		form.appendChild(method);
+		document.body.appendChild(form);
+		
+		closeCancelSalesOrderModal();
+		showSuccessNotification(`Sales order ${orderNumber} has been cancelled successfully.`);
+		setTimeout(() => {
+			form.submit();
+		}, 2000);
 	}
 
 	// Confirmation Modal Functions for Customer
 	function confirmCustomer(event) {
 		event.preventDefault();
 		document.getElementById('confirmCustomerModal').classList.remove('hidden');
+		document.getElementById('confirmCustomerModal').classList.add('flex');
 		return false;
 	}
 
 	function closeConfirmCustomer() {
 		document.getElementById('confirmCustomerModal').classList.add('hidden');
+		document.getElementById('confirmCustomerModal').classList.remove('flex');
 	}
 
 	function submitCustomer() {
 		closeConfirmCustomer();
+		// Show success notification before submitting form
+		showSuccessNotification('Customer added successfully!');
 		// Submit the form
 		const form = document.getElementById('newCustomerForm');
 		// Remove the onsubmit to avoid infinite loop
 		form.onsubmit = null;
-		form.submit();
+		setTimeout(() => {
+			form.submit();
+		}, 2000);
+	}
+
+	// Delete Customer Modal Functions
+	let currentDeleteCustomerId = null;
+
+	function openDeleteCustomerModal(id, customerName) {
+		currentDeleteCustomerId = id;
+		document.getElementById('deleteCustomerName').textContent = customerName;
+		const modal = document.getElementById('deleteCustomerModal');
+		modal.classList.remove('hidden');
+		modal.classList.add('flex');
+	}
+
+	function closeDeleteCustomerModal() {
+		const modal = document.getElementById('deleteCustomerModal');
+		modal.classList.add('hidden');
+		modal.classList.remove('flex');
+	}
+
+	function submitDeleteCustomer() {
+		const customerName = document.getElementById('deleteCustomerName').textContent;
+		
+		const form = document.createElement('form');
+		form.method = 'POST';
+		form.action = `/customers/${currentDeleteCustomerId}`;
+
+		const csrf = document.createElement('input');
+		csrf.type = 'hidden';
+		csrf.name = '_token';
+		csrf.value = document.querySelector('meta[name="csrf-token"]').content;
+
+		const method = document.createElement('input');
+		method.type = 'hidden';
+		method.name = '_method';
+		method.value = 'DELETE';
+
+		form.appendChild(csrf);
+		form.appendChild(method);
+		document.body.appendChild(form);
+		
+		closeDeleteCustomerModal();
+		showSuccessNotification(`Customer ${customerName} has been deleted successfully.`);
+		setTimeout(() => {
+			form.submit();
+		}, 2000);
+	}
+
+	// Toast Notification Functions
+	function showSuccessNotification(message) {
+		const notif = document.createElement('div');
+		notif.className = 'fixed top-5 right-5 z-[9999] animate-fadeIn';
+		notif.innerHTML = `
+			<div class="flex items-center gap-3 bg-green-100 border-2 border-green-400 text-green-800 rounded-lg px-6 py-4 shadow-lg">
+				<svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+					<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+				</svg>
+				<span class="font-medium text-sm">${message}</span>
+				<button onclick="this.parentElement.parentElement.remove()" class="text-green-600 hover:text-green-800 ml-2">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+		`;
+		document.body.appendChild(notif);
+		setTimeout(() => notif.remove(), 4000);
+	}
+
+	function showErrorNotification(message) {
+		const notif = document.createElement('div');
+		notif.className = 'fixed top-5 right-5 z-[9999] animate-fadeIn';
+		notif.innerHTML = `
+			<div class="flex items-center gap-3 bg-red-100 border-2 border-red-400 text-red-800 rounded-lg px-6 py-4 shadow-lg">
+				<svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+					<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+				</svg>
+				<span class="font-medium text-sm">${message}</span>
+				<button onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800 ml-2">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+		`;
+		document.body.appendChild(notif);
+		setTimeout(() => notif.remove(), 5000);
 	}
 </script>
 </div>
