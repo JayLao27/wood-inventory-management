@@ -10,23 +10,9 @@ RUN apt-get update && apt-get install -y \
 #Enable apache mod_rewrite (needed for laravel)
 RUN a2enmod rewrite
 
-#Set apache DocumentRoot to public and create proper virtual host
-RUN rm /etc/apache2/sites-enabled/000-default.conf && \
-    echo '<VirtualHost *:80>' > /etc/apache2/sites-available/000-default.conf && \
-    echo '    ServerAdmin webmaster@localhost' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '    ServerName localhost' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '    DocumentRoot /var/www/html/public' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '    <Directory /var/www/html/public>' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '        Options Indexes FollowSymLinks' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '        AllowOverride All' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '        Require all granted' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '    </Directory>' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '    <FilesMatch \.php$>' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '        SetHandler application/x-httpd-php' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '    </FilesMatch>' >> /etc/apache2/sites-available/000-default.conf && \
-    echo '</VirtualHost>' >> /etc/apache2/sites-available/000-default.conf && \
-    a2ensite 000-default && \
-    a2enmod php8.2
+#Set apache DocumentRoot to public
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's!/var/www/!/var/www/html/public/!g' /etc/apache2/apache2.conf
 
 #set working dir
 WORKDIR /var/www/html
