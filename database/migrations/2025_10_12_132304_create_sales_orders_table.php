@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->unique();
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
-            $table->date('order_date')->useCurrent();
+            $table->date('order_date');
             $table->date('delivery_date');
             $table->enum('status', ['In production', 'Confirmed', 'Pending', 'Delivered', 'Ready'])->default('Pending');
             $table->decimal('total_amount', 12, 2)->default(0);
