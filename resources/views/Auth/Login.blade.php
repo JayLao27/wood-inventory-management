@@ -120,7 +120,7 @@
 		<!-- Left Branding Section -->
 		<div class="flex-1 hidden lg:flex flex-col items-center justify-center animate-fade-in-up">
 			<div class="animate-float">
-				<img src="/images/logo.png" alt="RM Wood Works Logo" class="w-96 drop-shadow-2xl filter brightness-105">
+				<img src="{{ asset('images/Logo.png') }}" alt="RM Wood Works Logo" class="w-96 drop-shadow-2xl filter brightness-105">
 			</div>
 			<div class="mt-8 text-center space-y-3">
 				<h2 class="text-4xl font-bold text-[#5D2E0F] tracking-tight">Welcome Back</h2>
