@@ -222,8 +222,3 @@
     </div>
 </div>
 
-<!-- Include Alpine.js if not already included -->
-@push('scripts')
-<script src="//unpkg.com/alpinejs" defer></script>
-@endpush
-
