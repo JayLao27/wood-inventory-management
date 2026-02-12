@@ -162,7 +162,7 @@
 				<!-- Header -->
 				<div class="flex flex-col items-center mb-8">
 					<div class="w-20 h-20 bg-gradient-to-br from-[#a87958] to-[#9f9690] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-						<img src="/images/logo.png" alt="RM Wood Works" class="w-14 h-14 object-contain">
+						<img src="{{ asset('images/logo.png') }}" alt="RM Wood Works" class="w-14 h-14 object-contain">
 					</div>
 					<h1 class="text-3xl font-bold text-[#5D2E0F] mb-1">RM Wood Works</h1>
 					<p class="text-sm text-[#A0522D] font-medium">Management System</p>
