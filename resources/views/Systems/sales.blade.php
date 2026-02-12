@@ -1451,6 +1451,40 @@ $paymentBg = [
 		setMode('sales');
 	})();
 
+	// Auto-open modal if validation errors exist for new customer
+	@if ($errors->any() && (old('name') || old('customer_type') || old('phone') || old('email')))
+		// Check if this is from the new customer form (not edit customer)
+		// Edit customer forms have customer_id in old data
+		@if (!old('customer_id') && !request()->has('_method'))
+			document.addEventListener('DOMContentLoaded', function() {
+				// Open the new customer modal
+				openModal('newCustomerModal');
+				// Switch to customers tab to show the modal properly
+				const customersTab = document.getElementById('customersTab');
+				if (customersTab) {
+					customersTab.click();
+				}
+				// Scroll to the top of the modal to show errors
+				setTimeout(function() {
+					const modal = document.getElementById('newCustomerModal');
+					if (modal) {
+						const modalContent = modal.querySelector('.modal-content');
+						if (modalContent) {
+							modalContent.scrollTop = 0;
+						}
+					}
+				}, 100);
+			});
+		@endif
+	@endif
+
+	// Show success notification if exists
+	@if (session('success'))
+		document.addEventListener('DOMContentLoaded', function() {
+			showSuccessNotification('{{ session('success') }}');
+		});
+	@endif
+
 	// Export Dropdown Toggle - FIXED VERSION
 	const exportButton = document.getElementById('exportButton');
 	const exportDropdown = document.getElementById('exportDropdown');
@@ -1619,15 +1653,12 @@ $paymentBg = [
 
 	function submitCustomer() {
 		closeConfirmCustomer();
-		// Show success notification before submitting form
-		showSuccessNotification('Customer added successfully!');
-		// Submit the form
+		// Submit the form without showing success message
+		// Let server validate and show success after successful validation
 		const form = document.getElementById('newCustomerForm');
 		// Remove the onsubmit to avoid infinite loop
 		form.onsubmit = null;
-		setTimeout(() => {
-			form.submit();
-		}, 2000);
+		form.submit();
 	}
 
 	// Delete Customer Modal Functions
