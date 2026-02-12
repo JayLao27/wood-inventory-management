@@ -25,7 +25,7 @@
         <div class="p-6 border-b border-slate-700">
             <div class="flex items-center" :class="sidebarOpen ? 'space-x-3' : 'justify-center'">
                <div class="mt-4 w-12 h-12 bg-gradient-to-br from-[#a87958] to-[#9f9690] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-						<img src="/images/logo.png" alt="RM Wood Works" class="w-10 h-10 object-contain">
+						<img src="{{ asset('images/Logo.png') }}" alt="RM Wood Works" class="w-10 h-10 object-contain">
 					</div>
                 <div x-show="sidebarOpen" 
                      x-transition:enter="transition ease-out duration-200"
