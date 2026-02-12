@@ -1,6 +1,26 @@
 @extends('layouts.system')
 
 @section('main-content')
+<style>
+	/* Custom Scrollbar */
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: #475569;
+		border-radius: 4px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: #f59e0b;
+		border-radius: 4px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: #d97706;
+	}
+</style>
 	@php
 		$typeBg = [
 			'Payment Made' => '#FFB74D',
@@ -261,120 +281,155 @@
 					</div>
 				</div>
 			</div>
-	</div>
 
-	<!-- Add Transaction Modal -->
-	<div id="addTransactionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-			<div class="flex justify-between items-center mb-6">
-				<h2 class="text-2xl font-bold text-gray-800">Add Transaction</h2>
-				<button onclick="closeAddTransaction()" class="text-gray-500 hover:text-gray-700">
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-					</svg>
-				</button>
-			</div>
-
-			<div class="flex gap-4 mb-6 border-b border-gray-200">
-				<button onclick="showSalesOrders()" id="salesOrdersTab" class="pb-2 px-4 font-semibold text-slate-600 border-b-2 border-slate-600">Sales Orders (Income)</button>
-				<button onclick="showPurchaseOrders()" id="purchaseOrdersTab" class="pb-2 px-4 font-semibold text-gray-500 hover:text-gray-700">Purchase Orders (Expense)</button>
-			</div>
-
-			<!-- Sales Orders List -->
-			<div id="salesOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto">
-				@forelse($salesOrders as $salesOrder)
-					<div onclick="selectTransaction('{{ $salesOrder->order_number }}', {{ $salesOrder->total_amount }}, '{{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}', 'Income', {{ $salesOrder->id }}, {{ $salesOrder->remaining_balance }})" class="p-4 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition">
-						<div class="flex justify-between items-start">
-							<div class="flex-1">
-								<h3 class="font-semibold text-gray-800">{{ $salesOrder->order_number }}: {{ $salesOrder->customer->name ?? 'N/A' }}</h3>
-								<p class="text-sm text-gray-600">{{ $salesOrder->notes ?? 'Sales Order' }}</p>
-							</div>
-							<div class="flex flex-col items-end gap-1">
-								<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($salesOrder->total_amount, 2) }}</span>
-								@if($salesOrder->remaining_balance > 0)
-									<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">Remaining: ₱{{ number_format($salesOrder->remaining_balance, 2) }}</span>
-								@else
-									<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">Paid</span>
-								@endif
-							</div>
-						</div>
-						<p class="text-xs text-gray-500 mt-2">Date: {{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}</p>
+			<!-- Add Transaction Section -->
+			<div id="addTransactionSection" class="hidden bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-6 shadow-xl border border-slate-600 mt-6">
+				<div class="flex justify-between items-center mb-6">
+					<div>
+						<h2 class="text-xl font-bold text-white">Add New Transaction</h2>
+						<p class="text-slate-300 text-sm mt-1">Select an order to record a payment transaction</p>
 					</div>
-				@empty
-					<p class="text-center text-gray-500 py-4">No sales orders available</p>
-				@endforelse
-			</div>
-
-			<!-- Purchase Orders List -->
-			<div id="purchaseOrdersContainer" class="space-y-3 max-h-64 overflow-y-auto hidden">
-				@forelse($purchaseOrders as $purchaseOrder)
-					<div onclick="selectTransaction('{{ $purchaseOrder->order_number }}', {{ $purchaseOrder->total_amount }}, '{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}', 'Expense', {{ $purchaseOrder->id }}, {{ $purchaseOrder->remaining_balance }})" class="p-4 border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-400 cursor-pointer transition">
-						<div class="flex justify-between items-start">
-							<div class="flex-1">
-								<h3 class="font-semibold text-gray-800">{{ $purchaseOrder->order_number }}: {{ $purchaseOrder->supplier->name ?? 'N/A' }}</h3>
-								<p class="text-sm text-gray-600">{{ $purchaseOrder->notes ?? 'Purchase Order' }}</p>
-							</div>
-							<div class="flex flex-col items-end gap-1">
-								<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">₱{{ number_format($purchaseOrder->total_amount, 2) }}</span>
-								@if($purchaseOrder->remaining_balance > 0)
-									<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">Remaining: ₱{{ number_format($purchaseOrder->remaining_balance, 2) }}</span>
-								@else
-									<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">Paid</span>
-								@endif
-							</div>
-						</div>
-						<p class="text-xs text-gray-500 mt-2">Date: {{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}</p>
-					</div>
-				@empty
-					<p class="text-center text-gray-500 py-4">No purchase orders available</p>
-				@endforelse
-			</div>
-
-			<!-- Confirmation Section -->
-			<form id="transactionForm" method="POST" action="{{ route('accounting.transaction.store') }}">
-				@csrf
-				<input type="hidden" name="reference" id="formRef">
-				<input type="hidden" name="date" id="formDate">
-				<input type="hidden" name="transaction_type" id="formType">
-				<input type="hidden" name="order_id" id="formOrderId">
-				<input type="hidden" name="total_amount" id="formTotalAmount">
-				
-				<div id="confirmationSection" class="hidden mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-					<h3 class="font-semibold text-gray-800 mb-3">Confirm Transaction</h3>
-					<div class="space-y-2 mb-4">
-						<div class="flex justify-between">
-							<span class="text-gray-600">Reference:</span>
-							<span id="confirmRef" class="font-semibold text-gray-800">-</span>
-						</div>
-						<div class="flex justify-between">
-							<span class="text-gray-600">Total Amount:</span>
-							<span id="confirmAmount" class="font-semibold text-gray-800">-</span>
-						</div>
-						<div class="flex justify-between">
-							<span class="text-gray-600">Date:</span>
-							<span id="confirmDate" class="font-semibold text-gray-800">-</span>
-						</div>
-						<div class="flex justify-between">
-							<span class="text-gray-600">Type:</span>
-							<span id="confirmType" class="font-semibold text-gray-800">-</span>
-						</div>
-					</div>
-					<div class="mb-4">
-						<label class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
-						<input type="text" id="paymentAmount" name="amount" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter payment amount" required>
-						<p class="text-xs text-gray-500 mt-1">Max: <span id="maxAmount" class="font-semibold text-gray-700">-</span></p>
-					</div>
-					<div class="flex gap-3">
-					<button onclick="resetSelection()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
-						Back
+					<button onclick="closeAddTransaction()" class="text-slate-300 hover:text-white hover:bg-slate-600 p-2 rounded-lg transition">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
 					</button>
-						<button type="submit" class="flex-1 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition">
-							Confirm
-						</button>
-					</div>
 				</div>
-			</form>
-		</div>
+
+				<!-- Tabs -->
+				<div class="flex gap-2 mb-6">
+					<button onclick="showSalesOrders()" id="salesOrdersTab" class="flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-amber-500 text-white shadow-lg">
+						Sales Orders (Income)
+					</button>
+					<button onclick="showPurchaseOrders()" id="purchaseOrdersTab" class="flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-slate-600 text-slate-300 hover:bg-slate-500">
+						Purchase Orders (Expense)
+					</button>
+				</div>
+
+				<!-- Sales Orders List -->
+				<div id="salesOrdersContainer" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+					@forelse($salesOrders as $salesOrder)
+						<div onclick="selectTransaction('{{ $salesOrder->order_number }}', {{ $salesOrder->total_amount }}, '{{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}', 'Income', {{ $salesOrder->id }}, {{ $salesOrder->remaining_balance }})" class="p-4 bg-slate-800/60 border-2 border-slate-600 rounded-xl hover:border-green-500 hover:bg-slate-700/80 cursor-pointer transition-all shadow-lg">
+							<div class="flex justify-between items-start">
+								<div class="flex-1">
+									<h3 class="font-bold text-white text-lg">{{ $salesOrder->order_number }}</h3>
+									<p class="text-sm text-slate-300 font-medium mt-1">{{ $salesOrder->customer->name ?? 'N/A' }}</p>
+									<p class="text-xs text-slate-400 mt-1">{{ $salesOrder->notes ?? 'Sales Order' }}</p>
+								</div>
+								<div class="flex flex-col items-end gap-2">
+									<span class="px-3 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-bold rounded-lg shadow-lg">
+										₱{{ number_format($salesOrder->total_amount, 2) }}
+									</span>
+									@if($salesOrder->remaining_balance > 0)
+										<span class="px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded-lg">
+											Balance: ₱{{ number_format($salesOrder->remaining_balance, 2) }}
+										</span>
+									@else
+										<span class="px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded-lg">Fully Paid</span>
+									@endif
+								</div>
+							</div>
+							<div class="mt-3 pt-3 border-t border-slate-600">
+								<p class="text-xs text-slate-400">Order Date: {{ \Carbon\Carbon::parse($salesOrder->order_date)->format('F d, Y') }}</p>
+							</div>
+						</div>
+					@empty
+						<div class="py-12 text-center">
+							<svg class="w-12 h-12 text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+							</svg>
+							<p class="text-slate-400">No sales orders available</p>
+						</div>
+					@endforelse
+				</div>
+
+				<!-- Purchase Orders List -->
+				<div id="purchaseOrdersContainer" class="space-y-3 max-h-80 overflow-y-auto pr-2 hidden custom-scrollbar">
+					@forelse($purchaseOrders as $purchaseOrder)
+						<div onclick="selectTransaction('{{ $purchaseOrder->order_number }}', {{ $purchaseOrder->total_amount }}, '{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}', 'Expense', {{ $purchaseOrder->id }}, {{ $purchaseOrder->remaining_balance }})" class="p-4 bg-slate-800/60 border-2 border-slate-600 rounded-xl hover:border-red-500 hover:bg-slate-700/80 cursor-pointer transition-all shadow-lg">
+							<div class="flex justify-between items-start">
+								<div class="flex-1">
+									<h3 class="font-bold text-white text-lg">{{ $purchaseOrder->order_number }}</h3>
+									<p class="text-sm text-slate-300 font-medium mt-1">{{ $purchaseOrder->supplier->name ?? 'N/A' }}</p>
+									<p class="text-xs text-slate-400 mt-1">{{ $purchaseOrder->notes ?? 'Purchase Order' }}</p>
+								</div>
+								<div class="flex flex-col items-end gap-2">
+									<span class="px-3 py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-bold rounded-lg shadow-lg">
+										₱{{ number_format($purchaseOrder->total_amount, 2) }}
+									</span>
+									@if($purchaseOrder->remaining_balance > 0)
+										<span class="px-2 py-1 bg-yellow-600 text-white text-xs font-semibold rounded-lg">
+											Balance: ₱{{ number_format($purchaseOrder->remaining_balance, 2) }}
+										</span>
+									@else
+										<span class="px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded-lg">Fully Paid</span>
+									@endif
+								</div>
+							</div>
+							<div class="mt-3 pt-3 border-t border-slate-600">
+								<p class="text-xs text-slate-400">Order Date: {{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('F d, Y') }}</p>
+							</div>
+						</div>
+					@empty
+						<div class="py-12 text-center">
+							<svg class="w-12 h-12 text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+							</svg>
+							<p class="text-slate-400">No purchase orders available</p>
+						</div>
+					@endforelse
+				</div>
+
+				<!-- Confirmation Form -->
+				<form id="transactionForm" method="POST" action="{{ route('accounting.transaction.store') }}">
+					@csrf
+					<input type="hidden" name="reference" id="formRef">
+					<input type="hidden" name="date" id="formDate">
+					<input type="hidden" name="transaction_type" id="formType">
+					<input type="hidden" name="order_id" id="formOrderId">
+					<input type="hidden" name="total_amount" id="formTotalAmount">
+					
+					<div id="confirmationSection" class="hidden mt-6 p-5 bg-slate-800 rounded-xl border-2 border-amber-500 shadow-xl">
+						<h3 class="font-bold text-white text-lg mb-4 flex items-center gap-2">
+							<svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+							</svg>
+							Confirm Transaction Details
+						</h3>
+						<div class="grid grid-cols-2 gap-4 mb-5">
+							<div class="bg-slate-700/50 p-3 rounded-lg">
+								<span class="text-slate-400 text-xs font-medium">Reference</span>
+								<p id="confirmRef" class="font-bold text-white text-sm mt-1">-</p>
+							</div>
+							<div class="bg-slate-700/50 p-3 rounded-lg">
+								<span class="text-slate-400 text-xs font-medium">Total Amount</span>
+								<p id="confirmAmount" class="font-bold text-white text-sm mt-1">-</p>
+							</div>
+							<div class="bg-slate-700/50 p-3 rounded-lg">
+								<span class="text-slate-400 text-xs font-medium">Date</span>
+								<p id="confirmDate" class="font-bold text-white text-sm mt-1">-</p>
+							</div>
+							<div class="bg-slate-700/50 p-3 rounded-lg">
+								<span class="text-slate-400 text-xs font-medium">Type</span>
+								<p id="confirmType" class="font-bold text-white text-sm mt-1">-</p>
+							</div>
+						</div>
+						<div class="mb-5">
+							<label class="block text-sm font-bold text-white mb-2">Payment Amount</label>
+							<input type="text" id="paymentAmount" name="amount" class="w-full bg-slate-700 border-2 border-slate-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500" placeholder="Enter payment amount" required>
+							<p class="text-xs text-slate-400 mt-2">Maximum allowed: <span id="maxAmount" class="font-bold text-amber-400">-</span></p>
+						</div>
+						<div class="flex gap-3">
+							<button type="button" onclick="resetSelection()" class="flex-1 px-4 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition font-semibold">
+								Back
+							</button>
+							<button type="submit" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 transition shadow-lg font-semibold">
+								Confirm Payment
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
 	</div>
 
 	<script>
@@ -419,13 +474,18 @@
 
 		// Modal functions
 		function openAddTransaction() {
-			document.getElementById('addTransactionModal').classList.remove('hidden');
+			document.getElementById('addTransactionSection').classList.remove('hidden');
 			document.getElementById('confirmationSection').classList.add('hidden');
 			document.getElementById('salesOrdersContainer').classList.remove('hidden');
+			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
+			// Reset tab styling
+			showSalesOrders();
+			// Scroll to the section
+			document.getElementById('addTransactionSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 		}
 
 		function closeAddTransaction() {
-			document.getElementById('addTransactionModal').classList.add('hidden');
+			document.getElementById('addTransactionSection').classList.add('hidden');
 			resetSelection();
 		}
 
@@ -433,20 +493,22 @@
 		function showSalesOrders() {
 			document.getElementById('salesOrdersContainer').classList.remove('hidden');
 			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
-			document.getElementById('salesOrdersTab').classList.add('text-slate-600', 'border-b-2', 'border-slate-600');
-			document.getElementById('salesOrdersTab').classList.remove('text-gray-500');
-			document.getElementById('purchaseOrdersTab').classList.remove('text-slate-600', 'border-b-2', 'border-slate-600');
-			document.getElementById('purchaseOrdersTab').classList.add('text-gray-500');
+			// Update tab styling for sales orders
+			document.getElementById('salesOrdersTab').classList.add('bg-amber-500', 'text-white', 'shadow-lg');
+			document.getElementById('salesOrdersTab').classList.remove('bg-slate-600', 'text-slate-300');
+			document.getElementById('purchaseOrdersTab').classList.add('bg-slate-600', 'text-slate-300');
+			document.getElementById('purchaseOrdersTab').classList.remove('bg-amber-500', 'text-white', 'shadow-lg');
 			document.getElementById('confirmationSection').classList.add('hidden');
 		}
 
 		function showPurchaseOrders() {
 			document.getElementById('purchaseOrdersContainer').classList.remove('hidden');
 			document.getElementById('salesOrdersContainer').classList.add('hidden');
-			document.getElementById('purchaseOrdersTab').classList.add('text-slate-600', 'border-b-2', 'border-slate-600');
-			document.getElementById('purchaseOrdersTab').classList.remove('text-gray-500');
-			document.getElementById('salesOrdersTab').classList.remove('text-slate-600', 'border-b-2', 'border-slate-600');
-			document.getElementById('salesOrdersTab').classList.add('text-gray-500');
+			// Update tab styling for purchase orders
+			document.getElementById('purchaseOrdersTab').classList.add('bg-amber-500', 'text-white', 'shadow-lg');
+			document.getElementById('purchaseOrdersTab').classList.remove('bg-slate-600', 'text-slate-300');
+			document.getElementById('salesOrdersTab').classList.add('bg-slate-600', 'text-slate-300');
+			document.getElementById('salesOrdersTab').classList.remove('bg-amber-500', 'text-white', 'shadow-lg');
 			document.getElementById('confirmationSection').classList.add('hidden');
 		}
 
@@ -518,12 +580,7 @@
 			document.getElementById('purchaseOrdersContainer').classList.add('hidden');
 		}
 
-		// Close modal when clicking outside
-		document.getElementById('addTransactionModal').addEventListener('click', function(e) {
-			if (e.target === this) {
-				closeAddTransaction();
-			}
-		});
+		// Removed modal click listener since we're using inline section now
 
 	// Export Dropdown Toggle
 	const exportButtonAccounting = document.getElementById('exportButtonAccounting');
