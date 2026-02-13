@@ -476,13 +476,37 @@ $paymentBg = [
 							<td class="px-3 py-3">
 								<span class="inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span>
 							</td>
-							<td class="px-3 py-3 text-slate-300">{{ $customer->phone }}</td>
+							<td class="px-3 py-3 text-slate-300">{{ $customer->phone ?: 'N/A' }}</td>
 							<td class="px-3 py-3 text-slate-300">{{ $customer->email }}</td>
 							<td class="px-3 py-3 text-slate-300">{{ $customer->totalOrders() }}</td>
 							<td class="px-3 py-3 font-bold text-slate-300">₱{{ number_format($customer->totalSpent(), 2) }}</td>
 							<td class="px-3 py-3">
+								@php
+								$productsSummary = [];
+								foreach($customer->salesOrders as $order) {
+									foreach($order->items as $item) {
+										$productName = $item->product->product_name ?? 'Unknown Product';
+										if (!isset($productsSummary[$productName])) {
+											$productsSummary[$productName] = 0;
+										}
+										$productsSummary[$productName] += $item->quantity;
+									}
+								}
+								@endphp
 								<div class="flex space-x-2">
-									<button onclick="openModal('viewCustomerModal-{{ $customer->id }}')" class="p-1 hover:bg-slate-500 rounded" title="View">
+									@php
+									$customerData = [
+										'id' => $customer->id,
+										'name' => $customer->name,
+										'type' => $customer->customer_type,
+										'phone' => $customer->phone,
+										'email' => $customer->email,
+										'totalOrders' => $customer->totalOrders(),
+										'totalSpent' => $customer->totalSpent(),
+										'productsSummary' => $productsSummary,
+									];
+									@endphp
+									<button class="p-1 hover:bg-slate-500 rounded" title="View" data-customer='@json($customerData)' onclick="openViewCustomerModalFromData(this)">
 										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
 											<path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
 											<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
@@ -499,67 +523,9 @@ $paymentBg = [
 										</svg>
 									</button>
 								</div>
-								<!-- View Customer Modal -->
-								<div id="viewCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/70 hidden" style="z-index: 99999;">
-									<div class="bg-white text-gray-900 rounded-lg shadow-xl max-w-4xl w-[92%] mx-auto mt-16 p-3 max-h-[90vh] overflow-y-auto">
-										<div class="flex items-center justify-between mb-4">
-											<h3 class="text-xl font-bold">Customer Details</h3>
-											<button class="text-xl" onclick="closeModal('viewCustomerModal-{{ $customer->id }}')">✕</button>
-										</div>
-										<div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-base leading-relaxed mb-6">
-											<div><span class="font-semibold">Name:</span> {{ $customer->name }}</div>
-											<div><span class="font-semibold">Type:</span> <span class="px-2 py-0.5 rounded text-white" style="background: {{ $customerTypeBg[$customer->customer_type] ?? '#e5e7eb' }};">{{ $customer->customer_type }}</span></div>
-											<div><span class="font-semibold">Contact #:</span> {{ $customer->phone ?: '—' }}</div>
-											<div><span class="font-semibold">Email:</span> {{ $customer->email ?: '—' }}</div>
-											<div><span class="font-semibold">Total Orders:</span> {{ $customer->totalOrders() }}</div>
-											<div><span class="font-semibold">Total Spent:</span> ₱{{ number_format($customer->totalSpent(), 2) }}</div>
-										</div>
-
-										<!-- Products Purchased Section -->
-										<div class="border-t pt-6">
-											<h4 class="text-xl font-semibold mb-4">Products Purchased</h4>
-											@php
-											$productsSummary = [];
-											foreach($customer->salesOrders as $order) {
-											foreach($order->items as $item) {
-											$productName = $item->product->product_name ?? 'Unknown Product';
-											if (!isset($productsSummary[$productName])) {
-											$productsSummary[$productName] = 0;
-											}
-											$productsSummary[$productName] += $item->quantity;
-											}
-											}
-											@endphp
-											@if(count($productsSummary) > 0)
-											<div class="overflow-x-auto">
-												<table class="w-full text-xs border-collapse">
-													<thead>
-														<tr class="bg-slate-100 border-b">
-															<th class="px-3 py-1.5 text-left font-semibold">Product Name</th>
-															<th class="px-3 py-1.5 text-right font-semibold">Total Quantity</th>
-														</tr>
-													</thead>
-													<tbody>
-														@foreach($productsSummary as $productName => $totalQty)
-														<tr class="border-b hover:bg-slate-600 transition cursor-pointer">
-															<td class="px-3 py-1.5">{{ $productName }}</td>
-															<td class="px-3 py-1.5 text-right font-medium">{{ $totalQty }} pcs</td>
-														</tr>
-														@endforeach
-													</tbody>
-												</table>
-											</div>
-											@else
-											<p class="text-slate-500 text-xs">No products purchased yet</p>
-											@endif
-										</div>
-
-										<div class="flex justify-end mt-6">
-											<button class="px-3 py-1.5 bg-gray-900 text-white rounded" onclick="closeModal('viewCustomerModal-{{ $customer->id }}')">Close</button>
-										</div>
-									</div>
-								</div>
-								@empty
+							</td>
+						</tr>
+						@empty
 						<tr>
 							<td colspan="7" class="text-center py-4">No customers yet. Click "New Customer" to add one.</td>
 						</tr>
@@ -571,6 +537,63 @@ $paymentBg = [
 				</table>
 			</div>
 		</section>
+
+		<!-- View Customer Modal -->
+		<div id="viewCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div class="bg-amber-50 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+					<div class="p-4">
+						<div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+							<h3 class="text-xl font-bold text-gray-900">Customer Details</h3>
+							<button onclick="closeModal('viewCustomerModal')" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+								<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+								</svg>
+							</button>
+						</div>
+						
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+							<div class="bg-white p-3 rounded-xl border-2 border-gray-300">
+								<span class="text-xs font-bold text-gray-600 uppercase">Name</span>
+								<p id="viewCustomerName" class="text-sm font-bold text-gray-900 mt-1"></p>
+							</div>
+							<div class="bg-white p-3 rounded-xl border-2 border-gray-300">
+								<span class="text-xs font-bold text-gray-600 uppercase">Type</span>
+								<p id="viewCustomerType" class="text-sm font-bold text-gray-900 mt-1"></p>
+							</div>
+							<div class="bg-white p-3 rounded-xl border-2 border-gray-300">
+								<span class="text-xs font-bold text-gray-600 uppercase">Contact #</span>
+								<p id="viewCustomerPhone" class="text-sm font-bold text-gray-900 mt-1"></p>
+							</div>
+							<div class="bg-white p-3 rounded-xl border-2 border-gray-300">
+								<span class="text-xs font-bold text-gray-600 uppercase">Email</span>
+								<p id="viewCustomerEmail" class="text-sm font-bold text-gray-900 mt-1"></p>
+							</div>
+							<div class="bg-white p-3 rounded-xl border-2 border-gray-300">
+								<span class="text-xs font-bold text-gray-600 uppercase">Total Orders</span>
+								<p id="viewCustomerOrders" class="text-sm font-bold text-gray-900 mt-1"></p>
+							</div>
+							<div class="bg-white p-3 rounded-xl border-2 border-gray-300">
+								<span class="text-xs font-bold text-gray-600 uppercase">Total Spent</span>
+								<p id="viewCustomerSpent" class="text-sm font-bold text-gray-900 mt-1"></p>
+							</div>
+						</div>
+
+						<!-- Products Purchased Section -->
+						<div class="border-t-2 border-gray-300 pt-4">
+							<h4 class="text-lg font-bold text-gray-900 mb-4">Products Purchased</h4>
+							<div id="viewCustomerProducts" class="bg-white rounded-xl border-2 border-gray-300 overflow-hidden">
+								<!-- Products will be inserted here -->
+							</div>
+						</div>
+
+						<div class="flex justify-end space-x-2 mt-6">
+							<button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeModal('viewCustomerModal')">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<!-- Edit Customer Modal -->
 		<div id="editCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
@@ -1226,6 +1249,60 @@ $paymentBg = [
 		document.getElementById('editCustomerEmail').value = email || '';
 		document.getElementById('editCustomerForm').action = `/customers/${customerId}`;
 		openModal('editCustomerModal');
+	}
+
+
+	function openViewCustomerModalFromData(btn) {
+		const data = btn.getAttribute('data-customer');
+		if (!data) return;
+		const customer = JSON.parse(data);
+
+		// Customer type badge colors
+		const typeColors = {
+			'Wholesale': '#64B5F6',
+			'Retail': '#6366F1',
+			'Contractor': '#BA68C8'
+		};
+
+		document.getElementById('viewCustomerName').textContent = customer.name || '—';
+		const typeElement = document.getElementById('viewCustomerType');
+		typeElement.innerHTML = `<span class="px-2 py-0.5 rounded text-white text-xs" style="background: ${typeColors[customer.type] || '#e5e7eb'};">${customer.type}</span>`;
+		document.getElementById('viewCustomerPhone').textContent = customer.phone || '—';
+		document.getElementById('viewCustomerEmail').textContent = customer.email || '—';
+		document.getElementById('viewCustomerOrders').textContent = customer.totalOrders || '0';
+		document.getElementById('viewCustomerSpent').textContent = '₱' + (customer.totalSpent ? parseFloat(customer.totalSpent).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') : '0.00');
+
+		const productsContainer = document.getElementById('viewCustomerProducts');
+		if (customer.productsSummary && Object.keys(customer.productsSummary).length > 0) {
+			let tableHTML = `
+				<table class="w-full text-sm border-collapse">
+					<thead>
+						<tr class="bg-slate-700 text-white">
+							<th class="px-3 py-2 text-left font-semibold">Product Name</th>
+							<th class="px-3 py-2 text-right font-semibold">Total Quantity</th>
+						</tr>
+					</thead>
+					<tbody>
+				`;
+			for (const [productName, totalQty] of Object.entries(customer.productsSummary)) {
+				tableHTML += `
+					<tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+						<td class="px-3 py-2">${productName}</td>
+						<td class="px-3 py-2 text-right font-medium">${totalQty} pcs</td>
+					</tr>
+				`;
+			}
+		
+			tableHTML += `
+					</tbody>
+				</table>
+			`;
+			productsContainer.innerHTML = tableHTML;
+		} else {
+			productsContainer.innerHTML = '<p class="text-slate-500 text-sm p-4 text-center">No products purchased yet</p>';
+		}
+
+		openModal('viewCustomerModal');
 	}
 
 	(function() {
