@@ -1113,7 +1113,7 @@ $paymentBg = [
 </div>
 
 <!-- Confirmation Modal for Sales Order - Add -->
-<div id="confirmSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeConfirmSalesOrder()">
+<div id="confirmSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeConfirmSalesOrder()">
 	<div class="flex items-center justify-center min-h-screen p-3 w-full">
 		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
 			<div class="sticky top-0 bg-gradient-to-r from-green-600 to-green-700 p-3 text-white rounded-t-xl z-10">
@@ -1138,7 +1138,7 @@ $paymentBg = [
 </div>
 
 <!-- Confirmation Modal for Cancelling Sales Order -->
-<div id="confirmCancelSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeCancelSalesOrderModal()">
+<div id="confirmCancelSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeCancelSalesOrderModal()">
 	<div class="flex items-center justify-center min-h-screen p-3 w-full">
 		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
 			<div class="sticky top-0 bg-gradient-to-r from-red-600 to-red-700 p-3 text-white rounded-t-xl z-10">
@@ -1163,7 +1163,7 @@ $paymentBg = [
 </div>
 
 <!-- Confirmation Modal for Customer -->
-<div id="confirmCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeConfirmCustomer()">
+<div id="confirmCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeConfirmCustomer()">
 	<div class="flex items-center justify-center min-h-screen p-3 w-full">
 		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
 			<div class="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-3 text-white rounded-t-xl z-10">
@@ -1188,7 +1188,7 @@ $paymentBg = [
 </div>
 
 <!-- Delete Customer Confirmation Modal -->
-<div id="deleteCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeDeleteCustomerModal()">
+<div id="deleteCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeDeleteCustomerModal()">
 	<div class="flex items-center justify-center min-h-screen p-3 w-full">
 		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
 			<div class="sticky top-0 bg-gradient-to-r from-red-600 to-red-700 p-3 text-white rounded-t-xl z-10">
