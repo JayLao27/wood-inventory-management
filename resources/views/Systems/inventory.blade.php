@@ -1920,5 +1920,3 @@
         </script>
 
 @endsection
-
-
