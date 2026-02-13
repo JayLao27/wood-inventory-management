@@ -1,3 +1,54 @@
+    <!-- Success Notification -->
+    <div id="successNotification" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[999999] bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg text-lg font-semibold flex items-center gap-2 hidden transition-all duration-300">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span id="successNotificationText">Success!</span>
+    </div>
+    <script>
+    // Show success notification
+    function showSuccessNotification(message = 'Success!') {
+        const notif = document.getElementById('successNotification');
+        const notifText = document.getElementById('successNotificationText');
+        notifText.textContent = message;
+        notif.classList.remove('hidden');
+        setTimeout(() => {
+            notif.classList.add('hidden');
+        }, 2200);
+    }
+
+    // Attach to all procurement forms
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Supplier
+        const addSupplierForm = document.getElementById('addSupplierForm');
+        if (addSupplierForm) {
+            addSupplierForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Supplier added successfully!'), 100);
+            });
+        }
+        // Edit Supplier
+        const editSupplierForm = document.getElementById('editSupplierForm');
+        if (editSupplierForm) {
+            editSupplierForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Supplier updated successfully!'), 100);
+            });
+        }
+        // Add Purchase Order
+        const addPurchaseOrderForm = document.getElementById('addPurchaseOrderForm');
+        if (addPurchaseOrderForm) {
+            addPurchaseOrderForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Purchase order created!'), 100);
+            });
+        }
+        // Edit Purchase Order
+        const editPurchaseOrderForm = document.getElementById('editPurchaseOrderForm');
+        if (editPurchaseOrderForm) {
+            editPurchaseOrderForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Purchase order updated!'), 100);
+            });
+        }
+    });
+    </script>
 @extends('layouts.system')
 
 @section('main-content')
@@ -793,15 +844,6 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-bold text-gray-900 mb-3">Status *</label>
-                                    <select name="status" id="editPOStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
-                                        <option value="Pending">Pending</option>
-                                        <option value="Confirmed">Confirmed</option>
-                                        <option value="Delivered">Delivered</option>
-                                        <option value="Overdue">Overdue</option>
-                                    </select>
-                                </div>
-                                <div>
                                     <label class="block text-sm font-bold text-gray-900 mb-3">Payment Status *</label>
                                     <select name="payment_status" id="editPOPaymentStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
                                         <option value="Pending">Pending</option>
@@ -881,6 +923,102 @@
             </div>
         </div>
     </div>
+
+    <!-- Confirmation Modal for Cancelling Sales Order -->
+    <div id="confirmCancelSalesOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeCancelSalesOrderModal()">
+        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div class="p-4">
+                <!-- Icon -->
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Cancel Sales Order?</h3>
+                <p class="text-center text-xs mb-4" style="color: #666;">
+                    Cancel sales order <span id="cancelSalesOrderNumber" class="font-semibold">-</span>? This action cannot be undone.
+                </p>
+
+                <!-- Actions -->
+                <div class="flex justify-center gap-2">
+                    <button type="button" onclick="closeCancelSalesOrderModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                        No, Keep It
+                    </button>
+                    <button type="button" onclick="submitCancelSalesOrder()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                        Yes, Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Customer -->
+    <div id="confirmCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeConfirmCustomer()">
+        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div class="p-4">
+                <!-- Icon -->
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Add New Customer?</h3>
+                <p class="text-center text-xs mb-4" style="color: #666;">
+                    Register this new customer to the system? Their information will be saved for future orders.
+                </p>
+
+                <!-- Actions -->
+                <div class="flex justify-center gap-2">
+                    <button type="button" onclick="closeConfirmCustomer()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                        No, Cancel
+                    </button>
+                    <button type="button" onclick="submitCustomer()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                        Yes, Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Customer Confirmation Modal -->
+    <div id="deleteCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeDeleteCustomerModal()">
+        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div class="p-4">
+                <!-- Icon -->
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Delete Customer?</h3>
+                <p class="text-center text-xs mb-4" style="color: #666;">
+                    Delete <span id="deleteCustomerName" class="font-semibold">-</span>? This action cannot be undone.
+                </p>
+
+                <!-- Actions -->
+                <div class="flex justify-center gap-2">
+                    <button type="button" onclick="closeDeleteCustomerModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                        No, Keep
+                    </button>
+                    <button type="button" onclick="submitDeleteCustomer()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                        Yes, Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div
 
     <!-- Improved Received Stock Reports Modal -->
     <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 backdrop-blur-sm transition-opacity duration-300">
@@ -1633,7 +1771,7 @@
         }
 
         function deleteOrder(id) {
-            if (confirm('Are you sure you want to delete this purchase order?')) {
+            if (confirm('Are you sure you want to cancel this purchase order?')) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/procurement/purchase-orders/${id}`;

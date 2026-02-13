@@ -79,6 +79,13 @@ $paymentBg = [
 @endphp
 <!-- Main Content -->
 <div class="flex-1 flex flex-col overflow-hidden">
+	<!-- Success Notification -->
+	<div id="successNotification" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[999999] bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg text-lg font-semibold flex items-center gap-2 hidden transition-all duration-300">
+		<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+		</svg>
+		<span id="successNotificationText">Success!</span>
+	</div>
 	<!-- Header -->
 	<div class="bg-amber-50 p-5">
 		<div class="flex justify-between items-center">
