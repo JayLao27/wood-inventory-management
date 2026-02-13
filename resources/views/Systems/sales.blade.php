@@ -488,7 +488,7 @@ $paymentBg = [
 											<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
 										</svg>
 									</button>
-									<button onclick="openModal('editCustomerModal-{{ $customer->id }}')" class="p-1 hover:bg-slate-500 rounded" title="Edit">
+									<button onclick="openEditCustomerModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', '{{ $customer->customer_type }}', '{{ $customer->phone }}', '{{ $customer->email }}')" class="p-1 hover:bg-slate-500 rounded" title="Edit">
 										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
 											<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
 										</svg>
@@ -559,91 +559,6 @@ $paymentBg = [
 										</div>
 									</div>
 								</div>
-
-								<!-- Edit Customer Modal -->
-								<div id="editCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
-									<div class="flex items-center justify-center min-h-screen p-4">
-										<div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
-											<div class="p-4">
-												<div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
-													<h3 class="text-xl font-bold text-gray-900">Edit Customer</h3>
-													<button onclick="closeModal('editCustomerModal-{{ $customer->id }}')" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
-														<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-														</svg>
-													</button>
-												</div>
-												
-												@if ($errors->any())
-												<div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl">
-													<ul class="list-disc list-inside text-xs">
-														@foreach ($errors->all() as $error)
-														<li>{{ $error }}</li>
-														@endforeach
-													</ul>
-												</div>
-												@endif
-												
-												<form method="POST" action="{{ route('customers.update', $customer) }}" class="editCustomerForm">
-													@csrf
-													@method('PUT')
-													<div class="grid gap-4">
-														<div>
-															<label class="block text-sm font-bold text-gray-900 mb-3">Name <span class="text-red-500">*</span></label>
-															<input type="text" name="name" value="{{ old('name', $customer->name) }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('name') border-red-500 @enderror" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
-															@error('name')
-															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-															@else
-															<p class="text-gray-400 text-xs mt-1">This field is required. Enter customer name.</p>
-															@enderror
-														</div>
-														<div class="grid grid-cols-2 gap-4">
-															<div>
-																<label class="block text-sm font-bold text-gray-900 mb-3">Type <span class="text-red-500">*</span></label>
-																<select name="customer_type" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('customer_type') border-red-500 @enderror" required>
-																	@foreach(['Retail','Contractor','Wholesale'] as $t)
-																	<option value="{{ $t }}" {{ old('customer_type', $customer->customer_type) === $t ? 'selected' : '' }}>{{ $t }}</option>
-																	@endforeach
-																</select>
-																@error('customer_type')
-																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-																@else
-																<p class="text-gray-400 text-xs mt-1">This field is required. Select a customer type.</p>
-																@enderror
-															</div>
-															<div>
-																<label class="block text-sm font-bold text-gray-900 mb-3">Phone <span class="text-orange-500">**</span></label>
-																<input type="tel" name="phone" class="editCustomerPhone w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone', $customer->phone) }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
-																@error('phone')
-																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-																@else
-																<p class="text-gray-400 text-xs mt-1">Enter a phone number (up to 12 digits) or email below.</p>
-																@enderror
-															</div>
-														</div>
-														<div>
-															<label class="block text-sm font-bold text-gray-900 mb-3">Email <span class="text-orange-500">**</span></label>
-															<input type="email" name="email" class="editCustomerEmail w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email', $customer->email) }}" maxlength="255" title="Please enter a valid email address">
-															@error('email')
-															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-															@enderror
-															@error('contact')
-															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-															@else
-															<p class="text-gray-400 text-xs mt-1">** At least one contact method (phone or email) is required</p>
-															@enderror
-															<p class="editCustomerContactError text-red-500 text-xs mt-1 hidden"></p>
-														</div>
-														<div class="flex justify-end space-x-2 mt-6">
-															<button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeModal('editCustomerModal-{{ $customer->id }}')">Cancel</button>
-															<button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Customer</button>
-														</div>
-													</div>
-												</form>
-											</div>
-										</div>
-									</div>
-								</div>
 								@empty
 						<tr>
 							<td colspan="7" class="text-center py-4">No customers yet. Click "New Customer" to add one.</td>
@@ -656,6 +571,62 @@ $paymentBg = [
 				</table>
 			</div>
 		</section>
+
+		<!-- Edit Customer Modal -->
+		<div id="editCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+					<div class="p-4">
+						<div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+							<h3 class="text-xl font-bold text-gray-900">Edit Customer</h3>
+							<button onclick="closeModal('editCustomerModal')" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+								<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+								</svg>
+							</button>
+						</div>
+						
+						<form id="editCustomerForm" method="POST" action="" class="editCustomerForm">
+							@csrf
+							@method('PUT')
+							<div class="grid gap-4">
+								<div>
+									<label class="block text-sm font-bold text-gray-900 mb-3">Name <span class="text-red-500">*</span></label>
+									<input type="text" id="editCustomerName" name="name" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
+									<p class="text-gray-400 text-xs mt-1">This field is required. Enter customer name.</p>
+								</div>
+								<div class="grid grid-cols-2 gap-4">
+									<div>
+										<label class="block text-sm font-bold text-gray-900 mb-3">Type <span class="text-red-500">*</span></label>
+										<select id="editCustomerType" name="customer_type" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+											<option value="Retail">Retail</option>
+											<option value="Contractor">Contractor</option>
+											<option value="Wholesale">Wholesale</option>
+										</select>
+										<p class="text-gray-400 text-xs mt-1">This field is required. Select a customer type.</p>
+									</div>
+									<div>
+										<label class="block text-sm font-bold text-gray-900 mb-3">Phone <span class="text-orange-500">**</span></label>
+										<input type="tel" id="editCustomerPhone" name="phone" class="editCustomerPhone w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+										<p class="text-gray-400 text-xs mt-1">Enter a phone number (up to 12 digits) or email below.</p>
+									</div>
+								</div>
+								<div>
+									<label class="block text-sm font-bold text-gray-900 mb-3">Email <span class="text-orange-500">**</span></label>
+									<input type="email" id="editCustomerEmail" name="email" class="editCustomerEmail w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" maxlength="255" title="Please enter a valid email address">
+									<p class="text-gray-400 text-xs mt-1">** At least one contact method (phone or email) is required</p>
+									<p class="editCustomerContactError text-red-500 text-xs mt-1 hidden"></p>
+								</div>
+								<div class="flex justify-end space-x-2 mt-6">
+									<button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeModal('editCustomerModal')">Cancel</button>
+									<button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Customer</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<!-- New Order Modal - IMPROVED VERSION -->
 		<div id="newOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
@@ -1248,6 +1219,15 @@ $paymentBg = [
 		document.getElementById(modalId).classList.add('hidden');
 	}
 
+	function openEditCustomerModal(customerId, name, type, phone, email) {
+		document.getElementById('editCustomerName').value = name || '';
+		document.getElementById('editCustomerType').value = type || 'Retail';
+		document.getElementById('editCustomerPhone').value = phone || '';
+		document.getElementById('editCustomerEmail').value = email || '';
+		document.getElementById('editCustomerForm').action = `/customers/${customerId}`;
+		openModal('editCustomerModal');
+	}
+
 	(function() {
 		const salesTab = document.getElementById('salesTab');
 		const customersTab = document.getElementById('customersTab');
@@ -1499,7 +1479,7 @@ $paymentBg = [
 		});
 	@endif
 
-	// Export Dropdown Toggle - FIXED VERSION
+	// Export Dropdown Toggle 
 	const exportButton = document.getElementById('exportButton');
 	const exportDropdown = document.getElementById('exportDropdown');
 
