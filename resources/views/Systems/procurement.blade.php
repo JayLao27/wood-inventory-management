@@ -842,33 +842,14 @@
                                 <label class="block text-sm font-bold text-gray-900 mb-3">Supplier</label>
                                 <input type="text" id="editPOSupplierName" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-3">Status *</label>
-                                <select name="status" id="editPOStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="received">Received</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                            </div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-900 mb-3">Payment Status *</label>
-                                    <select name="payment_status" id="editPOPaymentStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
-                                        <option value="Pending">Pending</option>
-                                        <option value="Partial">Partial</option>
-                                        <option value="Paid">Paid</option>
-                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-gray-900 mb-3">Expected Delivery</label>
                                     <input type="date" id="editPOExpectedDelivery" name="expected_delivery" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 text-sm transition-all" />
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-3">Total Amount</label>
-                                <input type="text" id="editPOTotalAmount" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
-                            </div>
+                          
                             <div class="flex justify-end space-x-2 mt-6">
                                 <button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeEditPurchaseOrderModal()">Cancel</button>
                                 <button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Order</button>
