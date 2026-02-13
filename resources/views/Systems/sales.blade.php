@@ -1113,131 +1113,102 @@ $paymentBg = [
 </div>
 
 <!-- Confirmation Modal for Sales Order - Add -->
-<div id="confirmSalesOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeConfirmSalesOrder()">
-	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-		<div class="p-4">
-			<!-- Icon -->
-			<div class="flex justify-center mb-3">
-				<div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-					<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-					</svg>
+<div id="confirmSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeConfirmSalesOrder()">
+	<div class="flex items-center justify-center min-h-screen p-3 w-full">
+		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
+			<div class="sticky top-0 bg-gradient-to-r from-green-600 to-green-700 p-3 text-white rounded-t-xl z-10">
+				<div class="flex items-center justify-between">
+					<h3 class="text-lg font-bold">Confirm Sales Order</h3>
+					<button onclick="closeConfirmSalesOrder()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					</button>
 				</div>
 			</div>
-
-			<!-- Message -->
-			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Confirm Sales Order?</h3>
-			<p class="text-center text-xs mb-4" style="color: #666;">
-				Create this new sales order? Please review all details before confirming.
-			</p>
-
-			<!-- Actions -->
-			<div class="flex justify-center gap-2">
-				<button type="button" onclick="closeConfirmSalesOrder()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
-					No, Review Again
-				</button>
-				<button type="button" onclick="submitSalesOrder()" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
-					Yes, Confirm
-				</button>
+			<div class="p-6">
+				<p class="text-slate-700 mb-6">Create this new sales order? Please review all details before confirming.</p>
+				<div class="flex gap-3">
+					<button type="button" onclick="closeConfirmSalesOrder()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Review Again</button>
+					<button type="button" onclick="submitSalesOrder()" class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Confirm</button>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
 <!-- Confirmation Modal for Cancelling Sales Order -->
-<div id="confirmCancelSalesOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeCancelSalesOrderModal()">
-	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-		<div class="p-4">
-			<!-- Icon -->
-			<div class="flex justify-center mb-3">
-				<div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
-					<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-					</svg>
+<div id="confirmCancelSalesOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeCancelSalesOrderModal()">
+	<div class="flex items-center justify-center min-h-screen p-3 w-full">
+		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
+			<div class="sticky top-0 bg-gradient-to-r from-red-600 to-red-700 p-3 text-white rounded-t-xl z-10">
+				<div class="flex items-center justify-between">
+					<h3 class="text-lg font-bold">Cancel Sales Order</h3>
+					<button onclick="closeCancelSalesOrderModal()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					</button>
 				</div>
 			</div>
-
-			<!-- Message -->
-			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Cancel Sales Order?</h3>
-			<p class="text-center text-xs mb-4" style="color: #666;">
-				Cancel sales order <span id="cancelSalesOrderNumber" class="font-semibold">-</span>? This action cannot be undone.
-			</p>
-
-			<!-- Actions -->
-			<div class="flex justify-center gap-2">
-				<button type="button" onclick="closeCancelSalesOrderModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
-					No, Keep It
-				</button>
-				<button type="button" onclick="submitCancelSalesOrder()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
-					Yes, Cancel
-				</button>
+			<div class="p-6">
+				<p class="text-slate-700 mb-6">Cancel sales order <span id="cancelSalesOrderNumber" class="font-semibold">-</span>? This action cannot be undone.</p>
+				<div class="flex gap-3">
+					<button type="button" onclick="closeCancelSalesOrderModal()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Keep It</button>
+					<button type="button" onclick="submitCancelSalesOrder()" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Cancel</button>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
 <!-- Confirmation Modal for Customer -->
-<div id="confirmCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeConfirmCustomer()">
-	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-		<div class="p-4">
-			<!-- Icon -->
-			<div class="flex justify-center mb-3">
-				<div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
-					<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-					</svg>
+<div id="confirmCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeConfirmCustomer()">
+	<div class="flex items-center justify-center min-h-screen p-3 w-full">
+		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
+			<div class="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-3 text-white rounded-t-xl z-10">
+				<div class="flex items-center justify-between">
+					<h3 class="text-lg font-bold">Add New Customer</h3>
+					<button onclick="closeConfirmCustomer()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					</button>
 				</div>
 			</div>
-
-			<!-- Message -->
-			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Add New Customer?</h3>
-			<p class="text-center text-xs mb-4" style="color: #666;">
-				Register this new customer to the system? Their information will be saved for future orders.
-			</p>
-
-			<!-- Actions -->
-			<div class="flex justify-center gap-2">
-				<button type="button" onclick="closeConfirmCustomer()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
-					No, Cancel
-				</button>
-				<button type="button" onclick="submitCustomer()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
-					Yes, Add
-				</button>
+			<div class="p-6">
+				<p class="text-slate-700 mb-6">Register this new customer to the system? Their information will be saved for future orders.</p>
+				<div class="flex gap-3">
+					<button type="button" onclick="closeConfirmCustomer()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Cancel</button>
+					<button type="button" onclick="submitCustomer()" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Add</button>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
 <!-- Delete Customer Confirmation Modal -->
-<div id="deleteCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeDeleteCustomerModal()">
-	<div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-		<div class="p-4">
-			<!-- Icon -->
-			<div class="flex justify-center mb-3">
-				<div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
-					<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-					</svg>
+<div id="deleteCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-50 flex" onclick="if(event.target === this) closeDeleteCustomerModal()">
+	<div class="flex items-center justify-center min-h-screen p-3 w-full">
+		<div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700">
+			<div class="sticky top-0 bg-gradient-to-r from-red-600 to-red-700 p-3 text-white rounded-t-xl z-10">
+				<div class="flex items-center justify-between">
+					<h3 class="text-lg font-bold">Delete Customer</h3>
+					<button onclick="closeDeleteCustomerModal()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					</button>
 				</div>
 			</div>
-
-			<!-- Message -->
-			<h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Delete Customer?</h3>
-			<p class="text-center text-xs mb-4" style="color: #666;">
-				Delete <span id="deleteCustomerName" class="font-semibold">-</span>? This action cannot be undone.
-			</p>
-
-			<!-- Actions -->
-			<div class="flex justify-center gap-2">
-				<button type="button" onclick="closeDeleteCustomerModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
-					No, Keep
-				</button>
-				<button type="button" onclick="submitDeleteCustomer()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
-					Yes, Delete
-				</button>
+			<div class="p-6">
+				<p class="text-slate-700 mb-6">Delete <span id="deleteCustomerName" class="font-semibold">-</span>? This action cannot be undone.</p>
+				<div class="flex gap-3">
+					<button type="button" onclick="closeDeleteCustomerModal()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Keep</button>
+					<button type="button" onclick="submitDeleteCustomer()" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Delete</button>
+				</div>
 			</div>
 		</div>
-	</div>
 </div>
 
 <script>
