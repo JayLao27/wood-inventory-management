@@ -16,8 +16,14 @@
                         : 0;
                 @endphp
                 <div class="flex space-x-3">
-                    <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
-                        Reports
+                    <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition flex items-center gap-2">
+                        <svg class="h-6 w-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" class="text-amber-300"/>
+                            <rect x="9" y="9" width="4" height="12" rx="1" fill="currentColor" class="text-amber-400"/>
+                            <rect x="15" y="5" width="4" height="16" rx="1" fill="currentColor" class="text-amber-500"/>
+                            <path stroke="currentColor" stroke-width="2" d="M3 21h18"/>
+                        </svg>
+                        <span>Reports</span>
                     </button>
                 </div>
             </div>
@@ -884,14 +890,16 @@
                 <!-- Header -->
                 <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white px-8 py-6 rounded-t-2xl sticky top-0 z-10">
                     <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-2xl font-bold flex items-center gap-3">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Received Stock Reports
-                            </h3>
-                            <p class="text-slate-300 text-sm mt-1">Track and manage incoming inventory</p>
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <h3 class="text-2xl font-bold flex items-center gap-3">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Received Stock Reports
+                                </h3>
+                                <p class="text-slate-300 text-sm mt-1">Track and manage incoming inventory</p>
+                            </div>
                         </div>
                         <button onclick="closeReceivedStockReportsModal()" 
                                 class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200">
