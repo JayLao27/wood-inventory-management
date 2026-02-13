@@ -1,3 +1,54 @@
+    <!-- Success Notification -->
+    <div id="successNotification" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[999999] bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg text-lg font-semibold flex items-center gap-2 hidden transition-all duration-300">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span id="successNotificationText">Success!</span>
+    </div>
+    <script>
+    // Show success notification
+    function showSuccessNotification(message = 'Success!') {
+        const notif = document.getElementById('successNotification');
+        const notifText = document.getElementById('successNotificationText');
+        notifText.textContent = message;
+        notif.classList.remove('hidden');
+        setTimeout(() => {
+            notif.classList.add('hidden');
+        }, 2200);
+    }
+
+    // Attach to all procurement forms
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Supplier
+        const addSupplierForm = document.getElementById('addSupplierForm');
+        if (addSupplierForm) {
+            addSupplierForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Supplier added successfully!'), 100);
+            });
+        }
+        // Edit Supplier
+        const editSupplierForm = document.getElementById('editSupplierForm');
+        if (editSupplierForm) {
+            editSupplierForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Supplier updated successfully!'), 100);
+            });
+        }
+        // Add Purchase Order
+        const addPurchaseOrderForm = document.getElementById('addPurchaseOrderForm');
+        if (addPurchaseOrderForm) {
+            addPurchaseOrderForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Purchase order created!'), 100);
+            });
+        }
+        // Edit Purchase Order
+        const editPurchaseOrderForm = document.getElementById('editPurchaseOrderForm');
+        if (editPurchaseOrderForm) {
+            editPurchaseOrderForm.addEventListener('submit', function(e) {
+                setTimeout(() => showSuccessNotification('Purchase order updated!'), 100);
+            });
+        }
+    });
+    </script>
 @extends('layouts.system')
 
 @section('main-content')
@@ -16,8 +67,14 @@
                         : 0;
                 @endphp
                 <div class="flex space-x-3">
-                    <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition">
-                        Reports
+                    <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition flex items-center gap-2">
+                        <svg class="h-6 w-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" class="text-amber-300"/>
+                            <rect x="9" y="9" width="4" height="12" rx="1" fill="currentColor" class="text-amber-400"/>
+                            <rect x="15" y="5" width="4" height="16" rx="1" fill="currentColor" class="text-amber-500"/>
+                            <path stroke="currentColor" stroke-width="2" d="M3 21h18"/>
+                        </svg>
+                        <span>Reports</span>
                     </button>
                 </div>
             </div>
@@ -759,6 +816,210 @@
         </div>
     </div>
 
+    <!-- Edit Purchase Order Modal -->
+    <div id="editPurchaseOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+                        <h3 class="text-xl font-bold text-gray-900">Edit Purchase Order</h3>
+                        <button onclick="closeEditPurchaseOrderModal()" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="editPurchaseOrderForm" method="POST" action="">
+                        @csrf
+                        @method('PUT')
+                        <div class="grid gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Order Number</label>
+                                <input type="text" id="editPOOrderNumber" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Supplier</label>
+                                <input type="text" id="editPOSupplierName" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-900 mb-3">Payment Status *</label>
+                                    <select name="payment_status" id="editPOPaymentStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Partial">Partial</option>
+                                        <option value="Paid">Paid</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-6">
+                                <button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeEditPurchaseOrderModal()">Cancel</button>
+                                <button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Order</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Supplier Modal -->
+    <div id="editSupplierModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+                        <h3 class="text-xl font-bold text-gray-900">Edit Supplier</h3>
+                        <button onclick="closeEditSupplierModal()" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="editSupplierForm" method="POST" action="">
+                        @csrf
+                        @method('PUT')
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Name *</label>
+                                <input type="text" id="editSupplierName" name="name" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Contact Person *</label>
+                                <input type="text" id="editSupplierContactPerson" name="contact_person" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Phone *</label>
+                                <input type="text" id="editSupplierPhone" name="phone" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Email *</label>
+                                <input type="email" id="editSupplierEmail" name="email" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Address *</label>
+                                <textarea id="editSupplierAddress" name="address" rows="2" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Payment Terms *</label>
+                                <input type="text" id="editSupplierPaymentTerms" name="payment_terms" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Status *</label>
+                                <select id="editSupplierStatus" name="status" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-2 mt-6">
+                            <button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeEditSupplierModal()">Cancel</button>
+                            <button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Supplier</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Cancelling Sales Order -->
+    <div id="confirmCancelSalesOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeCancelSalesOrderModal()">
+        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div class="p-4">
+                <!-- Icon -->
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Cancel Sales Order?</h3>
+                <p class="text-center text-xs mb-4" style="color: #666;">
+                    Cancel sales order <span id="cancelSalesOrderNumber" class="font-semibold">-</span>? This action cannot be undone.
+                </p>
+
+                <!-- Actions -->
+                <div class="flex justify-center gap-2">
+                    <button type="button" onclick="closeCancelSalesOrderModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                        No, Keep It
+                    </button>
+                    <button type="button" onclick="submitCancelSalesOrder()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                        Yes, Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Customer -->
+    <div id="confirmCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeConfirmCustomer()">
+        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div class="p-4">
+                <!-- Icon -->
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Add New Customer?</h3>
+                <p class="text-center text-xs mb-4" style="color: #666;">
+                    Register this new customer to the system? Their information will be saved for future orders.
+                </p>
+
+                <!-- Actions -->
+                <div class="flex justify-center gap-2">
+                    <button type="button" onclick="closeConfirmCustomer()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                        No, Cancel
+                    </button>
+                    <button type="button" onclick="submitCustomer()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                        Yes, Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Customer Confirmation Modal -->
+    <div id="deleteCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeDeleteCustomerModal()">
+        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div class="p-4">
+                <!-- Icon -->
+                <div class="flex justify-center mb-3">
+                    <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Delete Customer?</h3>
+                <p class="text-center text-xs mb-4" style="color: #666;">
+                    Delete <span id="deleteCustomerName" class="font-semibold">-</span>? This action cannot be undone.
+                </p>
+
+                <!-- Actions -->
+                <div class="flex justify-center gap-2">
+                    <button type="button" onclick="closeDeleteCustomerModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+                        No, Keep
+                    </button>
+                    <button type="button" onclick="submitDeleteCustomer()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+                        Yes, Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div
+
     <!-- Improved Received Stock Reports Modal -->
     <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 backdrop-blur-sm transition-opacity duration-300">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -767,14 +1028,16 @@
                 <!-- Header -->
                 <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white px-8 py-6 rounded-t-2xl sticky top-0 z-10">
                     <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-2xl font-bold flex items-center gap-3">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Received Stock Reports
-                            </h3>
-                            <p class="text-slate-300 text-sm mt-1">Track and manage incoming inventory</p>
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <h3 class="text-2xl font-bold flex items-center gap-3">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Received Stock Reports
+                                </h3>
+                                <p class="text-slate-300 text-sm mt-1">Track and manage incoming inventory</p>
+                            </div>
                         </div>
                         <button onclick="closeReceivedStockReportsModal()" 
                                 class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200">
@@ -1482,13 +1745,33 @@
             console.log('View order:', id);
         }
 
+        // Purchase Orders and Suppliers data for edit modals
+        const purchaseOrdersData = @json($purchaseOrders ?? []);
+        const suppliersData = @json($suppliers ?? []);
+
         function editOrder(id) {
-            // Implement edit order functionality
-            console.log('Edit order:', id);
+            const order = purchaseOrdersData.data ? purchaseOrdersData.data.find(o => o.id === id) : purchaseOrdersData.find(o => o.id === id);
+            if (!order) {
+                console.error('Order not found:', id);
+                return;
+            }
+            
+            document.getElementById('editPOOrderNumber').value = order.order_number || 'PO-' + String(order.id).padStart(6, '0');
+            document.getElementById('editPOSupplierName').value = order.supplier ? order.supplier.name : 'N/A';
+            document.getElementById('editPOStatus').value = order.status || 'Pending';
+            document.getElementById('editPOPaymentStatus').value = order.payment_status || 'Pending';
+            document.getElementById('editPurchaseOrderForm').action = `/procurement/purchase-orders/${id}`;
+            
+            document.getElementById('editPurchaseOrderModal').classList.remove('hidden');
+        }
+
+        function closeEditPurchaseOrderModal() {
+            document.getElementById('editPurchaseOrderModal').classList.add('hidden');
+            document.getElementById('editPurchaseOrderForm').reset();
         }
 
         function deleteOrder(id) {
-            if (confirm('Are you sure you want to delete this purchase order?')) {
+            if (confirm('Are you sure you want to cancel this purchase order?')) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/procurement/purchase-orders/${id}`;
@@ -1511,8 +1794,27 @@
         }
 
         function editSupplier(id) {
-            // Implement edit supplier functionality
-            console.log('Edit supplier:', id);
+            const supplier = suppliersData.find(s => s.id === id);
+            if (!supplier) {
+                console.error('Supplier not found:', id);
+                return;
+            }
+            
+            document.getElementById('editSupplierName').value = supplier.name || '';
+            document.getElementById('editSupplierContactPerson').value = supplier.contact_person || '';
+            document.getElementById('editSupplierPhone').value = supplier.phone || '';
+            document.getElementById('editSupplierEmail').value = supplier.email || '';
+            document.getElementById('editSupplierAddress').value = supplier.address || '';
+            document.getElementById('editSupplierPaymentTerms').value = supplier.payment_terms || '';
+            document.getElementById('editSupplierStatus').value = supplier.status || 'active';
+            document.getElementById('editSupplierForm').action = `/procurement/suppliers/${id}`;
+            
+            document.getElementById('editSupplierModal').classList.remove('hidden');
+        }
+
+        function closeEditSupplierModal() {
+            document.getElementById('editSupplierModal').classList.add('hidden');
+            document.getElementById('editSupplierForm').reset();
         }
 
         function deleteSupplier(id) {
