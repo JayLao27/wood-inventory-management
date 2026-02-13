@@ -58,7 +58,7 @@
         <!-- Sidebar Menu -->
         <nav class="flex-1 p-4 overflow-y-auto">
             <ul class="space-y-2">
-                <!-- Dashboard - Available to All -->
+                <!-- Dashboard -->
                 <li>
                     <a href="{{ route('dashboard') }}" 
                        class="flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 group relative {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-[#E17100] to-[#531b1b] text-white shadow-lg' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
