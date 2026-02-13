@@ -1,4 +1,4 @@
-<!-- Sidebar with Toggle Functionality + Persistent State -->
+<!-- Sidebar -->
 <div x-data="{ 
     sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
     toggleSidebar() {
