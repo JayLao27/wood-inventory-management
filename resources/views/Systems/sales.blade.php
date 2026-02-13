@@ -652,11 +652,11 @@ $paymentBg = [
 		</div>
 
 		<!-- New Order Modal - IMPROVED VERSION -->
-		<div id="newOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+		<div id="newOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-[99999]">
 			<div class="flex items-center justify-center min-h-screen p-3">
 				<div class="bg-amber-50 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
 					<!-- Header -->
-					<div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-2xl z-10">
+					<div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-2xl z-[100000]">
 						<div class="flex justify-between items-center">
 							<div>
 								<h3 class="text-xl font-bold flex items-center gap-1.5">
@@ -850,11 +850,11 @@ $paymentBg = [
 		</div>
 
 		<!-- Add New Customer Modal -->
-		<div id="newCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+		<div id="newCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-[99999]">
 			<div class="flex items-center justify-center min-h-screen p-3">
 				<div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
 					<!-- Header -->
-					<div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-2xl z-10">
+					<div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-2xl z-[100000]">
 						<div class="flex justify-between items-center">
 							<div>
 								<h3 class="text-xl font-bold flex items-center gap-1.5">
