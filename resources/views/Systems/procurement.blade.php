@@ -759,6 +759,123 @@
         </div>
     </div>
 
+    <!-- Edit Purchase Order Modal -->
+    <div id="editPurchaseOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+                        <h3 class="text-xl font-bold text-gray-900">Edit Purchase Order</h3>
+                        <button onclick="closeEditPurchaseOrderModal()" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="editPurchaseOrderForm" method="POST" action="">
+                        @csrf
+                        @method('PUT')
+                        <div class="grid gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Order Number</label>
+                                <input type="text" id="editPOOrderNumber" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Supplier</label>
+                                <input type="text" id="editPOSupplierName" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-900 mb-3">Status *</label>
+                                    <select name="status" id="editPOStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Confirmed">Confirmed</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Overdue">Overdue</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-900 mb-3">Payment Status *</label>
+                                    <select name="payment_status" id="editPOPaymentStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Partial">Partial</option>
+                                        <option value="Paid">Paid</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-6">
+                                <button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeEditPurchaseOrderModal()">Cancel</button>
+                                <button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Order</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Supplier Modal -->
+    <div id="editSupplierModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+                        <h3 class="text-xl font-bold text-gray-900">Edit Supplier</h3>
+                        <button onclick="closeEditSupplierModal()" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="editSupplierForm" method="POST" action="">
+                        @csrf
+                        @method('PUT')
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Name *</label>
+                                <input type="text" id="editSupplierName" name="name" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Contact Person *</label>
+                                <input type="text" id="editSupplierContactPerson" name="contact_person" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Phone *</label>
+                                <input type="text" id="editSupplierPhone" name="phone" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Email *</label>
+                                <input type="email" id="editSupplierEmail" name="email" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Address *</label>
+                                <textarea id="editSupplierAddress" name="address" rows="2" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Payment Terms *</label>
+                                <input type="text" id="editSupplierPaymentTerms" name="payment_terms" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Status *</label>
+                                <select id="editSupplierStatus" name="status" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-2 mt-6">
+                            <button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeEditSupplierModal()">Cancel</button>
+                            <button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Supplier</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Improved Received Stock Reports Modal -->
     <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 backdrop-blur-sm transition-opacity duration-300">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -1482,9 +1599,29 @@
             console.log('View order:', id);
         }
 
+        // Purchase Orders and Suppliers data for edit modals
+        const purchaseOrdersData = @json($purchaseOrders ?? []);
+        const suppliersData = @json($suppliers ?? []);
+
         function editOrder(id) {
-            // Implement edit order functionality
-            console.log('Edit order:', id);
+            const order = purchaseOrdersData.data ? purchaseOrdersData.data.find(o => o.id === id) : purchaseOrdersData.find(o => o.id === id);
+            if (!order) {
+                console.error('Order not found:', id);
+                return;
+            }
+            
+            document.getElementById('editPOOrderNumber').value = order.order_number || 'PO-' + String(order.id).padStart(6, '0');
+            document.getElementById('editPOSupplierName').value = order.supplier ? order.supplier.name : 'N/A';
+            document.getElementById('editPOStatus').value = order.status || 'Pending';
+            document.getElementById('editPOPaymentStatus').value = order.payment_status || 'Pending';
+            document.getElementById('editPurchaseOrderForm').action = `/procurement/purchase-orders/${id}`;
+            
+            document.getElementById('editPurchaseOrderModal').classList.remove('hidden');
+        }
+
+        function closeEditPurchaseOrderModal() {
+            document.getElementById('editPurchaseOrderModal').classList.add('hidden');
+            document.getElementById('editPurchaseOrderForm').reset();
         }
 
         function deleteOrder(id) {
@@ -1511,8 +1648,27 @@
         }
 
         function editSupplier(id) {
-            // Implement edit supplier functionality
-            console.log('Edit supplier:', id);
+            const supplier = suppliersData.find(s => s.id === id);
+            if (!supplier) {
+                console.error('Supplier not found:', id);
+                return;
+            }
+            
+            document.getElementById('editSupplierName').value = supplier.name || '';
+            document.getElementById('editSupplierContactPerson').value = supplier.contact_person || '';
+            document.getElementById('editSupplierPhone').value = supplier.phone || '';
+            document.getElementById('editSupplierEmail').value = supplier.email || '';
+            document.getElementById('editSupplierAddress').value = supplier.address || '';
+            document.getElementById('editSupplierPaymentTerms').value = supplier.payment_terms || '';
+            document.getElementById('editSupplierStatus').value = supplier.status || 'active';
+            document.getElementById('editSupplierForm').action = `/procurement/suppliers/${id}`;
+            
+            document.getElementById('editSupplierModal').classList.remove('hidden');
+        }
+
+        function closeEditSupplierModal() {
+            document.getElementById('editSupplierModal').classList.add('hidden');
+            document.getElementById('editSupplierForm').reset();
         }
 
         function deleteSupplier(id) {

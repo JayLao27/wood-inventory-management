@@ -398,41 +398,44 @@ $paymentBg = [
 						</div>
 
 						<!-- Edit Order Modal -->
-						<div id="editOrderModal-{{ $order->id }}" class="fixed inset-0 bg-black/50 hidden" style="z-index: 99999;">
-							<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-3">
-								<div class="flex items-center justify-between mb-4">
-									<h3 class="font-semibold">Edit Order {{ $order->order_number }}</h3>
-									<button onclick="closeModal('editOrderModal-{{ $order->id }}')">✕</button>
+						<div id="editOrderModal-{{ $order->id }}" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
+							<div class="flex items-center justify-center min-h-screen p-4">
+								<div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+									<div class="p-4">
+										<div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+											<h3 class="text-xl font-bold text-gray-900">Edit Order {{ $order->order_number }}</h3>
+											<button onclick="closeModal('editOrderModal-{{ $order->id }}')" class="text-gray-700 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+												<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+												</svg>
+											</button>
+										</div>
+										
+										<form method="POST" action="{{ route('sales-orders.update', $order) }}">
+											@csrf
+											@method('PUT')
+											<div class="grid gap-4">
+												<div>
+													<label class="block text-sm font-bold text-gray-900 mb-3">Customer</label>
+													<input type="text" value="{{ $order->customer->name }} ({{ $order->customer->customer_type }})" class="text-black w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
+													<input type="hidden" name="customer_id" value="{{ $order->customer_id }}">
+												</div>
+												<div>
+													<label class="block text-sm font-bold text-gray-900 mb-3">Delivery Date</label>
+													<input type="date" name="delivery_date" value="{{ $order->delivery_date }}" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
+												</div>
+												<div>
+													<label class="block text-sm font-bold text-gray-900 mb-3">Notes</label>
+													<textarea name="note" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" rows="3">{{ $order->note }}</textarea>
+												</div>
+												<div class="flex justify-end space-x-2 mt-6">
+													<button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeModal('editOrderModal-{{ $order->id }}')">Cancel</button>
+													<button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Order</button>
+												</div>
+											</div>
+										</form>
+									</div>
 								</div>
-								<form method="POST" action="{{ route('sales-orders.update', $order) }}">
-									@csrf
-									@method('PUT')
-									<div class="grid gap-3">
-										<div>
-											<label class="text-xs">Customer</label>
-											<select name="customer_id" class="w-full border rounded px-2 py-1">
-												@foreach($customers as $c)
-												<option value="{{ $c->id }}" @selected($order->customer_id==$c->id)>{{ $c->name }} ({{ $c->customer_type }})</option>
-												@endforeach
-											</select>
-										</div>
-										<div>
-											<label class="text-xs">Delivery Date</label>
-											<input type="date" name="delivery_date" value="{{ $order->delivery_date }}" class="w-full border rounded px-2 py-1">
-										</div>
-										<div class="grid grid-cols-2 gap-3">
-
-
-										</div>
-										<div>
-											<label class="text-xs">Notes</label>
-											<textarea name="note" class="w-full border rounded px-2 py-1" rows="3">{{ $order->note }}</textarea>
-										</div>
-										<div class="flex justify-end gap-1.5">
-											<button type="button" class="px-3 py-1.5 border rounded" onclick="closeModal('editOrderModal-{{ $order->id }}')">Cancel</button>
-											<button type="submit" class="px-3 py-1.5 bg-blue-600 text-white rounded">Save</button>
-										</div>
-								</form>
 							</div>
 						</div>
 
@@ -558,76 +561,87 @@ $paymentBg = [
 								</div>
 
 								<!-- Edit Customer Modal -->
-								<div id="editCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black/50 hidden" style="z-index: 99999;">
-									<div class="bg-white text-gray-900 rounded shadow max-w-lg w-full mx-auto mt-24 p-3 max-h-[90vh] overflow-y-auto">
-										<div class="flex items-center justify-between mb-4">
-											<h3 class="font-semibold">Edit Customer</h3>
-											<button onclick="closeModal('editCustomerModal-{{ $customer->id }}')">✕</button>
-										</div>
-										@if ($errors->any())
-										<div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-											<ul class="list-disc list-inside text-xs">
-												@foreach ($errors->all() as $error)
-												<li>{{ $error }}</li>
-												@endforeach
-											</ul>
-										</div>
-										@endif
-										<form method="POST" action="{{ route('customers.update', $customer) }}" class="editCustomerForm">
-											@csrf
-											@method('PUT')
-											<div class="grid gap-3">
-												<div>
-													<label class="text-xs">Name <span class="text-red-500">*</span></label>
-													<input type="text" name="name" value="{{ old('name', $customer->name) }}" class="w-full border rounded px-2 py-1 @error('name') border-red-500 @enderror" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
-													@error('name')
-													<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-													@else
-													<p class="text-gray-400 text-xs mt-1">This field is required. Enter customer name.</p>
-													@enderror
+								<div id="editCustomerModal-{{ $customer->id }}" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
+									<div class="flex items-center justify-center min-h-screen p-4">
+										<div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+											<div class="p-4">
+												<div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
+													<h3 class="text-xl font-bold text-gray-900">Edit Customer</h3>
+													<button onclick="closeModal('editCustomerModal-{{ $customer->id }}')" class="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl p-2 transition-all">
+														<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+														</svg>
+													</button>
 												</div>
-												<div class="grid grid-cols-2 gap-3">
-													<div>
-														<label class="text-xs">Type <span class="text-red-500">*</span></label>
-														<select name="customer_type" class="w-full border rounded px-2 py-1 @error('customer_type') border-red-500 @enderror" required>
-															@foreach(['Retail','Contractor','Wholesale'] as $t)
-															<option value="{{ $t }}" {{ old('customer_type', $customer->customer_type) === $t ? 'selected' : '' }}>{{ $t }}</option>
-															@endforeach
-														</select>
-														@error('customer_type')
-														<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-														@else
-														<p class="text-gray-400 text-xs mt-1">This field is required. Select a customer type.</p>
-														@enderror
+												
+												@if ($errors->any())
+												<div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl">
+													<ul class="list-disc list-inside text-xs">
+														@foreach ($errors->all() as $error)
+														<li>{{ $error }}</li>
+														@endforeach
+													</ul>
+												</div>
+												@endif
+												
+												<form method="POST" action="{{ route('customers.update', $customer) }}" class="editCustomerForm">
+													@csrf
+													@method('PUT')
+													<div class="grid gap-4">
+														<div>
+															<label class="block text-sm font-bold text-gray-900 mb-3">Name <span class="text-red-500">*</span></label>
+															<input type="text" name="name" value="{{ old('name', $customer->name) }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('name') border-red-500 @enderror" required minlength="2" maxlength="255" pattern="[a-zA-Z\s'-]+" title="Name must contain only letters, spaces, hyphens, and apostrophes">
+															@error('name')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@else
+															<p class="text-gray-400 text-xs mt-1">This field is required. Enter customer name.</p>
+															@enderror
+														</div>
+														<div class="grid grid-cols-2 gap-4">
+															<div>
+																<label class="block text-sm font-bold text-gray-900 mb-3">Type <span class="text-red-500">*</span></label>
+																<select name="customer_type" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('customer_type') border-red-500 @enderror" required>
+																	@foreach(['Retail','Contractor','Wholesale'] as $t)
+																	<option value="{{ $t }}" {{ old('customer_type', $customer->customer_type) === $t ? 'selected' : '' }}>{{ $t }}</option>
+																	@endforeach
+																</select>
+																@error('customer_type')
+																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+																@else
+																<p class="text-gray-400 text-xs mt-1">This field is required. Select a customer type.</p>
+																@enderror
+															</div>
+															<div>
+																<label class="block text-sm font-bold text-gray-900 mb-3">Phone <span class="text-orange-500">**</span></label>
+																<input type="tel" name="phone" class="editCustomerPhone w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone', $customer->phone) }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
+																@error('phone')
+																<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+																@else
+																<p class="text-gray-400 text-xs mt-1">Enter a phone number (up to 12 digits) or email below.</p>
+																@enderror
+															</div>
+														</div>
+														<div>
+															<label class="block text-sm font-bold text-gray-900 mb-3">Email <span class="text-orange-500">**</span></label>
+															<input type="email" name="email" class="editCustomerEmail w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email', $customer->email) }}" maxlength="255" title="Please enter a valid email address">
+															@error('email')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@enderror
+															@error('contact')
+															<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+															@else
+															<p class="text-gray-400 text-xs mt-1">** At least one contact method (phone or email) is required</p>
+															@enderror
+															<p class="editCustomerContactError text-red-500 text-xs mt-1 hidden"></p>
+														</div>
+														<div class="flex justify-end space-x-2 mt-6">
+															<button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeModal('editCustomerModal-{{ $customer->id }}')">Cancel</button>
+															<button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-sm rounded-xl hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all">Update Customer</button>
+														</div>
 													</div>
-													<div>
-														<label class="text-xs">Phone <span class="text-orange-500">**</span></label>
-														<input type="tel" name="phone" class="editCustomerPhone w-full border rounded px-2 py-1 @error('phone') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('phone', $customer->phone) }}" placeholder="09XXXXXXXXX" maxlength="12" pattern="[0-9]{0,12}" title="Phone must be up to 12 digits">
-														@error('phone')
-														<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-														@else
-														<p class="text-gray-400 text-xs mt-1">Enter a phone number (up to 12 digits) or email below.</p>
-														@enderror
-													</div>
-												</div>
-												<div>
-													<label class="text-xs">Email <span class="text-orange-500">**</span></label>
-													<input type="email" name="email" class="editCustomerEmail w-full border rounded px-2 py-1 @error('email') border-red-500 @enderror @error('contact') border-red-500 @enderror" value="{{ old('email', $customer->email) }}" maxlength="255" title="Please enter a valid email address">
-													@error('email')
-													<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-													@enderror
-													@error('contact')
-													<p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-													@else
-													<p class="text-gray-400 text-xs mt-1">** At least one contact method (phone or email) is required</p>
-													@enderror
-													<p class="editCustomerContactError text-red-500 text-xs mt-1 hidden"></p>
-												</div>
-												<div class="flex justify-end gap-1.5">
-													<button type="button" class="px-3 py-1.5 border rounded" onclick="closeModal('editCustomerModal-{{ $customer->id }}')">Cancel</button>
-													<button type="submit" class="px-3 py-1.5 bg-blue-600 text-white rounded">Save</button>
-												</div>
-										</form>
+												</form>
+											</div>
+										</div>
 									</div>
 								</div>
 								@empty
