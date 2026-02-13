@@ -427,15 +427,64 @@
 							<button type="button" onclick="resetSelection()" class="flex-1 px-4 py-2.5 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-semibold">
 								Back
 							</button>
-							<button type="submit" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 transition shadow-lg font-semibold">
-								Confirm Payment
-							</button>
-						</div>
+						<button type="button" onclick="confirmTransaction(event)" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 transition shadow-lg font-semibold">
+							Confirm Payment
+						</button>
 					</div>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmTransactionModal" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100001]" style="display: none; align-items: center; justify-content: center;">
+	<div class="bg-amber-50 rounded-xl shadow-2xl w-full max-w-md mx-4 border-4 border-slate-700 z-[100003]">
+		<!-- Modal Header with Gradient -->
+		<div class="sticky top-0 z-[100002] bg-gradient-to-r from-slate-700 to-slate-800 px-6 py-4 rounded-t-lg">
+			<h3 class="text-xl font-bold text-white flex items-center gap-2">
+				<svg class="w-6 h-6 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+					<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+				</svg>
+				Confirm Transaction
+			</h3>
+		</div>
+		
+		<!-- Modal Body -->
+		<div class="px-6 py-5 space-y-4">
+			<p class="text-gray-700 text-sm leading-relaxed">
+				Are you sure you want to record this transaction?
+			</p>
+			
+			<div class="bg-white p-4 rounded-lg border-2 border-slate-200 space-y-2">
+				<div class="flex justify-between">
+					<span class="text-gray-600 text-sm font-medium">Reference:</span>
+					<span id="modalRef" class="text-gray-900 font-semibold text-sm">-</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-gray-600 text-sm font-medium">Type:</span>
+					<span id="modalType" class="font-semibold text-sm">-</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-gray-600 text-sm font-medium">Payment Amount:</span>
+					<span id="modalAmount" class="text-gray-900 font-bold text-sm">-</span>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Modal Footer -->
+		<div class="px-6 pb-5 flex gap-3">
+			<button type="button" onclick="closeConfirmTransaction()" 
+				class="flex-1 px-4 py-2.5 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-semibold transition shadow-md">
+				Cancel
+			</button>
+			<button type="button" onclick="submitConfirmedTransaction()" 
+				class="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold transition shadow-lg flex items-center justify-center gap-2">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+				</svg>
+				Yes, Confirm
+			</button>
 
 	<script>
 		let maxPaymentAmount = 0;
@@ -564,20 +613,68 @@
 			}
 		});
 
-		// Handle form submission - remove commas before sending
-		document.getElementById('transactionForm').addEventListener('submit', function(e) {
+		let isConfirming = false;
+
+		// Handle confirmation modal
+		function confirmTransaction(event) {
+			if (event) event.preventDefault();
+			
 			let paymentAmount = document.getElementById('paymentAmount').value.replace(/,/g, '');
 			let numValue = parseInt(paymentAmount) || 0;
 			
-			// Validate payment amount doesn't exceed max
+			// Validate payment amount
+			if (numValue <= 0) {
+				alert('Please enter a valid payment amount');
+				return false;
+			}
+			
 			if (numValue > maxPaymentAmount) {
-				e.preventDefault();
 				alert('Payment amount cannot exceed ₱' + maxPaymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 				return false;
 			}
 			
+			// Populate modal with transaction details
+			const reference = document.getElementById('confirmRef').textContent;
+			const type = document.getElementById('confirmType').textContent;
+			const formattedAmount = '₱' + numValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+			
+			document.getElementById('modalRef').textContent = reference;
+			document.getElementById('modalType').textContent = type;
+			document.getElementById('modalType').className = type === 'Income' 
+				? 'font-semibold text-sm text-green-600' 
+				: 'font-semibold text-sm text-red-600';
+			document.getElementById('modalAmount').textContent = formattedAmount;
+			
+			// Show modal
+			const modal = document.getElementById('confirmTransactionModal');
+			modal.classList.remove('hidden');
+			modal.style.display = 'flex';
+			document.body.style.overflow = 'hidden';
+			
+			return false;
+		}
+		
+		function closeConfirmTransaction() {
+			const modal = document.getElementById('confirmTransactionModal');
+			modal.classList.add('hidden');
+			modal.style.display = 'none';
+			document.body.style.overflow = '';
+			isConfirming = false;
+		}
+		
+		function submitConfirmedTransaction() {
+			isConfirming = true;
+			
+			// Remove commas from payment amount before submission
+			let paymentAmount = document.getElementById('paymentAmount').value.replace(/,/g, '');
 			document.getElementById('paymentAmount').value = paymentAmount;
-		});
+			
+			// Close modal
+			closeConfirmTransaction();
+			
+			// Submit the form
+			document.getElementById('transactionForm').submit();
+		}
 
 		function showConfirmationNotification(message) {
 			const notif = document.createElement('div');

@@ -377,7 +377,7 @@
 
                 <!-- Form Content -->
                 <div class="p-3">
-                    <form id="addSupplierForm" method="POST" action="{{ route('procurement.supplier.store') }}">
+                    <form id="addSupplierForm" method="POST" action="{{ route('procurement.supplier.store') }}" onsubmit="return confirmSupplier(event)">
                         @csrf
                         <div class="space-y-5">
                             <!-- Basic Information Section -->
@@ -592,7 +592,7 @@
 
                 <!-- Form Content -->
                 <div class="p-3">
-                    <form id="addPurchaseOrderForm" method="POST" action="{{ route('procurement.purchase-order.store') }}">
+                    <form id="addPurchaseOrderForm" method="POST" action="{{ route('procurement.purchase-order.store') }}" onsubmit="return confirmPurchaseOrder(event)">
                         @csrf
                         <div class="space-y-5">
                             <!-- Supplier Selection -->
@@ -627,7 +627,7 @@
                                     </svg>
                                     Order Date <span class="text-red-500">*</span>
                                 </label>
-                                <input type="date" name="order_date" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('order_date') border-red-500 @enderror" value="{{ old('order_date', date('Y-m-d')) }}" required>
+                                <input type="date" name="order_date" min="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('order_date') border-red-500 @enderror" value="{{ old('order_date', date('Y-m-d')) }}" required>
                                 @error('order_date')
                                     <p class="text-red-500 text-xs mt-2 flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -647,7 +647,7 @@
                                     </svg>
                                     Expected Delivery <span class="text-red-500">*</span>
                                 </label>
-                                <input type="date" name="expected_delivery" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('expected_delivery') border-red-500 @enderror" value="{{ old('expected_delivery') }}" required>
+                                <input type="date" name="expected_delivery" min="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('expected_delivery') border-red-500 @enderror" value="{{ old('expected_delivery') }}" required>
                                 @error('expected_delivery')
                                     <p class="text-red-500 text-xs mt-2 flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -817,9 +817,9 @@
     </div>
 
     <!-- Edit Purchase Order Modal -->
-    <div id="editPurchaseOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+    <div id="editPurchaseOrderModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50" style="display: none; align-items: center; justify-content: center;">
+        <div class="p-4 w-full max-w-2xl">
+            <div class="bg-amber-50 rounded-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
                 <div class="p-4">
                     <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
                         <h3 class="text-xl font-bold text-gray-900">Edit Purchase Order</h3>
@@ -842,6 +842,15 @@
                                 <label class="block text-sm font-bold text-gray-900 mb-3">Supplier</label>
                                 <input type="text" id="editPOSupplierName" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
                             </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Status *</label>
+                                <select name="status" id="editPOStatus" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="received">Received</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-bold text-gray-900 mb-3">Payment Status *</label>
@@ -851,6 +860,14 @@
                                         <option value="Paid">Paid</option>
                                     </select>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-900 mb-3">Expected Delivery</label>
+                                    <input type="date" id="editPOExpectedDelivery" name="expected_delivery" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 text-sm transition-all" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Total Amount</label>
+                                <input type="text" id="editPOTotalAmount" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
                             </div>
                             <div class="flex justify-end space-x-2 mt-6">
                                 <button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeEditPurchaseOrderModal()">Cancel</button>
@@ -924,101 +941,105 @@
         </div>
     </div>
 
-    <!-- Confirmation Modal for Cancelling Sales Order -->
-    <div id="confirmCancelSalesOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeCancelSalesOrderModal()">
-        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-            <div class="p-4">
-                <!-- Icon -->
-                <div class="flex justify-center mb-3">
-                    <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
-                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+    <!-- Confirmation Modal for Purchase Order -->
+    <div id="confirmPurchaseOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeConfirmPurchaseOrder()">
+        <div class="flex items-center justify-center min-h-screen p-3 w-full">
+            <div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700 z-[100003]">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-0xl z-[100002]">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold">Confirm Purchase Order</h3>
+                        <button onclick="closeConfirmPurchaseOrder()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Message -->
-                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Cancel Sales Order?</h3>
-                <p class="text-center text-xs mb-4" style="color: #666;">
-                    Cancel sales order <span id="cancelSalesOrderNumber" class="font-semibold">-</span>? This action cannot be undone.
-                </p>
-
-                <!-- Actions -->
-                <div class="flex justify-center gap-2">
-                    <button type="button" onclick="closeCancelSalesOrderModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
-                        No, Keep It
-                    </button>
-                    <button type="button" onclick="submitCancelSalesOrder()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
-                        Yes, Cancel
-                    </button>
+                <div class="p-6">
+                    <p class="text-slate-700 mb-6">Create this new purchase order? Please review all details before confirming.</p>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeConfirmPurchaseOrder()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Review Again</button>
+                        <button type="button" onclick="submitPurchaseOrder()" class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Confirm</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Confirmation Modal for Customer -->
-    <div id="confirmCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeConfirmCustomer()">
-        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-            <div class="p-4">
-                <!-- Icon -->
-                <div class="flex justify-center mb-3">
-                    <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                        </svg>
+    <!-- Confirmation Modal for Supplier -->
+    <div id="confirmSupplierModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeConfirmSupplier()">
+        <div class="flex items-center justify-center min-h-screen p-3 w-full">
+            <div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700 z-[100003]">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-xl z-[100002]">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold">Add New Supplier</h3>
+                        <button onclick="closeConfirmSupplier()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Message -->
-                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Add New Customer?</h3>
-                <p class="text-center text-xs mb-4" style="color: #666;">
-                    Register this new customer to the system? Their information will be saved for future orders.
-                </p>
-
-                <!-- Actions -->
-                <div class="flex justify-center gap-2">
-                    <button type="button" onclick="closeConfirmCustomer()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
-                        No, Cancel
-                    </button>
-                    <button type="button" onclick="submitCustomer()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
-                        Yes, Add
-                    </button>
+                <div class="p-6">
+                    <p class="text-slate-700 mb-6">Register this new supplier to the system? Their information will be saved for future orders.</p>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeConfirmSupplier()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Cancel</button>
+                        <button type="button" onclick="submitSupplier()" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Add</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Delete Customer Confirmation Modal -->
-    <div id="deleteCustomerModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeDeleteCustomerModal()">
-        <div class="modal-content bg-amber-50 rounded-lg max-w-xs w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
-            <div class="p-4">
-                <!-- Icon -->
-                <div class="flex justify-center mb-3">
-                    <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
-                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+    <!-- Delete Purchase Order Confirmation Modal -->
+    <div id="deleteOrderModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeDeleteOrder()">
+        <div class="flex items-center justify-center min-h-screen p-3 w-full">
+            <div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700 z-[100003]">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-xl z-[100002]">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold">Cancel Purchase Order</h3>
+                        <button onclick="closeDeleteOrder()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Message -->
-                <h3 class="text-center font-bold text-sm mb-1" style="color: #374151;">Delete Customer?</h3>
-                <p class="text-center text-xs mb-4" style="color: #666;">
-                    Delete <span id="deleteCustomerName" class="font-semibold">-</span>? This action cannot be undone.
-                </p>
-
-                <!-- Actions -->
-                <div class="flex justify-center gap-2">
-                    <button type="button" onclick="closeDeleteCustomerModal()" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
-                        No, Keep
-                    </button>
-                    <button type="button" onclick="submitDeleteCustomer()" class="px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
-                        Yes, Delete
-                    </button>
+                <div class="p-6">
+                    <p class="text-slate-700 mb-6">Cancel this purchase order? This action cannot be undone.</p>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeDeleteOrder()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Keep It</button>
+                        <button type="button" onclick="submitDeleteOrder()" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div
+    </div>
+
+    <!-- Delete Supplier Confirmation Modal -->
+    <div id="deleteSupplierModal" class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden z-[100001] flex" onclick="if(event.target === this) closeDeleteSupplier()">
+        <div class="flex items-center justify-center min-h-screen p-3 w-full">
+            <div class="bg-amber-50 rounded-xl max-w-lg w-full overflow-y-auto shadow-2xl border-2 border-slate-700 z-[100003]">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white rounded-t-xl z-[100002]">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold">Delete Supplier</h3>
+                        <button onclick="closeDeleteSupplier()" class="text-white hover:text-slate-200 hover:bg-white/10 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-slate-700 mb-6">Delete this supplier? This action cannot be undone.</p>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeDeleteSupplier()" class="flex-1 px-4 py-3 border-2 border-slate-400 text-slate-700 bg-white rounded-xl hover:bg-slate-50 transition-all font-bold shadow-sm hover:shadow-md">No, Keep</button>
+                        <button type="button" onclick="submitDeleteSupplier()" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold shadow-lg hover:shadow-xl">Yes, Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Improved Received Stock Reports Modal -->
     <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 backdrop-blur-sm transition-opacity duration-300">
@@ -1750,47 +1771,101 @@
         const suppliersData = @json($suppliers ?? []);
 
         function editOrder(id) {
-            const order = purchaseOrdersData.data ? purchaseOrdersData.data.find(o => o.id === id) : purchaseOrdersData.find(o => o.id === id);
-            if (!order) {
-                console.error('Order not found:', id);
-                return;
+            try {
+                console.log('editOrder called with id=', id);
+                const order = purchaseOrdersData.data ? purchaseOrdersData.data.find(o => o.id === id) : purchaseOrdersData.find(o => o.id === id);
+                if (!order) {
+                    console.error('Order not found:', id, purchaseOrdersData);
+                    return;
+                }
+
+                const orderNumberEl = document.getElementById('editPOOrderNumber');
+                const supplierNameEl = document.getElementById('editPOSupplierName');
+                const paymentStatusEl = document.getElementById('editPOPaymentStatus');
+                const statusEl = document.getElementById('editPOStatus');
+                const expectedEl = document.getElementById('editPOExpectedDelivery');
+                const totalEl = document.getElementById('editPOTotalAmount');
+
+                if (orderNumberEl) orderNumberEl.value = order.order_number || 'PO-' + String(order.id).padStart(6, '0');
+                if (supplierNameEl) supplierNameEl.value = order.supplier ? order.supplier.name : 'N/A';
+                if (paymentStatusEl) paymentStatusEl.value = order.payment_status || 'Pending';
+                if (statusEl && order.status) statusEl.value = order.status;
+                if (expectedEl && order.expected_delivery) {
+                    try {
+                        const ed = new Date(order.expected_delivery);
+                        if (!isNaN(ed)) expectedEl.value = ed.toISOString().split('T')[0];
+                        else expectedEl.value = order.expected_delivery;
+                    } catch (e) {
+                        expectedEl.value = order.expected_delivery || '';
+                    }
+                }
+                if (totalEl) totalEl.value = (order.total_amount !== undefined && order.total_amount !== null) ? parseFloat(order.total_amount).toFixed(2) : '';
+
+                // Set form action
+                const updateUrlTemplate = "{{ route('procurement.purchase-order.update', ['id' => '__ID__']) }}";
+                const editForm = document.getElementById('editPurchaseOrderForm');
+                if (editForm) editForm.action = updateUrlTemplate.replace('__ID__', id);
+
+                const modal = document.getElementById('editPurchaseOrderModal');
+                if (!modal) {
+                    console.error('editPurchaseOrderModal element not found');
+                    return;
+                }
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            } catch (err) {
+                console.error('Error in editOrder:', err);
+                alert('Unable to open edit modal. Check console for details.');
             }
-            
-            document.getElementById('editPOOrderNumber').value = order.order_number || 'PO-' + String(order.id).padStart(6, '0');
-            document.getElementById('editPOSupplierName').value = order.supplier ? order.supplier.name : 'N/A';
-            document.getElementById('editPOStatus').value = order.status || 'Pending';
-            document.getElementById('editPOPaymentStatus').value = order.payment_status || 'Pending';
-            document.getElementById('editPurchaseOrderForm').action = `/procurement/purchase-orders/${id}`;
-            
-            document.getElementById('editPurchaseOrderModal').classList.remove('hidden');
         }
 
         function closeEditPurchaseOrderModal() {
-            document.getElementById('editPurchaseOrderModal').classList.add('hidden');
+            const modal = document.getElementById('editPurchaseOrderModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modal.style.display = 'none';
             document.getElementById('editPurchaseOrderForm').reset();
         }
 
+        let currentDeleteOrderId = null;
+
         function deleteOrder(id) {
-            if (confirm('Are you sure you want to cancel this purchase order?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/procurement/purchase-orders/${id}`;
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-                
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-                
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                document.body.appendChild(form);
-                form.submit();
-            }
+            currentDeleteOrderId = id;
+            const modal = document.getElementById('deleteOrderModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDeleteOrder() {
+            const modal = document.getElementById('deleteOrderModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentDeleteOrderId = null;
+        }
+
+        function submitDeleteOrder() {
+            if (!currentDeleteOrderId) return;
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/procurement/purchase-orders/${currentDeleteOrderId}`;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(methodField);
+            document.body.appendChild(form);
+            form.submit();
+            
+            closeDeleteOrder();
         }
 
         function editSupplier(id) {
@@ -1817,26 +1892,45 @@
             document.getElementById('editSupplierForm').reset();
         }
 
+        let currentDeleteSupplierId = null;
+
         function deleteSupplier(id) {
-            if (confirm('Are you sure you want to delete this supplier?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/procurement/suppliers/${id}`;
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-                
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-                
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                document.body.appendChild(form);
-            }
+            currentDeleteSupplierId = id;
+            const modal = document.getElementById('deleteSupplierModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDeleteSupplier() {
+            const modal = document.getElementById('deleteSupplierModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentDeleteSupplierId = null;
+        }
+
+        function submitDeleteSupplier() {
+            if (!currentDeleteSupplierId) return;
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/procurement/suppliers/${currentDeleteSupplierId}`;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(methodField);
+            document.body.appendChild(form);
+            form.submit();
+            
+            closeDeleteSupplier();
         }
 
         // Initialize tab state on page load
@@ -1935,6 +2029,50 @@
 
             // payment filter removed; no-op
         });
+
+        // Purchase Order Confirmation Modal Functions
+        function confirmPurchaseOrder(event) {
+            event.preventDefault();
+            const modal = document.getElementById('confirmPurchaseOrderModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            return false;
+        }
+
+        function closeConfirmPurchaseOrder() {
+            const modal = document.getElementById('confirmPurchaseOrderModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function submitPurchaseOrder() {
+            closeConfirmPurchaseOrder();
+            const form = document.getElementById('addPurchaseOrderForm');
+            form.onsubmit = null;
+            form.submit();
+        }
+
+        // Supplier Confirmation Modal Functions
+        function confirmSupplier(event) {
+            event.preventDefault();
+            const modal = document.getElementById('confirmSupplierModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            return false;
+        }
+
+        function closeConfirmSupplier() {
+            const modal = document.getElementById('confirmSupplierModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function submitSupplier() {
+            closeConfirmSupplier();
+            const form = document.getElementById('addSupplierForm');
+            form.onsubmit = null;
+            form.submit();
+        }
     </script>
 
 @endsection

@@ -185,12 +185,25 @@ class ProcurementController extends Controller
     public function updatePurchaseOrder(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Pending,Confirmed,Delivered,Overdue',
+            // database stores status as lowercase enum values
+            'status' => 'required|in:pending,approved,received,cancelled',
             'payment_status' => 'required|in:Pending,Partial,Paid',
+            'expected_delivery' => 'nullable|date',
         ]);
 
         $purchaseOrder = PurchaseOrder::findOrFail($id);
-        $purchaseOrder->update($request->only(['status', 'payment_status']));
+        // Log incoming data for debugging
+        Log::info('ProcurementController@updatePurchaseOrder - incoming', ['id' => $id, 'input' => $request->all(), 'user_id' => auth()->id() ?? null]);
+
+        // Perform explicit assignments to avoid mass-assignment surprises
+        $purchaseOrder->status = $request->input('status', $purchaseOrder->status);
+        $purchaseOrder->payment_status = $request->input('payment_status', $purchaseOrder->payment_status);
+        if ($request->has('expected_delivery')) {
+            $purchaseOrder->expected_delivery = $request->input('expected_delivery');
+        }
+        $purchaseOrder->save();
+
+        Log::info('ProcurementController@updatePurchaseOrder - saved', ['id' => $id, 'status' => $purchaseOrder->status, 'payment_status' => $purchaseOrder->payment_status]);
 
         return redirect()->route('procurement')->with('success', 'Purchase order updated successfully!');
     }
