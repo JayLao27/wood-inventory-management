@@ -17,7 +17,7 @@ class CacheService
     public static function getCustomers()
     {
         return Cache::remember('customers_list', 600, function () {
-            return Customer::select('id', 'name', 'customer_type', 'email')
+            return Customer::select('id', 'name', 'customer_type', 'email', 'phone')
                 ->orderBy('name')
                 ->get();
         });
