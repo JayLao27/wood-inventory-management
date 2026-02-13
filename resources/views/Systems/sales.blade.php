@@ -255,7 +255,28 @@ $paymentBg = [
 								<span class="mt-1 inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $ct }}</span>
 							</td>
 							<td class="px-3 py-3 text-slate-300">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
-							<td class="px-3 py-3 text-slate-300">{{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</td>
+							@php
+								$delivery = \Illuminate\Support\Carbon::parse($order->delivery_date);
+								$today = \Illuminate\Support\Carbon::today();
+							@endphp
+							<td class="px-3 py-3 text-slate-300">
+								<div class="flex items-center gap-2">
+									<div>{{ $delivery->format('M d, Y') }}</div>
+									@php
+										if ($delivery->isToday()) {
+											echo '<span class="text-xs font-semibold px-2 py-0.5 rounded bg-red-600 text-white">Due Today</span>';
+										} elseif ($delivery->lt($today)) {
+											$overdue = $delivery->diffInDays($today);
+											echo '<span class="text-xs font-semibold px-2 py-0.5 rounded bg-red-600 text-white">Overdue ' . ($overdue === 1 ? '1 day' : $overdue . ' day/s') . '</span>';
+										} else {
+											$ahead = $today->diffInDays($delivery);
+											if ($ahead <= 3) {
+												echo '<span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500 text-white">Due in ' . ($ahead === 1 ? '1 day' : $ahead . ' day/s') . '</span>';
+											}
+										}
+									@endphp
+								</div>
+							</td>
 							@php
 							$sb = $order->status === 'Pending' ? '#ffffff' : ($statusBg[$order->status] ?? '#e5e7eb');
 							$stText = $order->status === 'Pending' ? 'text-gray-900' : 'text-white';
@@ -429,7 +450,7 @@ $paymentBg = [
 												</div>
 												<div>
 													<label class="block text-sm font-bold text-gray-900 mb-3">Delivery Date</label>
-													<input type="date" name="delivery_date" value="{{ $order->delivery_date }}" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
+													<input type="date" name="delivery_date" min="{{ date('Y-m-d') }}" value="{{ $order->delivery_date }}" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
 												</div>
 												<div>
 													<label class="block text-sm font-bold text-gray-900 mb-3">Notes</label>
@@ -738,7 +759,7 @@ $paymentBg = [
 										</svg>
 										Delivery Date <span class="text-red-500">*</span>
 									</label>
-									<input type="date" name="delivery_date" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('delivery_date') border-red-500 @enderror" value="{{ old('delivery_date') }}" required>
+									<input type="date" name="delivery_date" min="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('delivery_date') border-red-500 @enderror" value="{{ old('delivery_date') }}" required>
 									@error('delivery_date')
 									<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
 										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -1795,6 +1816,23 @@ $paymentBg = [
 		document.body.appendChild(notif);
 		setTimeout(() => notif.remove(), 5000);
 	}
+
+// Ensure date inputs do not allow past dates (handles browser & timezone differences)
+document.addEventListener('DOMContentLoaded', function() {
+	try {
+		const today = new Date();
+		const yyyy = today.getFullYear();
+		const mm = String(today.getMonth() + 1).padStart(2, '0');
+		const dd = String(today.getDate()).padStart(2, '0');
+		const iso = `${yyyy}-${mm}-${dd}`;
+		document.querySelectorAll('input[type="date"][name="delivery_date"]').forEach(function(el) {
+			// set or override min to today's date
+			el.setAttribute('min', iso);
+		});
+	} catch (e) {
+		console.warn('Could not set min for delivery_date inputs', e);
+	}
+});
 </script>
 </div>
 @endsection
