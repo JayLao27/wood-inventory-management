@@ -676,16 +676,17 @@
 			document.getElementById('transactionForm').submit();
 		}
 
-		function showConfirmationNotification(message) {
+        // Toast Notification Functions
+		function showSuccessNotification(message) {
 			const notif = document.createElement('div');
 			notif.className = 'fixed top-5 right-5 z-[9999] animate-fadeIn';
 			notif.innerHTML = `
-				<div class="flex items-center gap-3 bg-amber-100 border-2 border-amber-400 text-amber-900 rounded-lg px-5 py-3 shadow-lg">
+				<div class="flex items-center gap-3 bg-green-100 border-2 border-green-400 text-green-800 rounded-lg px-6 py-4 shadow-lg">
 					<svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
 						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
 					</svg>
 					<span class="font-medium text-sm">${message}</span>
-					<button onclick="this.parentElement.parentElement.remove()" class="text-amber-700 hover:text-amber-900 ml-2">
+					<button onclick="this.parentElement.parentElement.remove()" class="text-green-600 hover:text-green-800 ml-2">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
 						</svg>
@@ -696,9 +697,34 @@
 			setTimeout(() => notif.remove(), 4000);
 		}
 
+		function showErrorNotification(message) {
+			const notif = document.createElement('div');
+			notif.className = 'fixed top-5 right-5 z-[9999] animate-fadeIn';
+			notif.innerHTML = `
+				<div class="flex items-center gap-3 bg-red-100 border-2 border-red-400 text-red-800 rounded-lg px-6 py-4 shadow-lg">
+					<svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+					</svg>
+					<span class="font-medium text-sm">${message}</span>
+					<button onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800 ml-2">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					</button>
+				</div>
+			`;
+			document.body.appendChild(notif);
+			setTimeout(() => notif.remove(), 5000);
+		}
+
 		@if (session('success'))
 			document.addEventListener('DOMContentLoaded', function() {
-				showConfirmationNotification('{{ session('success') }}');
+				showSuccessNotification('{{ session('success') }}');
+			});
+		@endif
+		@if (session('error'))
+			document.addEventListener('DOMContentLoaded', function() {
+				showErrorNotification('{{ session('error') }}');
 			});
 		@endif
 
@@ -804,7 +830,7 @@
 		const selectedRow = document.querySelector('tr.transaction-row.border-amber-500');
 		
 		if (!selectedRow) {
-			showConfirmationNotification('Please select a transaction by clicking on a row in the table to export as receipt.');
+			showErrorNotification('Please select a transaction by clicking on a row in the table to export as receipt.');
 			return;
 		}
 		
