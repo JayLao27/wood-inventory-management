@@ -282,10 +282,9 @@ $paymentBg = [
 						<tr class="hover:bg-slate-600 transition cursor-pointer data-row">
 							<td class="px-3 py-3">
 								<div class="font-medium text-slate-300">{{ $customer->name }}</div>
-								@php $ctBg = $customerTypeBg[$customer->customer_type] ?? '#e5e7eb'; @endphp
-								<span class="mt-1 inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span>
 							</td>
 							<td class="px-3 py-3">
+								@php $ctBg = $customerTypeBg[$customer->customer_type] ?? '#e5e7eb'; @endphp
 								<span class="inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span>
 							</td>
 							<td class="px-3 py-3 text-slate-300">{{ $customer->phone ?: 'N/A' }}</td>
