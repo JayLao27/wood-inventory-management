@@ -1405,7 +1405,7 @@ $paymentBg = [
 		}
 
 		// If no row is selected, prompt user
-		alert('Please select an order by clicking on a row in the table to export as receipt.');
+		showErrorNotification('Please select an order by clicking on a row in the table to export as receipt.');
 	}
 
 	function exportSalesReport(event) {
