@@ -52,8 +52,11 @@ class SalesOrderController extends Controller
 
         $totalAmount = 0;
         if (!empty($validated['items'])) {
+            $productIds = array_column($validated['items'], 'product_id');
+            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
             foreach ($validated['items'] as $item) {
-                $product = Product::find($item['product_id']);
+                $product = $products->get($item['product_id']);
                 if (!$product) { continue; }
                 $unitPrice = (float) $product->selling_price;
                 $quantity = (int) $item['quantity'];
@@ -71,6 +74,20 @@ class SalesOrderController extends Controller
         }
 
         $salesOrder->update(['total_amount' => $totalAmount]);
+
+        if ($request->wantsJson()) {
+            // Eager load relationships for the partial
+            $salesOrder->load(['customer', 'items.product']);
+            
+            // Render the partial
+            $html = view('partials.sales-order-row', ['order' => $salesOrder])->render();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Sales order created.',
+                'html' => $html
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Sales order created.');
     }

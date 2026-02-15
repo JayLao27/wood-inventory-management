@@ -49,7 +49,8 @@
                     </div>
                 </div>
 
-
+        </script>
+        
                 <!-- Completed Card -->
                 <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
                     <div class="flex justify-between items-start">
@@ -129,55 +130,9 @@
                     $visibleWorkOrders = ($workOrders ?? collect())->whereNotIn('status', ['completed', 'cancelled']);
                 @endphp
                 <div class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;" id="workOrderTableBody">
-                    @forelse($visibleWorkOrders as $workOrder)
-                    <div onclick="viewWorkOrder({{ $workOrder->id }})" class="p-5 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer work-order-row" data-order-number="{{ $workOrder->order_number }}" data-product-name="{{ $workOrder->product_name }}" data-assigned-to="{{ $workOrder->assigned_to }}" data-status="{{ $workOrder->status }}">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-white text-lg">{{ $workOrder->order_number }} • {{ $workOrder->product_name }}</h3>
-                                <p class="text-base text-slate-300 font-medium mt-1">Due: {{ $workOrder->due_date->format('m/d/Y') }} • Assigned: {{ $workOrder->assigned_to }}</p>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                @php
-                                    $statusColors = [
-                                        'pending' => 'bg-yellow-500',
-                                        'in_progress' => 'bg-blue-500',
-                                        'quality_check' => 'bg-purple-500',
-                                        'completed' => 'bg-green-500',
-                                        'overdue' => 'bg-red-500',
-                                        'cancelled' => 'bg-gray-500'
-                                    ];
-                                    $statusColor = $statusColors[$workOrder->status] ?? 'bg-gray-500';
-                                    $statusLabel = ucwords(str_replace('_', ' ', $workOrder->status));
-                                @endphp
-                                <span class="px-4 py-2 {{ $statusColor }} text-white text-xs font-bold rounded-xl shadow-lg">
-                                    {{ $statusLabel }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-4 gap-4 mt-4 text-base">
-                            <div>
-                                <span class="text-slate-400 font-medium text-xs">Quantity</span>
-                                <p class="text-white font-bold text-lg mt-1">{{ $workOrder->quantity }} pcs</p>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 font-medium text-xs">Starting Date</span>
-                                <p class="text-white font-bold text-lg mt-1">{{ $workOrder->created_at ? \Carbon\Carbon::parse($workOrder->created_at)->format('m/d/Y') : 'N/A' }}</p>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 font-medium text-xs">Due Date</span>
-                                <p class="text-white font-bold text-lg mt-1">{{ $workOrder->due_date->format('m/d/Y') }}</p>
-                            </div>
-                            <div class="flex items-center space-x-2 justify-end">
-                                <button onclick="event.stopPropagation(); openCompleteConfirmModal({{ $workOrder->id }}, '{{ $workOrder->order_number }}')" class="p-2.5 hover:bg-slate-500 rounded-lg transition-all" title="Complete">
-                                    <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    @endforelse
+                    @foreach($visibleWorkOrders as $workOrder)
+                        @include('partials.work-order-row', ['workOrder' => $workOrder])
+                    @endforeach
                     <div id="workOrderEmptyState" class="py-12 px-4 text-center text-slate-400 {{ $visibleWorkOrders->count() > 0 ? 'hidden' : '' }}">
                         No active production found
                     </div>
@@ -486,8 +441,8 @@
         </div>
 
             <!-- View Work Order Modal -->
-            <div id="viewWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeViewWorkOrderModal()">
-                <div class="modal-content bg-amber-50 rounded-xl max-w-md w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div id="viewWorkOrderModal" class="modal-overlay fi    xed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeViewWorkOrderModal()">
+                <div class="modal-content bg-amber-50 rounded-xl max-w-[700px] w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
                     <div class="p-3.5">
                         <!-- Header -->
                         <div class="flex items-center justify-between mb-4 border-b-2 pb-3.5" style="border-color: #374151;">
@@ -1283,18 +1238,26 @@
                 if (e.target.id === 'workOrderForm') {
                     e.preventDefault();
                     const form = e.target;
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Create Work Order';
+                    
+                    if(submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creating...';
+                    }
+
                     const formData = new FormData(form);
                     
                     fetch(form.action, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
                         body: formData
                     })
                     .then(response => {
-                        // Check content type
                         const contentType = response.headers.get('content-type');
                         if (!contentType || !contentType.includes('application/json')) {
                             throw new Error('Server returned non-JSON response. Status: ' + response.status);
@@ -1304,9 +1267,18 @@
                     })
                     .then(data => {
                         if (data.success) {
-                            showSuccessNotification('Work order created successfully!');
+                            showSuccessNotification(data.message);
                             closeWorkOrderModal();
-                            setTimeout(() => location.reload(), 1500);
+                            form.reset();
+                            
+                            if (data.html) {
+                                const tbody = document.getElementById('workOrderTableBody');
+                                const emptyState = document.getElementById('workOrderEmptyState');
+                                if (emptyState) emptyState.classList.add('hidden');
+                                tbody.insertAdjacentHTML('afterbegin', data.html); // Add new row at top
+                            } else {
+                                setTimeout(() => location.reload(), 1500);
+                            }
                         } else {
                             showErrorNotification(data.message || 'Error creating work order');
                         }
@@ -1314,6 +1286,12 @@
                     .catch(error => {
                         console.error('Error:', error);
                         showErrorNotification('Error creating work order: ' + error.message);
+                    })
+                    .finally(() => {
+                        if(submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                        }
                     });
                 }
             });
@@ -1479,4 +1457,5 @@
                 });
             @endif
         </script>
+
 @endsection

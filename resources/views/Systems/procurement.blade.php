@@ -2053,6 +2053,6 @@
                     showErrorNotification('{{ session('error') }}');
                 @endif
             });
-    </script>
+            </script>
 
 @endsection
