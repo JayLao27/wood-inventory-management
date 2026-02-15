@@ -78,14 +78,43 @@ class SalesOrderController extends Controller
         if ($request->wantsJson()) {
             // Eager load relationships for the partial
             $salesOrder->load(['customer', 'items.product']);
+
+            // Define the same color maps used in the blade views
+            $customerTypeBg = [
+                'Wholesale' => '#64B5F6',
+                'Retail' => '#6366F1',
+                'Contractor' => '#BA68C8',
+            ];
+            $statusBg = [
+                'In production' => '#FFB74D',
+                'Pending' => '#64B5F6',
+                'Delivered' => '#81C784',
+                'Ready' => '#BA68C8',
+            ];
+            $paymentBg = [
+                'Pending' => '#ffffff',
+                'Partial' => '#FFB74D',
+                'Paid' => '#81C784',
+            ];
+
+            $viewData = [
+                'order' => $salesOrder,
+                'customerTypeBg' => $customerTypeBg,
+                'statusBg' => $statusBg,
+                'paymentBg' => $paymentBg,
+            ];
             
-            // Render the partial
-            $html = view('partials.sales-order-row', ['order' => $salesOrder])->render();
+            // Render the table row partial
+            $html = view('partials.sales-order-row', $viewData)->render();
+
+            // Render the view/edit modals for this new order
+            $modalHtml = view('partials.sales-order-modals', $viewData)->render();
             
             return response()->json([
                 'success' => true,
                 'message' => 'Sales order created.',
-                'html' => $html
+                'html' => $html,
+                'modalHtml' => $modalHtml,
             ]);
         }
 
@@ -97,18 +126,57 @@ class SalesOrderController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'delivery_date' => 'required|date|after_or_equal:today',
-            'status' => 'required|in:In production,Confirmed,Pending,Delivered,Ready',
-            'payment_status' => 'required|in:Pending,Partial,Paid',
+            'status' => 'nullable|in:In production,Confirmed,Pending,Delivered,Ready',
+            'payment_status' => 'nullable|in:Pending,Partial,Paid',
             'note' => 'nullable|string',
         ]);
 
         $sales_order->update([
             'customer_id' => $validated['customer_id'],
             'delivery_date' => $validated['delivery_date'],
-            'status' => $validated['status'],
-            'payment_status' => $validated['payment_status'],
+            'status' => $validated['status'] ?? $sales_order->status,
+            'payment_status' => $validated['payment_status'] ?? $sales_order->payment_status,
             'note' => $validated['note'] ?? null,
         ]);
+
+        if ($request->wantsJson()) {
+            $sales_order->load(['customer', 'items.product']);
+
+            $customerTypeBg = [
+                'Wholesale' => '#64B5F6',
+                'Retail' => '#6366F1',
+                'Contractor' => '#BA68C8',
+            ];
+            $statusBg = [
+                'In production' => '#FFB74D',
+                'Pending' => '#64B5F6',
+                'Delivered' => '#81C784',
+                'Ready' => '#BA68C8',
+            ];
+            $paymentBg = [
+                'Pending' => '#ffffff',
+                'Partial' => '#FFB74D',
+                'Paid' => '#81C784',
+            ];
+
+            $viewData = [
+                'order' => $sales_order,
+                'customerTypeBg' => $customerTypeBg,
+                'statusBg' => $statusBg,
+                'paymentBg' => $paymentBg,
+            ];
+
+            $html = view('partials.sales-order-row', $viewData)->render();
+            $modalHtml = view('partials.sales-order-modals', $viewData)->render();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sales order updated successfully.',
+                'html' => $html,
+                'modalHtml' => $modalHtml,
+                'orderId' => $sales_order->id,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Sales order updated.');
     }
