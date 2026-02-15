@@ -1209,17 +1209,47 @@ $paymentBg = [
 			return toNumber(priceAttr);
 		}
 
-		function updatePricingFields() {
+		async function fetchLatestPrice(productId) {
+			if (!productId) return 0;
+			try {
+				const response = await fetch(`/inventory/${productId}/details?type=product`);
+				const data = await response.json();
+				if (data && data.item && data.item.selling_price) {
+					return toNumber(data.item.selling_price);
+				}
+			} catch (error) {
+				console.error('Error fetching latest price:', error);
+			}
+			return getSelectedUnitPrice(); // Fallback to data-price if AJAX fails
+		}
+
+		async function updatePricingFields() {
 			const unit = getSelectedUnitPrice();
 			const qty = toNumber(newItemQty?.value || '0');
-			if (newItemUnitPrice) newItemUnitPrice.value = unit ? formatCurrency(unit) : '';
+			
+			if (newItemUnitPrice) newItemUnitPrice.value = unit ? formatCurrency(unit) : 'Fetching...';
 			if (newItemUnitPriceHidden) newItemUnitPriceHidden.value = unit ? unit.toFixed(2) : '';
+			
 			const total = unit * (qty || 0);
 			if (newItemLineTotal) newItemLineTotal.textContent = 'Line total: ' + formatCurrency(total);
 		}
 
 		if (newItemProduct) {
-			newItemProduct.addEventListener('change', () => {
+			newItemProduct.addEventListener('change', async () => {
+				const productId = newItemProduct.value;
+				if (!productId) return;
+
+				// Show fetching state
+				if (newItemUnitPrice) newItemUnitPrice.value = 'Fetching...';
+
+				const latestPrice = await fetchLatestPrice(productId);
+				
+				// Update the data-price attribute so subsequent calls to getSelectedUnitPrice use the fresh value
+				const opt = newItemProduct.options[newItemProduct.selectedIndex];
+				if (opt) {
+					opt.setAttribute('data-price', latestPrice.toFixed(2));
+				}
+
 				// If quantity empty or <1, default to 1 on first select
 				if (newItemQty && (!newItemQty.value || toNumber(newItemQty.value) < 1)) {
 					newItemQty.value = '1';
@@ -1229,7 +1259,7 @@ $paymentBg = [
 		}
 		if (newItemQty) {
 			['input', 'change', 'blur'].forEach(evt => newItemQty.addEventListener(evt, () => {
-				if (toNumber(newItemQty.value) < 1) newItemQty.value = '1';
+				if (newItemQty.value && toNumber(newItemQty.value) < 1) newItemQty.value = '1';
 				updatePricingFields();
 			}));
 		}
