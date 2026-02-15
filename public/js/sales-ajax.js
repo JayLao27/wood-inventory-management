@@ -71,8 +71,75 @@ async function confirmSalesOrder(event) {
 
             tbody.insertAdjacentHTML('afterbegin', data.html);
 
+            // Inject the view/edit modals for the new order into the DOM
+            if (data.modalHtml) {
+                document.body.insertAdjacentHTML('beforeend', data.modalHtml);
+            }
+
         } else {
             showErrorNotification(data.message || 'Error creating order');
+        }
+    } catch (error) {
+        console.error(error);
+        showErrorNotification('An error occurred. Please try again.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    }
+
+    return false;
+}
+
+async function submitEditOrder(event, orderId) {
+    event.preventDefault();
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+
+    // Show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Updating...';
+
+    try {
+        const formData = new FormData(form);
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Close the edit modal
+            closeModal('editOrderModal-' + orderId);
+
+            // Replace the old row with the updated one
+            const oldRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+            if (oldRow && data.html) {
+                oldRow.insertAdjacentHTML('afterend', data.html);
+                oldRow.remove();
+            }
+
+            // Replace the old modals with updated ones
+            const oldViewModal = document.getElementById('viewOrderModal-' + orderId);
+            const oldEditModal = document.getElementById('editOrderModal-' + orderId);
+            if (oldViewModal) oldViewModal.remove();
+            if (oldEditModal) oldEditModal.remove();
+
+            if (data.modalHtml) {
+                document.body.insertAdjacentHTML('beforeend', data.modalHtml);
+            }
+
+            showSuccessNotification(data.message);
+        } else {
+            showErrorNotification(data.message || 'Error updating order.');
         }
     } catch (error) {
         console.error(error);
