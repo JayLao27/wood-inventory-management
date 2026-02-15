@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin,inventory_clerk,procurement_officer');
     Route::get('/inventory/{id}/details', [InventoryController::class, 'getDetails'])
         ->name('inventory.details')
-        ->middleware('role:admin,inventory_clerk,procurement_officer');
+        ->middleware('role:admin,inventory_clerk,procurement_officer,sales_clerk');
     Route::get('/inventory/{id}/edit-product', action: [InventoryController::class, 'editProduct'])
         ->name('inventory.edit-product')
         ->middleware('role:admin,inventory_clerk,procurement_officer');
