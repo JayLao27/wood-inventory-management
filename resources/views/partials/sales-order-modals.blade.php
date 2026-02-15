@@ -117,7 +117,7 @@
                     </button>
                 </div>
                 
-                <form method="POST" action="{{ route('sales-orders.update', $order) }}">
+                <form method="POST" action="{{ route('sales-orders.update', $order) }}" onsubmit="return submitEditOrder(event, {{ $order->id }})">
                     @csrf
                     @method('PUT')
                     <div class="grid gap-4">
