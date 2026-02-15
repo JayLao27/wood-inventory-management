@@ -1,5 +1,5 @@
 @use('App\Models\SalesOrder')
-<tr class="hover:bg-slate-600 transition cursor-pointer data-row" data-status="{{ $order->status }}" data-payment="{{ $order->payment_status }}">
+<tr class="hover:bg-slate-600 transition cursor-pointer data-row" data-order-id="{{ $order->id }}" data-status="{{ $order->status }}" data-payment="{{ $order->payment_status }}">
     <td class="px-3 py-3 font-mono text-slate-300">{{ $order->order_number }}</td>
     <td class="px-3 py-3">
         <div class="font-medium text-slate-300">{{ $order->customer?->name }}</div>
