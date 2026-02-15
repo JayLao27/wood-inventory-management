@@ -168,9 +168,13 @@ class ProductionController extends Controller
             $message = 'Work order ' . $orderNumber . ' created. Materials have been deducted from stock.';
             
             if ($request->wantsJson()) {
+                $workOrder->load(['salesOrder.customer', 'product']);
+                $html = view('partials.work-order-row', ['workOrder' => $workOrder])->render();
+
                 return response()->json([
                     'success' => true,
-                    'message' => $message
+                    'message' => $message,
+                    'html' => $html
                 ]);
             }
 
