@@ -36,22 +36,45 @@ class SalesOrderController extends Controller
             'items.*.quantity' => 'required_with:items|integer|min:1',
         ]);
 
-        $orderNumber = $this->generateOrderNumber();
+        $maxRetries = 5;
+        $retryCount = 0;
+        $salesOrder = null;
 
-        $salesOrder = SalesOrder::create([
-            'order_number' => $orderNumber,
-            'customer_id' => $validated['customer_id'],
-            'order_date' => now()->toDateString(),
-            'delivery_date' => $validated['delivery_date'],
-            'status' => 'Pending',
-            'total_amount' => 0,
-            'paid_amount' => 0,
-            'payment_status' => 'Pending',
-            'note' => $validated['note'] ?? null,
-        ]);
+        while ($retryCount < $maxRetries) {
+            try {
+                $orderNumber = $this->generateOrderNumber();
+
+                $salesOrder = SalesOrder::create([
+                    'order_number' => $orderNumber,
+                    'customer_id' => $validated['customer_id'],
+                    'order_date' => now()->toDateString(),
+                    'delivery_date' => $validated['delivery_date'],
+                    'status' => 'Pending',
+                    'total_amount' => 0,
+                    'paid_amount' => 0,
+                    'payment_status' => 'Pending',
+                    'note' => $validated['note'] ?? null,
+                ]);
+
+                // If creation succeeds, break the loop
+                break;
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Check if it's a duplicate entry error (SQLSTATE 23000)
+                if ($e->getCode() == '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
+                    $retryCount++;
+                    if ($retryCount >= $maxRetries) {
+                        throw $e;
+                    }
+                    // Wait a tiny bit to allow the other transaction to finish if needed
+                    usleep(100000); // 100ms
+                    continue;
+                }
+                throw $e;
+            }
+        }
 
         $totalAmount = 0;
-        if (!empty($validated['items'])) {
+        if ($salesOrder && !empty($validated['items'])) {
             $productIds = array_column($validated['items'], 'product_id');
             $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
@@ -73,7 +96,9 @@ class SalesOrderController extends Controller
             }
         }
 
-        $salesOrder->update(['total_amount' => $totalAmount]);
+        if ($salesOrder) {
+            $salesOrder->update(['total_amount' => $totalAmount]);
+        }
 
         if ($request->wantsJson()) {
             // Eager load relationships for the partial
