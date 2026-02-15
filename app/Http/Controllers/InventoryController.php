@@ -100,6 +100,10 @@ class InventoryController extends Controller
         }
 
         $itemType = $request->type === 'product' ? 'Product' : 'Material';
+        
+        // Clear cache
+        \App\Services\CacheService::clearRelated($request->type);
+        
         return redirect()->route('inventory')->with('success', $itemType . ' added successfully!');
     }
 
@@ -187,6 +191,10 @@ class InventoryController extends Controller
         }
 
         $itemType = $request->type === 'product' ? 'Product' : 'Material';
+        
+        // Clear cache
+        \App\Services\CacheService::clearRelated($request->type);
+        
         return redirect()->route('inventory')->with('success', $itemType . ' updated successfully!');
     }
 
@@ -199,6 +207,9 @@ class InventoryController extends Controller
         }
 
         $item->delete();
+
+        // Clear cache
+        \App\Services\CacheService::clearRelated($type);
 
         $itemType = $type === 'product' ? 'Product' : 'Material';
         return redirect()->route('inventory')->with('success', $itemType . ' deleted successfully!');
