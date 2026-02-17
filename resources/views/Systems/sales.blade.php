@@ -87,52 +87,65 @@ $paymentBg = [
 		<span id="successNotificationText">Success!</span>
 	</div>
 	<!-- Header -->
-	<div class="bg-amber-50 p-5">
+	<div class="bg-amber-50 p-5 relative z-50 border-b border-amber-200">
 		<div class="flex justify-between items-center">
 			<div>
 				<h1 class="text-xl font-bold text-gray-800">Sales & Orders</h1>
 				<p class="text-base text-gray-600 mt-2">Manage customer orders, sales, and deliveries</p>
 			</div>
-			<div class="relative">
-				<button id="exportButton" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
-					<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-					</svg>
-					<span>Export</span>
-					<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-					</svg>
-				</button>
-				<!-- Export Dropdown -->
-				<div id="exportDropdown" class="hidden absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-					<div class="py-1">
-						<a href="#" onclick="exportReceipt(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
-							<div class="flex items-center gap-1.5">
-								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-								</svg>
-								<span>Receipt</span>
-							</div>
-						</a>
-						<a href="#" onclick="exportSalesReport(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
-							<div class="flex items-center gap-1.5">
-								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-								</svg>
-								<span>Sales Report</span>
-							</div>
-						</a>
-						<a href="#" onclick="exportCustomerList(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
-							<div class="flex items-center gap-1.5">
-								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-								</svg>
-								<span>Customer List</span>
-							</div>
-						</a>
+			<div class="flex items-center gap-3 relative z-50">
+				<!-- Export Button -->
+				<div class="relative">
+					<button id="exportButton" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+						</svg>
+						<span>Export</span>
+						<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+						</svg>
+					</button>
+					<!-- Export Dropdown -->
+					<div id="exportDropdown" class="hidden absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+						<div class="py-1">
+							<a href="#" onclick="exportReceipt(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
+								<div class="flex items-center gap-1.5">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+									</svg>
+									<span>Receipt</span>
+								</div>
+							</a>
+							<a href="#" onclick="exportSalesReport(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
+								<div class="flex items-center gap-1.5">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+									</svg>
+									<span>Sales Report</span>
+								</div>
+							</a>
+							<a href="#" onclick="exportCustomerList(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
+								<div class="flex items-center gap-1.5">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+									</svg>
+									<span>Customer List</span>
+								</div>
+							</a>
+						</div>
 					</div>
 				</div>
+
+				<!-- Archive Button -->
+				<button type="button" onclick="openModal('archiveModal')" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition shadow-sm hover:shadow-md">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+					</svg>
+					<span>Archive</span>
+				</button>
 			</div>
+
+
 		</div>
 	</div>
 
@@ -204,12 +217,14 @@ $paymentBg = [
 					<h2 class="text-xl font-bold text-white">Sales Management</h2>
 					<p class="text-slate-300 text-xs font-medium mt-2">Manage customer orders and track sales performance</p>
 				</div>
-				<button id="headerBtn" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-1.5 font-medium" onclick="openModal('newOrderModal')">
-					<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-					</svg>
-					<span>New Order</span>
-				</button>
+				<div class="flex items-center gap-2">
+					<button id="headerBtn" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-1.5 font-medium" onclick="openModal('newOrderModal')">
+						<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+						</svg>
+						<span>New Order</span>
+					</button>
+				</div>
 			</header>
 
 			<!-- Search + Filters -->
@@ -229,7 +244,6 @@ $paymentBg = [
 			<div class="flex space-x-2 w-full mb-6">
 				<button id="salesTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Orders</button>
 				<button id="customersTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Customers</button>
-				<button id="archiveTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Archive</button>
 			</div>
 
 
@@ -350,37 +364,7 @@ $paymentBg = [
 					</tbody>
 				</table>
 			</div>
-			<!-- Archive Table -->
-			<div id="archiveTable" class="hidden overflow-y-auto overflow-x-visible" style="max-height: 60vh;">
-				<table class="w-full border-collapse text-left text-xs text-white">
-					<thead class="bg-slate-800 text-slate-300 sticky top-0">
-						<tr>
-							<th class="px-3 py-3 font-medium">Order #</th>
-							<th class="px-3 py-3 font-medium">Customer</th>
-							<th class="px-3 py-3 font-medium">Order Date</th>
-							<th class="px-3 py-3 font-medium">Delivery Date</th>
-							<th class="px-3 py-3 font-medium">Total Amount</th>
-							<th class="px-3 py-3 font-medium">Payment Status</th>
-							<th class="px-3 py-3 font-medium">Action</th>
-						</tr>
-					</thead>
-					<tbody id="archiveTbody" class="divide-y divide-slate-600">
-						@forelse($archiveOrders as $order)
-						@include('partials.sales-order-row', ['order' => $order])
-						@empty
-						<tr>
-							<td colspan="7" class="text-center py-4">No archived orders.</td>
-						</tr>
-						@endforelse
 
-
-						<tr id="archiveNoMatch" class="hidden">
-							<td colspan="7" class="text-center py-4">No matches found</td>
-						</tr>
-					</tbody>
-
-				</table>
-			</div>
 		</section>
 
 
@@ -1125,11 +1109,8 @@ $paymentBg = [
 	(function() {
 		const salesTab = document.getElementById('salesTab');
 		const customersTab = document.getElementById('customersTab');
-		const archiveTab = document.getElementById('archiveTab');
 		const salesTable = document.getElementById('salesTable');
 		const customerTable = document.getElementById('customerTable');
-		const archiveTable = document.getElementById('archiveTable');
-
 		const headerBtn = document.getElementById('headerBtn');
 		const searchInput = document.getElementById('searchInput');
 		const statusFilter = document.getElementById('statusFilter');
@@ -1148,9 +1129,8 @@ $paymentBg = [
 		function setMode(mode) {
 			salesTable.classList.add('hidden');
 			customerTable.classList.add('hidden');
-			archiveTable.classList.add('hidden');
-			
-			const allTabs = [salesTab, customersTab, archiveTab];
+
+			const allTabs = [salesTab, customersTab];
 			allTabs.forEach(t => {
 				t.style.backgroundColor = '#475569';
 				t.style.color = '#FFFFFF';
@@ -1164,28 +1144,19 @@ $paymentBg = [
 				salesTab.style.backgroundColor = '#FFF1DA';
 				salesTab.style.color = '#111827';
 				salesTab.style.borderColor = 'transparent';
-			} else if (mode === 'customers') {
+			} else {
 				customerTable.classList.remove('hidden');
 				headerBtn.textContent = '+ New Customer';
 				headerBtn.setAttribute('onclick', 'openModal("newCustomerModal")');
 				customersTab.style.backgroundColor = '#FFF1DA';
 				customersTab.style.color = '#111827';
 				customersTab.style.borderColor = 'transparent';
-			} else if (mode === 'archive') {
-				archiveTable.classList.remove('hidden');
-				headerBtn.textContent = 'Archive View';
-				headerBtn.setAttribute('onclick', '');
-				archiveTab.style.backgroundColor = '#FFF1DA';
-				archiveTab.style.color = '#111827';
-				archiveTab.style.borderColor = 'transparent';
 			}
 			applyFilters();
 		}
 
-
 		salesTab.addEventListener('click', () => setMode('sales'));
 		customersTab.addEventListener('click', () => setMode('customers'));
-		archiveTab.addEventListener('click', () => setMode('archive'));
 
 
 		function stringIncludes(haystack, needle) {
@@ -1197,15 +1168,10 @@ $paymentBg = [
 			const sVal = statusFilter ? statusFilter.value : '';
 			const pVal = paymentFilter.value;
 			const inSales = !salesTable.classList.contains('hidden');
-			const inArchive = !archiveTable.classList.contains('hidden');
-			const inCustomers = !customerTable.classList.contains('hidden');
 
-			if (inSales || inArchive) {
+			if (inSales) {
 				let any = false;
-				const tbody = inSales ? salesTbody : document.getElementById('archiveTbody');
-				const noMatch = inSales ? salesNoMatch : document.getElementById('archiveNoMatch');
-				
-				const rows = tbody.querySelectorAll('tr.data-row');
+				const rows = salesTbody.querySelectorAll('tr.data-row');
 				rows.forEach(tr => {
 					let show = true;
 					if (q) {
@@ -1221,8 +1187,8 @@ $paymentBg = [
 					tr.classList.toggle('hidden', !show);
 					any = any || show;
 				});
-				noMatch.classList.toggle('hidden', any);
-			} else if (inCustomers) {
+				salesNoMatch.classList.toggle('hidden', any);
+			} else {
 				let any = false;
 				const rows = customersTbody.querySelectorAll('tr.data-row');
 				rows.forEach(tr => {
@@ -1704,17 +1670,112 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 });
 </script>
+
+@push('modals')
+<div id="archiveModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
+	<div class="flex items-center justify-center min-h-screen p-4">
+		<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border border-slate-600">
+			<!-- Modal Header -->
+			<div class="flex justify-between items-center p-5 border-b border-slate-600">
+				<div class="flex items-center gap-3">
+					<div class="bg-red-500/20 p-2 rounded-lg">
+						<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+						</svg>
+					</div>
+					<div>
+						<h3 class="text-lg font-bold text-white">Cancelled Orders Archive</h3>
+						<p class="text-slate-400 text-xs mt-0.5">History of all cancelled sales orders</p>
+					</div>
+				</div>
+				<button onclick="closeModal('archiveModal')" class="text-slate-400 hover:text-white hover:bg-white/10 rounded-xl p-2 transition-all">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+
+			<!-- Search Bar -->
+			<div class="px-5 pt-4 pb-2">
+				<input type="search" id="archiveSearchInput" placeholder="Search archived orders..." class="bg-slate-600 w-full rounded-lg px-4 py-2 text-white text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 border border-slate-500">
+			</div>
+
+			<!-- Archive Table -->
+			<div class="p-5 overflow-y-auto" style="max-height: 65vh;">
+				<table class="w-full border-collapse text-left text-xs text-white">
+					<thead class="bg-slate-800/80 text-slate-300 sticky top-0">
+						<tr>
+							<th class="px-3 py-3 font-medium rounded-tl-lg">Order #</th>
+							<th class="px-3 py-3 font-medium">Customer</th>
+							<th class="px-3 py-3 font-medium">Order Date</th>
+							<th class="px-3 py-3 font-medium">Delivery Date</th>
+							<th class="px-3 py-3 font-medium">Status</th>
+							<th class="px-3 py-3 font-medium">Total Amount</th>
+							<th class="px-3 py-3 font-medium">Payment</th>
+							<th class="px-3 py-3 font-medium rounded-tr-lg">Action</th>
+						</tr>
+					</thead>
+					<tbody id="archiveTbody" class="divide-y divide-slate-600/50">
+						@forelse($archiveOrders as $order)
+						@include('partials.sales-order-row', ['order' => $order])
+						@empty
+						<tr>
+							<td colspan="8" class="text-center py-8 text-slate-400">
+								<svg class="w-10 h-10 mx-auto mb-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+								</svg>
+								No cancelled orders yet
+							</td>
+						</tr>
+						@endforelse
+						<tr id="archiveNoMatch" class="hidden">
+							<td colspan="8" class="text-center py-8 text-slate-400">No matching archived orders found</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- Footer -->
+			<div class="px-5 py-3 border-t border-slate-600 flex justify-between items-center">
+				<span class="text-slate-400 text-xs">{{ $archiveOrders->count() }} cancelled {{ Str::plural('order', $archiveOrders->count()) }}</span>
+				<button onclick="closeModal('archiveModal')" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all text-sm font-medium">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+// Archive modal search
+document.addEventListener('DOMContentLoaded', function() {
+	const archiveSearch = document.getElementById('archiveSearchInput');
+	if (archiveSearch) {
+		archiveSearch.addEventListener('input', function() {
+			const q = this.value.trim().toLowerCase();
+			const tbody = document.getElementById('archiveTbody');
+			const rows = tbody.querySelectorAll('tr.data-row');
+			const noMatch = document.getElementById('archiveNoMatch');
+			let any = false;
+			rows.forEach(tr => {
+				const text = (tr.textContent || '').toLowerCase();
+				const show = !q || text.includes(q);
+				tr.classList.toggle('hidden', !show);
+				any = any || show;
+			});
+			if (noMatch) noMatch.classList.toggle('hidden', any);
+		});
+	}
+});
+</script>
+
 <script src="{{ asset('js/sales-ajax.js') }}"></script>
 
-    <!-- Sales Order Modals -->
-    @push('modals')
+
     @foreach($salesOrders as $order)
         @include('partials.sales-order-modals', ['order' => $order])
     @endforeach
     @foreach($archiveOrders as $order)
         @include('partials.sales-order-modals', ['order' => $order])
     @endforeach
-
     @endpush
 </div>
 @endsection
