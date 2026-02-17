@@ -975,236 +975,131 @@
     <!-- Improved Received Stock Reports Modal -->
     <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 backdrop-blur-sm transition-opacity duration-300">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-amber-50 rounded-2xl w-full max-h-[95vh] shadow-2xl transform transition-all duration-300 scale-95 opacity-0 modal-content overflow-y-auto border-2 border-slate-700">
+            <div class="rounded-2xl w-full lg:w-[60%] max-h-[95vh] shadow-2xl transform transition-all duration-300 scale-95 opacity-0 modal-content overflow-hidden border border-slate-600" style="background-color: #FFF1DA;">
                 
-                <!-- Header -->
-                <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white px-8 py-6 rounded-t-2xl sticky top-0 z-10">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-4">
-                            <div>
-                                <h3 class="text-2xl font-bold flex items-center gap-3">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Received Stock Reports
-                                </h3>
-                                <p class="text-slate-300 text-sm mt-1">Track and manage incoming inventory</p>
-                            </div>
-                        </div>
-                        <button onclick="closeReceivedStockReportsModal()" 
-                                class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center p-5 border-b-2" style="border-color: #374151;">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-500/10 p-2 rounded-lg">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                        </button>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold" style="color: #374151;">Procurement Reports</h3>
+                            <p class="text-gray-600 text-xs mt-0.5">Track and manage incoming inventory</p>
+                        </div>
+                    </div>
+                    <button onclick="closeReceivedStockReportsModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-xl p-2 transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="px-5 pt-4 pb-2">
+                    <!-- Search Bar -->
+                    <input type="search" id="reportSearchInput" placeholder="Search reports..." class="bg-white w-full rounded-lg px-4 py-2 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 border border-gray-300 mb-3 transition-all">
+                    
+                    <!-- Date Range Filters -->
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">From</label>
+                            <input type="date" id="filterDateFrom" class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">To</label>
+                            <input type="date" id="filterDateTo" class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+                        </div>
+                    </div>
+
+                    <!-- Quick Filters -->
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <button onclick="applyReportQuickFilter('yesterday')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">Yesterday</button>
+                        <button onclick="applyReportQuickFilter('last-week')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">Last Week</button>
+                        <button onclick="applyReportQuickFilter('1-month')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">1 Month</button>
+                        <button onclick="applyReportQuickFilter('1-year')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">1 Year</button>
+                    </div>
+
+                    <!-- Actions Row -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex gap-2">
+                             <button onclick="filterReceivedStock()" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500 text-white shadow-lg hover:bg-amber-600">Apply Filters</button>
+                             <button onclick="resetFilters()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-all text-xs font-bold">Reset</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Excel
+                            </button>
+                            <button onclick="printReport()" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg> Print
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-8">
-                    <!-- Enhanced Filter Section -->
-                    <div class="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl p-6 mb-6 border border-slate-200 shadow-sm">
-                        <div class="flex items-center gap-2 mb-4">
-                            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                            </svg>
-                            <h4 class="text-lg font-semibold text-slate-800">Filters</h4>
+                <!-- Summary Cards (Simplified) -->
+                <div class="px-5 pb-3 grid grid-cols-2 gap-4">
+                    <div class="bg-white/60 p-3 rounded-xl border border-amber-200 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-amber-600">Total Received</p>
+                            <p id="totalReceived" class="text-lg font-bold text-gray-800">0</p>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <!-- Date From -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    Date From
-                                </label>
-                                <input type="date" id="filterDateFrom" 
-                                       class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white">
-                            </div>
-
-                            <!-- Date To -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    Date To
-                                </label>
-                                <input type="date" id="filterDateTo" 
-                                       class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white">
-                            </div>
-
-                            <!-- Material Filter -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                                    </svg>
-                                    Material
-                                </label>
-                                <select id="filterMaterial" 
-                                        class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white">
-                                    <option value="">All Materials</option>
-                                </select>
-                            </div>
-
-                            <!-- Status Filter -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    Status
-                                </label>
-                                <select id="filterStatus" 
-                                        class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white">
-                                    <option value="">All Status</option>
-                                    <option value="received">Received</option>
-                                    <option value="partial">Partial</option>
-                                    <option value="defective">Defective</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex gap-3 mt-6">
-                            <button onclick="filterReceivedStock()" 
-                                    class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 font-medium">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                                Apply Filters
-                            </button>
-                            <button onclick="resetFilters()" 
-                                    class="px-6 py-2.5 bg-white border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-all duration-200 flex items-center gap-2 font-medium">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
-                                Reset
-                            </button>
-                            <div class="ml-auto flex gap-2">
-                                <button onclick="exportToExcel()" 
-                                        class="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-md hover:shadow-lg">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Export Excel
-                                </button>
-                                <button onclick="printReport()" 
-                                        class="px-6 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-md hover:shadow-lg">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                                    </svg>
-                                    Print
-                                </button>
-                            </div>
+                        <div class="bg-amber-100 p-2 rounded-full text-amber-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
                         </div>
                     </div>
+                    <div class="bg-white/60 p-3 rounded-xl border border-red-200 flex justify-between items-center">
+                        <div>
+                             <p class="text-[10px] uppercase font-bold text-red-600">Total Defects</p>
+                             <p id="totalDefects" class="text-lg font-bold text-gray-800">0</p>
+                        </div>
+                        <div class="bg-red-100 p-2 rounded-full text-red-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Enhanced Summary Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-300 shadow-sm hover:shadow-md transition-shadow duration-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-amber-700 mb-1">Total Received</p>
-                                    <p id="totalReceived" class="text-3xl font-bold text-amber-900">0</p>
-                                </div>
-                                <div class="bg-amber-500 bg-opacity-20 rounded-full p-3">
-                                    <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        
+                <!-- Reports Table -->
+                <div class="px-5 pb-5 overflow-y-auto custom-scrollbar" style="max-height: 55vh;">
+                    <table class="w-full border-separate border-spacing-y-2 text-left text-xs">
+                        <thead class="text-gray-700 bg-gray-100/80 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold rounded-tl-xl">Date</th>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold">PO Number</th>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold">Material</th>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold">Qty</th>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold text-red-600">Defects</th>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold">Supplier</th>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold">Status</th>
+                                <th class="px-2 py-3 sm:px-4 text-[10px] sm:text-xs font-bold rounded-tr-xl">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="receivedStockTableBody" class="text-gray-600">
+                            <tr>
+                                <td colspan="8" class="py-12 px-4">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <svg class="w-16 h-16 mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        <p class="text-lg font-medium">Loading data...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                        <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-5 border border-red-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-red-700 mb-1">Total Defects</p>
-                                    <p id="totalDefects" class="text-3xl font-bold text-red-900">0</p>
-                                </div>
-                                <div class="bg-red-500 bg-opacity-20 rounded-full p-3">
-                                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
- </div>
-                    <!-- Enhanced Reports Table -->
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden w-100%">
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead>
-                                    <tr class="bg-gradient-to-r from-slate-100 to-slate-200 border-b-2 border-slate-300">
-                                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                                </svg>
-                                                Date
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
-                                                </svg>
-                                                PO Number
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                                                </svg>
-                                                Material
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-4 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">Quantity</th>
-                                        <th class="px-6 py-4 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">Defect Qty</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Supplier</th>
-                                        <th class="px-6 py-4 text-center text-xs font-bold text-slate-700 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">Notes</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="receivedStockTableBody" class="divide-y divide-slate-200">
-                                    <tr>
-                                        <td colspan="8" class="py-12 px-4">
-                                            <div class="flex flex-col items-center justify-center text-slate-400">
-                                                <svg class="w-16 h-16 mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                                </svg>
-                                                <p class="text-lg font-medium">Loading data...</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div class="bg-slate-50 px-6 py-4 border-t border-slate-200">
-                            <div class="flex items-center justify-between">
-                                <div class="text-sm text-slate-600">
-                                    Showing <span class="font-medium" id="showingFrom">0</span> to 
-                                    <span class="font-medium" id="showingTo">0</span> of 
-                                    <span class="font-medium" id="totalRecords">0</span> results
-                                </div>
-                                <div class="flex gap-2">
-                                    <button onclick="previousPage()" 
-                                            class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        Previous
-                                    </button>
-                                    <button onclick="nextPage()" 
-                                            class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Pagination -->
+                <div class="px-5 py-3 border-t-2 flex justify-between items-center" style="border-color: #374151;">
+                    <div class="text-xs text-gray-600">
+                        Showing <span class="font-bold" id="showingFrom">0</span> to 
+                        <span class="font-bold" id="showingTo">0</span> of 
+                        <span class="font-bold" id="totalRecords">0</span> results
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="previousPage()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+                        <button onclick="nextPage()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
                     </div>
                 </div>
             </div>
@@ -1464,84 +1359,30 @@
         // Received Stock Reports Modal Functions
         function openReceivedStockReportsModal() {
             document.getElementById('receivedStockReportsModal').classList.remove('hidden');
-            loadReceivedStockReports();
+            // Reset filters on open
+            if(document.getElementById('reportSearchInput')) document.getElementById('reportSearchInput').value = '';
+            if(document.getElementById('filterDateFrom')) document.getElementById('filterDateFrom').value = '';
+            if(document.getElementById('filterDateTo')) document.getElementById('filterDateTo').value = '';
+            filterReceivedStock();
         }
 
         function closeReceivedStockReportsModal() {
             document.getElementById('receivedStockReportsModal').classList.add('hidden');
         }
 
-        async function loadReceivedStockReports() {
-            const tbody = document.getElementById('receivedStockTableBody');
-            tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
-
-            try {
-                const response = await fetch('/procurement/received-stock-reports');
-                const data = await response.json();
-
-                if (data.success && data.movements && data.movements.length > 0) {
-                    let totalReceived = 0;
-                    let totalDefects = 0;
-
-                    tbody.innerHTML = data.movements.map(movement => {
-                        const receivedQty = parseFloat(movement.quantity || 0);
-                        const defectQty = parseFloat(movement.defect_quantity || 0);
-                        totalReceived += receivedQty;
-                        totalDefects += defectQty;
-
-                        return `
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-gray-700">${movement.date}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.po_number || 'N/A'}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.material_name}</td>
-                                <td class="px-4 py-3 text-gray-700">${receivedQty.toFixed(2)}</td>
-                                <td class="px-4 py-3 text-red-600">${defectQty.toFixed(2)}</td>
-                                <td class="px-4 py-3 text-gray-700">${movement.supplier_name || 'N/A'}</td>
-                                <td class="px-4 py-3">
-                                    <span class="text-xs font-semibold ${
-                                        movement.status === 'completed' ? 'text-green-600' : 
-                                        movement.status === 'pending' ? 'text-orange-600' : 'text-red-600'
-                                    }">${movement.status || 'N/A'}</span>
-                                </td>
-                                <td class="px-4 py-3 text-gray-700">${movement.notes || '-'}</td>
-                            </tr>
-                        `;
-                    }).join('');
-
-                    // Update summary - with null checks
-                    const totalReceivedEl = document.getElementById('totalReceived');
-                    const totalDefectsEl = document.getElementById('totalDefects');
-                    
-                    if (totalReceivedEl) totalReceivedEl.textContent = totalReceived.toFixed(2);
-                    if (totalDefectsEl) totalDefectsEl.textContent = totalDefects.toFixed(2);
-
-                    // Populate material filter
-                    const materialSelect = document.getElementById('filterMaterial');
-                    const uniqueMaterials = [...new Set(data.movements.map(m => m.material_name))];
-                    materialSelect.innerHTML = '<option value="">All Materials</option>' + 
-                        uniqueMaterials.map(material => `<option value="${material}">${material}</option>`).join('');
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">No received stock records found</td></tr>';
-                    const totalReceivedEl = document.getElementById('totalReceived');
-                    const totalDefectsEl = document.getElementById('totalDefects');
-                    if (totalReceivedEl) totalReceivedEl.textContent = '0';
-                    if (totalDefectsEl) totalDefectsEl.textContent = '0';
-                }
-            } catch (error) {
-                console.error('Error loading received stock reports:', error);
-                tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
-            }
-        }
+        // loadReceivedStockReports is replaced by filterReceivedStock to unify logic
+        // Keeping this alias if it's called from elsewhere, though openModal now calls filter directly
+        const loadReceivedStockReports = filterReceivedStock;
 
         async function filterReceivedStock() {
-            const dateFrom = document.getElementById('filterDateFrom').value;
-            const dateTo = document.getElementById('filterDateTo').value;
-            const material = document.getElementById('filterMaterial').value;
+            const dateFrom = document.getElementById('filterDateFrom')?.value || '';
+            const dateTo = document.getElementById('filterDateTo')?.value || '';
+            const search = document.getElementById('reportSearchInput')?.value || '';
 
             const params = new URLSearchParams();
             if (dateFrom) params.append('date_from', dateFrom);
             if (dateTo) params.append('date_to', dateTo);
-            if (material) params.append('material', material);
+            if (search) params.append('search', search);
 
             const tbody = document.getElementById('receivedStockTableBody');
             tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-gray-400">Loading...</td></tr>';
@@ -1598,16 +1439,64 @@
             }
         }
 
+        // Apply Quick Filter
+        function applyReportQuickFilter(type) {
+            const dateFromInput = document.getElementById('filterDateFrom');
+            const dateToInput = document.getElementById('filterDateTo');
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            
+            let start = '';
+            let end = today;
+
+            switch(type) {
+                case 'yesterday':
+                    const yesterday = new Date(now);
+                    yesterday.setDate(now.getDate() - 1);
+                    start = yesterday.toISOString().split('T')[0];
+                    end = start;
+                    break;
+                case 'last-week':
+                    const lastWeek = new Date(now);
+                    lastWeek.setDate(now.getDate() - 7);
+                    start = lastWeek.toISOString().split('T')[0];
+                    break;
+                case '1-month':
+                    const oneMonth = new Date(now);
+                    oneMonth.setMonth(now.getMonth() - 1);
+                    start = oneMonth.toISOString().split('T')[0];
+                    break;
+                case '1-year':
+                    const oneYear = new Date(now);
+                    oneYear.setFullYear(now.getFullYear() - 1);
+                    start = oneYear.toISOString().split('T')[0];
+                    break;
+            }
+
+            if (dateFromInput) dateFromInput.value = start;
+            if (dateToInput) dateToInput.value = end;
+            filterReceivedStock();
+        }
+
         // Reset Filters
         function resetFilters() {
-            document.getElementById('filterDateFrom').value = '';
-            document.getElementById('filterDateTo').value = '';
-            document.getElementById('filterMaterial').value = '';
-            if (document.getElementById('filterStatus')) {
-                document.getElementById('filterStatus').value = '';
-            }
+            if(document.getElementById('reportSearchInput')) document.getElementById('reportSearchInput').value = '';
+            if(document.getElementById('filterDateFrom')) document.getElementById('filterDateFrom').value = '';
+            if(document.getElementById('filterDateTo')) document.getElementById('filterDateTo').value = '';
             loadReceivedStockReports();
         }
+
+        // Add event listener for search input
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('reportSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        filterReceivedStock();
+                    }
+                });
+            }
+        });
 
         // Export to Excel (placeholder - requires backend implementation)
         function exportToExcel() {
