@@ -222,7 +222,7 @@ class ProcurementController extends Controller
         $purchaseOrder->items()->delete();
         $purchaseOrder->delete();
 
-        return redirect()->route('procurement')->with('success', 'Purchase order deleted successfully!');
+        return redirect()->route('procurement')->with('success', 'Purchase order cancelled!');
     }
 
     /**
