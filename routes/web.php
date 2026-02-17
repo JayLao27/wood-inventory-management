@@ -112,8 +112,12 @@ Route::middleware('auth')->group(function () {
     // Sales
     Route::resource('sales-orders', SalesOrderController::class)
         ->middleware('role:admin,sales_clerk');
-    Route::post('/sales-orders/item/{item}/cancel', [App\Http\Controllers\SalesOrderController::class, 'cancelItem'])
+    Route::post('/sales-orders/item/{item}/cancel', [SalesOrderController::class, 'cancelItem'])
         ->name('sales-orders.item.cancel')
+        ->middleware('role:admin,sales_clerk');
+
+    Route::post('/sales-orders/{sales_order}/deliver', [SalesOrderController::class, 'deliver'])
+        ->name('sales-orders.deliver')
         ->middleware('role:admin,sales_clerk');
 
     Route::get('/sales', [SalesOrderController::class, 'index'])
