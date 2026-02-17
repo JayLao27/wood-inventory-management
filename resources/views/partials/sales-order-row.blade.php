@@ -7,13 +7,6 @@
         <span class="mt-1 inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $ct }}</span>
     </td>
     <td class="px-3 py-3 text-slate-300">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</td>
-    <td class="px-3 py-3 text-slate-300">
-        @if($order->due_date)
-            {{ \Illuminate\Support\Carbon::parse($order->due_date)->format('M d, Y') }}
-        @else
-            -
-        @endif
-    </td>
     @php
         $delivery = \Illuminate\Support\Carbon::parse($order->delivery_date);
         $due = $order->due_date ? \Illuminate\Support\Carbon::parse($order->due_date) : $delivery;
@@ -23,19 +16,17 @@
         $diff = $due->diffInDays($today);
     @endphp
     <td class="px-3 py-3 text-slate-300">
-        <div class="flex items-center gap-2">
-            <div>{{ $delivery->format('M d, Y') }}</div>
-            @if ($isDueToday)
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-600 text-white">Due Today</span>
-            @elseif ($isOverdue)
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-600 text-white">Overdue {{ $diff == 1 ? '1 day' : $diff . ' days' }}</span>
-            @else
-                @php $ahead = $today->diffInDays($due); @endphp
-                @if ($ahead <= 3)
-                    <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500 text-white">Due in {{ $ahead == 1 ? '1 day' : $ahead . ' days' }}</span>
-                @endif
-            @endif
-        </div>
+        @if ($isDueToday)
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-600 text-white">Due Today</span>
+        @elseif ($isOverdue)
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-600 text-white">Overdue {{ $diff == 1 ? '1 day' : $diff . ' days' }}</span>
+        @else
+            @php $ahead = $today->diffInDays($due); @endphp
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500 text-white">Due in {{ $ahead == 1 ? '1 day' : $ahead . ' days' }}</span>
+        @endif
+    </td>
+    <td class="px-3 py-3 text-slate-300">
+        {{ $delivery->format('M d, Y') }}
     </td>
     <td class="px-3 py-3">
         @php
