@@ -257,7 +257,8 @@ $paymentBg = [
 							<th class="px-3 py-3 font-medium">Order Date</th>
 							<th class="px-3 py-3 font-medium">Due Date</th>
 							<th class="px-3 py-3 font-medium">Delivery Date</th>
-							<th class="px-3 py-3 font-medium">Total Amount</th>
+							<th class="px-3 py-3 font-medium">Status</th>
+							<th class="px-3 py-3 font-medium text-center">Total Amount</th>
 							<th class="px-3 py-3 font-medium">Payment Status</th>
 							<th class="px-3 py-3 font-medium">Action</th>
 						</tr>
@@ -265,16 +266,13 @@ $paymentBg = [
 					<tbody id="salesTbody" class="divide-y divide-slate-600">
 						@forelse($salesOrders as $order)
 						@include('partials.sales-order-row', ['order' => $order])
-
-
-
 						@empty
 						<tr>
-							<td colspan="8" class="text-center py-4">No orders yet. Click "New Order" to create one.</td>
+							<td colspan="9" class="text-center py-4 text-slate-400">No orders yet. Click "New Order" to create one.</td>
 						</tr>
 						@endforelse
 						<tr id="salesNoMatch" class="hidden">
-							<td colspan="8" class="text-center py-4">No matches</td>
+							<td colspan="9" class="text-center py-4 text-slate-400">No matching orders found</td>
 						</tr>
 					</tbody>
 				</table>
@@ -554,7 +552,7 @@ $paymentBg = [
 									@enderror
 								</div>
 
-								<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+								<div class="grid grid-cols-1 gap-5">
 									<!-- Delivery Date -->
 									<div>
 										<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-1.5">
@@ -568,26 +566,6 @@ $paymentBg = [
 										<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
 											<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
 												<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-											</svg>
-											{{ $message }}
-										</p>
-										@enderror
-									</div>
-
-									<!-- Due Date -->
-									<div>
-										<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-1.5">
-											<svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-											</svg>
-											Due Date
-										</label>
-										<input type="date" name="due_date" id="newOrderDueDate" min="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('due_date') border-red-500 @enderror" value="{{ old('due_date') }}">
-										<p class="text-gray-400 text-[10px] mt-1">Optional. Defaults to delivery date if empty.</p>
-										@error('due_date')
-										<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
-											<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-11a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
 											</svg>
 											{{ $message }}
 										</p>
@@ -1736,96 +1714,162 @@ document.addEventListener('DOMContentLoaded', function() {
 @push('modals')
 <div id="archiveModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
 	<div class="flex items-center justify-center min-h-screen p-4">
-		<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border border-slate-600">
+		<div class="rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl border border-slate-600" style="background-color: #FFF1DA;">
 			<!-- Modal Header -->
-			<div class="flex justify-between items-center p-5 border-b border-slate-600">
+			<div class="flex justify-between items-center p-5 border-b-2" style="border-color: #374151;">
 				<div class="flex items-center gap-3">
-					<div class="bg-red-500/20 p-2 rounded-lg">
-						<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<div class="bg-amber-500/10 p-2 rounded-lg">
+						<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
 						</svg>
 					</div>
 					<div>
-						<h3 class="text-lg font-bold text-white">Cancelled Orders Archive</h3>
-						<p class="text-slate-400 text-xs mt-0.5">History of all cancelled sales orders</p>
+						<h3 class="text-lg font-bold" style="color: #374151;">Orders Archive</h3>
+						<p class="text-gray-600 text-xs mt-0.5">History of cancelled and delivered sales orders</p>
 					</div>
 				</div>
-				<button onclick="closeModal('archiveModal')" class="text-slate-400 hover:text-white hover:bg-white/10 rounded-xl p-2 transition-all">
+				<button onclick="closeModal('archiveModal')" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-xl p-2 transition-all">
 					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
 					</svg>
 				</button>
 			</div>
 
-			<!-- Search Bar -->
 			<div class="px-5 pt-4 pb-2">
-				<input type="search" id="archiveSearchInput" placeholder="Search archived orders..." class="bg-slate-600 w-full rounded-lg px-4 py-2 text-white text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 border border-slate-500">
+				<input type="search" id="archiveSearchInput" placeholder="Search archived orders..." class="bg-white w-full rounded-lg px-4 py-2 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 border border-gray-300 mb-4 transition-all">
+				
+				<!-- Archive Filter Buttons -->
+				<div class="flex items-center gap-2 bg-gray-100/50 p-2 rounded-xl border border-gray-200">
+					<button onclick="filterArchive('all')" id="archiveFilterAll" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500 text-white shadow-lg archive-filter-btn">All Archived</button>
+					<button onclick="filterArchive('Cancelled')" id="archiveFilterCancelled" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:bg-gray-200 archive-filter-btn">Cancelled</button>
+					<button onclick="filterArchive('Delivered')" id="archiveFilterDelivered" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:bg-gray-200 archive-filter-btn">Delivered</button>
+				</div>
 			</div>
 
 			<!-- Archive Table -->
-			<div class="p-5 overflow-y-auto" style="max-height: 65vh;">
-				<table class="w-full border-collapse text-left text-xs text-white">
-					<thead class="bg-slate-800/80 text-slate-300 sticky top-0">
+			<div class="px-5 pb-5 overflow-y-auto custom-scrollbar" style="max-height: 65vh;">
+				<table class="w-full border-separate border-spacing-y-2 text-left text-xs">
+					<thead class="text-gray-700 bg-gray-100/80 sticky top-0 z-10">
 						<tr>
-							<th class="px-3 py-3 font-medium rounded-tl-lg">Order #</th>
-							<th class="px-3 py-3 font-medium">Customer</th>
-							<th class="px-3 py-3 font-medium">Order Date</th>
-							<th class="px-3 py-3 font-medium">Due Date</th>
-							<th class="px-3 py-3 font-medium">Delivery Date</th>
-							<th class="px-3 py-3 font-medium">Status</th>
-							<th class="px-3 py-3 font-medium">Total Amount</th>
-							<th class="px-3 py-3 font-medium">Payment</th>
-							<th class="px-3 py-3 font-medium rounded-tr-lg">Action</th>
+							<th class="px-4 py-3 font-bold rounded-tl-xl">Order #</th>
+							<th class="px-4 py-3 font-bold">Customer</th>
+							<th class="px-4 py-3 font-bold text-center">Order Date</th>
+							<th class="px-4 py-3 font-bold text-center">Delivery Date</th>
+							<th class="px-4 py-3 font-bold text-center">Status</th>
+							<th class="px-4 py-3 font-bold text-right">Total Amount</th>
+							<th class="px-4 py-3 font-bold text-center">Payment</th>
+							<th class="px-4 py-3 font-bold rounded-tr-xl text-center">Action</th>
 						</tr>
 					</thead>
-					<tbody id="archiveTbody" class="divide-y divide-slate-600/50">
+					<tbody id="archiveTbody" class="bg-transparent">
 						@forelse($archiveOrders as $order)
-						@include('partials.sales-order-row', ['order' => $order])
+						@include('partials.sales-order-row', ['order' => $order, 'isArchive' => true])
 						@empty
 						<tr>
-							<td colspan="8" class="text-center py-8 text-slate-400">
-								<svg class="w-10 h-10 mx-auto mb-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<td colspan="8" class="text-center py-10 bg-white/40 rounded-xl shadow-sm">
+								<svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
 								</svg>
-								No cancelled orders yet
+								<p class="text-gray-500 font-medium">No archived orders found</p>
 							</td>
 						</tr>
 						@endforelse
 						<tr id="archiveNoMatch" class="hidden">
-							<td colspan="8" class="text-center py-8 text-slate-400">No matching archived orders found</td>
+							<td colspan="9" class="text-center py-8 text-slate-400">No matching archived orders found</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 
 			<!-- Footer -->
-			<div class="px-5 py-3 border-t border-slate-600 flex justify-between items-center">
-				<span class="text-slate-400 text-xs">{{ $archiveOrders->count() }} cancelled {{ Str::plural('order', $archiveOrders->count()) }}</span>
-				<button onclick="closeModal('archiveModal')" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-all text-sm font-medium">Close</button>
+			<div class="px-5 py-3 border-t-2 flex justify-between items-center" style="border-color: #374151;">
+				<span class="text-gray-500 text-xs font-medium">{{ $archiveOrders->count() }} archived {{ Str::plural('order', $archiveOrders->count()) }}</span>
+				<button onclick="closeModal('archiveModal')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all text-sm font-bold shadow-md">Close</button>
 			</div>
 		</div>
 	</div>
 </div>
 
+<!-- Delivery Confirmation Modal -->
+<div id="deliverOrderModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[99999]" style="cursor: default;">
+	<div class="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border-2 border-slate-600 animate-fadeIn" onclick="event.stopPropagation()">
+		<div class="text-center">
+			<div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+				</svg>
+			</div>
+			<h3 class="text-xl font-bold text-white mb-2">Confirm Delivery</h3>
+			<p class="text-slate-400 mb-6 text-sm">Are you sure order <span id="deliverOrderNumber" class="text-green-400 font-bold"></span> has been delivered? It will be moved to the Archive.</p>
+		</div>
+		<form id="deliverOrderForm" method="POST">
+			@csrf
+			<div class="flex gap-3">
+				<button type="button" onclick="closeModal('deliverOrderModal')" class="flex-1 px-4 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition-all font-bold text-sm">Cancel</button>
+				<button type="submit" class="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-bold text-sm shadow-lg shadow-green-900/20">Confirm Delivery</button>
+			</div>
+		</form>
+	</div>
+</div>
+
 <script>
+let currentArchiveStatus = 'all';
+
+function filterArchive(status) {
+	currentArchiveStatus = status;
+	
+	// Update button styles
+	document.querySelectorAll('.archive-filter-btn').forEach(btn => {
+		btn.classList.remove('bg-amber-500', 'text-white', 'shadow-lg');
+		btn.classList.add('text-slate-300', 'hover:bg-slate-500/50');
+	});
+	
+	const btnId = 'archiveFilter' + (status === 'all' ? 'All' : status);
+	const activeBtn = document.getElementById(btnId);
+	if (activeBtn) {
+		activeBtn.classList.remove('text-slate-300', 'hover:bg-slate-500/50');
+		activeBtn.classList.add('bg-amber-500', 'text-white', 'shadow-lg');
+	}
+
+	applyArchiveFilters();
+}
+
+function applyArchiveFilters() {
+	const q = document.getElementById('archiveSearchInput')?.value.trim().toLowerCase() || '';
+	const tbody = document.getElementById('archiveTbody');
+	const rows = tbody.querySelectorAll('tr.data-row');
+	const noMatch = document.getElementById('archiveNoMatch');
+	let any = false;
+
+	rows.forEach(tr => {
+		const text = (tr.textContent || '').toLowerCase();
+		const status = tr.getAttribute('data-status');
+		
+		const matchesSearch = !q || text.includes(q);
+		const matchesStatus = currentArchiveStatus === 'all' || status === currentArchiveStatus;
+		
+		const show = matchesSearch && matchesStatus;
+		tr.classList.toggle('hidden', !show);
+		any = any || show;
+	});
+
+	if (noMatch) noMatch.classList.toggle('hidden', any);
+}
+
+function openDeliverOrderModal(id, number) {
+	document.getElementById('deliverOrderNumber').textContent = number;
+	document.getElementById('deliverOrderForm').action = `/sales-orders/${id}/deliver`;
+	const modal = document.getElementById('deliverOrderModal');
+	modal.classList.remove('hidden');
+	modal.classList.add('flex');
+}
+
 // Archive modal search
 document.addEventListener('DOMContentLoaded', function() {
 	const archiveSearch = document.getElementById('archiveSearchInput');
 	if (archiveSearch) {
-		archiveSearch.addEventListener('input', function() {
-			const q = this.value.trim().toLowerCase();
-			const tbody = document.getElementById('archiveTbody');
-			const rows = tbody.querySelectorAll('tr.data-row');
-			const noMatch = document.getElementById('archiveNoMatch');
-			let any = false;
-			rows.forEach(tr => {
-				const text = (tr.textContent || '').toLowerCase();
-				const show = !q || text.includes(q);
-				tr.classList.toggle('hidden', !show);
-				any = any || show;
-			});
-			if (noMatch) noMatch.classList.toggle('hidden', any);
-		});
+		archiveSearch.addEventListener('input', applyArchiveFilters);
 	}
 });
 </script>
