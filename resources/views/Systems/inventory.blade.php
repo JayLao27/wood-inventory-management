@@ -588,106 +588,117 @@
         </div>
 
         <!-- Stock Logs Modal -->
+        <!-- Stock Logs Modal - REFINED VERSION -->
         <div id="stockLogsModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-amber-50 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
-                    <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-4 text-white rounded-t-2xl">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h3 class="text-xl font-bold flex items-center gap-2">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Stock Logs
-                                </h3>
-                                <p class="text-slate-300 text-xs mt-1">Complete audit trail of all inventory movements</p>
-                            </div>
-                            <button onclick="closeStockLogsModal()" class="text-white hover:text-slate-300 hover:bg-white/10 rounded-xl p-2 transition-all">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <div class="rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-600" style="background-color: #FFF1DA;">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center p-5 border-b-2" style="border-color: #374151;">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-amber-500/10 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                            </button>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold" style="color: #374151;">Stock Logs</h3>
+                                <p class="text-gray-600 text-xs mt-0.5">Complete audit trail of all inventory movements</p>
+                            </div>
                         </div>
+                        <button onclick="closeStockLogsModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
 
-                    <div class="p-4">
+                    <div class="p-5 overflow-y-auto custom-scrollbar" style="max-height: calc(90vh - 85px);">
+                        <!-- Quick Filters -->
+                        <div class="mb-4 flex flex-wrap gap-2">
+                             <button type="button" onclick="setQuickFilter('yesterday')" class="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800 rounded-lg transition-all border border-gray-200">
+                                Yesterday
+                            </button>
+                            <button type="button" onclick="setQuickFilter('last_week')" class="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800 rounded-lg transition-all border border-gray-200">
+                                Last Week
+                            </button>
+                            <button type="button" onclick="setQuickFilter('1_month')" class="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800 rounded-lg transition-all border border-gray-200">
+                                1 Month
+                            </button>
+                            <button type="button" onclick="setQuickFilter('1_year')" class="px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800 rounded-lg transition-all border border-gray-200">
+                                1 Year
+                            </button>
+                        </div>
+
                         <!-- Filters -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-2">Search & Filter</label>
-                                <input type="text" id="logSearchFilter" placeholder="Search by material, supplier, reference..." class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-blue-500 transition-all" oninput="filterStockLogs()">
+                                <label class="block text-xs font-bold text-gray-700 mb-1.5">Search & Filter</label>
+                                <div class="relative">
+                                    <input type="text" id="logSearchFilter" placeholder="Search by material, supplier..." class="w-full border border-gray-300 rounded-xl pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" oninput="filterStockLogs()">
+                                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-2">From Date</label>
-                                <input type="date" id="logDateFromFilter" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 transition-all" onchange="loadStockLogs()">
+                                <label class="block text-xs font-bold text-gray-700 mb-1.5">From Date</label>
+                                <input type="date" id="logDateFromFilter" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" onchange="loadStockLogs()">
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-2">To Date</label>
-                                <input type="date" id="logDateToFilter" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 transition-all" onchange="loadStockLogs()">
+                                <label class="block text-xs font-bold text-gray-700 mb-1.5">To Date</label>
+                                <input type="date" id="logDateToFilter" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" onchange="loadStockLogs()">
                             </div>
                         </div>
 
-                        <!-- Summary -->
+                        <!-- Summary Cards -->
                         <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="bg-green-50 border-2 border-green-500 rounded-xl p-4 shadow-lg">
-                                <p class="text-green-600 text-xs font-bold uppercase">Total In</p>
-                                <p id="logTotalIn" class="text-xl font-bold text-green-700 mt-1">0</p>
+                            <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
+                                <p class="text-green-800 text-xs font-bold uppercase tracking-wider">Total In</p>
+                                <p id="logTotalIn" class="text-2xl font-bold text-green-700 mt-1">0</p>
                             </div>
-                            <div class="bg-red-50 border-2 border-red-500 rounded-xl p-4 shadow-lg">
-                                <p class="text-red-600 text-xs font-bold uppercase">Total Out</p>
-                                <p id="logTotalOut" class="text-xl font-bold text-red-700 mt-1">0</p>
+                            <div class="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
+                                <p class="text-red-800 text-xs font-bold uppercase tracking-wider">Total Out</p>
+                                <p id="logTotalOut" class="text-2xl font-bold text-red-700 mt-1">0</p>
                             </div>
-                            <div class="bg-slate-100 border-2 border-slate-500 rounded-xl p-4 shadow-lg">
-                                <p class="text-slate-600 text-xs font-bold uppercase">Total Logs</p>
-                                <p id="logTotalMovements" class="text-xl font-bold text-slate-700 mt-1">0</p>
+                            <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
+                                <p class="text-slate-800 text-xs font-bold uppercase tracking-wider">Total Logs</p>
+                                <p id="logTotalMovements" class="text-2xl font-bold text-slate-700 mt-1">0</p>
                             </div>
                         </div>
 
                         <!-- Tabs Navigation -->
-                        <div class="mb-6">
-                            <div class="flex gap-2 border-b-2 border-gray-200">
-                                <button onclick="switchTab('stockIn')" id="tabStockIn" class="tab-button active px-6 py-3 font-semibold text-sm transition-all duration-200 border-b-3 -mb-0.5">
-                                    <div class="flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
-                                        <span>Stock IN</span>
-                                    </div>
+                        <div class="mb-4">
+                            <div class="flex p-1 bg-gray-200/50 rounded-xl inline-flex">
+                                <button onclick="switchTab('stockIn')" id="tabStockIn" class="tab-button active px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    Stock IN
                                 </button>
-                                <button onclick="switchTab('stockOut')" id="tabStockOut" class="tab-button px-6 py-3 font-semibold text-sm transition-all duration-200 border-b-3 -mb-0.5">
-                                    <div class="flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                        </svg>
-                                        <span>Stock OUT</span>
-                                    </div>
+                                <button onclick="switchTab('stockOut')" id="tabStockOut" class="tab-button px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 text-gray-500 hover:text-gray-700">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                    </svg>
+                                    Stock OUT
                                 </button>
                             </div>
                         </div>
 
                         <!-- Tab Content -->
-                        <div class="tab-content-container">
+                        <div class="tab-content-container relative min-h-[300px]">
                             <!-- Stock IN Section -->
-                            <div id="contentStockIn" class="tab-content active">
-                                <div class="mb-4">
-                                    <h4 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-3">
-                                        <div class="p-2 bg-green-100 rounded-lg">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                        </div>
-                                        Stock IN (Received from Suppliers)
-                                    </h4>
-                                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md bg-white">
-                                        <table class="w-full text-sm">
-                                            <thead class="bg-gradient-to-r from-green-600 to-green-500 text-white">
+                            <div id="contentStockIn" class="tab-content active absolute inset-0 w-full transition-all duration-300">
+                                <div class="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-xs text-left">
+                                            <thead class="bg-gray-100/80 text-gray-700 font-bold uppercase tracking-wider sticky top-0">
                                                 <tr>
-                                                    <th class="px-4 py-3 text-left font-semibold">Date & Time</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">Material</th>
-                                                    <th class="px-4 py-3 text-center font-semibold">Quantity</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">PO ID</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">From Supplier</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">Notes</th>
+                                                    <th class="px-4 py-3">Date & Time</th>
+                                                    <th class="px-4 py-3">Material</th>
+                                                    <th class="px-4 py-3 text-center">Quantity</th>
+                                                    <th class="px-4 py-3">PO ID</th>
+                                                    <th class="px-4 py-3">From Supplier</th>
+                                                    <th class="px-4 py-3">Notes</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="stockInTable" class="divide-y divide-gray-100">
@@ -701,26 +712,18 @@
                             </div>
 
                             <!-- Stock OUT Section -->
-                            <div id="contentStockOut" class="tab-content hidden">
-                                <div class="mb-4">
-                                    <h4 class="text-2xl font-bold text-red-700 mb-4 flex items-center gap-3">
-                                        <div class="p-2 bg-red-100 rounded-lg">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                            </svg>
-                                        </div>
-                                        Stock OUT (Used in Work Orders)
-                                    </h4>
-                                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md bg-white">
-                                        <table class="w-full text-sm">
-                                            <thead class="bg-gradient-to-r from-red-600 to-red-500 text-white">
+                            <div id="contentStockOut" class="tab-content hidden absolute inset-0 w-full transition-all duration-300">
+                                <div class="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-xs text-left">
+                                            <thead class="bg-gray-100/80 text-gray-700 font-bold uppercase tracking-wider sticky top-0">
                                                 <tr>
-                                                    <th class="px-4 py-3 text-left font-semibold">Date & Time</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">Material</th>
-                                                    <th class="px-4 py-3 text-center font-semibold">Quantity Out</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">Work Order</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">Team Assigned</th>
-                                                    <th class="px-4 py-3 text-left font-semibold">Notes</th>
+                                                    <th class="px-4 py-3">Date & Time</th>
+                                                    <th class="px-4 py-3">Material</th>
+                                                    <th class="px-4 py-3 text-center">Quantity Out</th>
+                                                    <th class="px-4 py-3">Work Order</th>
+                                                    <th class="px-4 py-3">Team Assigned</th>
+                                                    <th class="px-4 py-3">Notes</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="stockOutTable" class="divide-y divide-gray-100">
@@ -735,41 +738,26 @@
                         </div>
 
                         <style>
-                            .tab-button {
-                                color: #6b7280;
-                                background: transparent;
-                                border-bottom: 3px solid transparent;
-                                position: relative;
-                            }
-                            
-                            .tab-button:hover {
-                                color: #374151;
-                                background: #f9fafb;
-                            }
-                            
+                            /* Custom Tab Styling */
                             .tab-button.active {
-                                color: #1f2937;
-                                border-bottom-color: #3b82f6;
-                                background: #eff6ff;
+                                background-color: white;
+                                color: #111827; /* gray-900 */
+                                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
                             }
                             
+                            /* Fade Animation */
                             .tab-content {
-                                animation: fadeIn 0.3s ease-in;
+                                opacity: 1;
+                                transform: translateY(0);
+                                pointer-events: auto;
                             }
                             
                             .tab-content.hidden {
-                                display: none;
-                            }
-                            
-                            @keyframes fadeIn {
-                                from {
-                                    opacity: 0;
-                                    transform: translateY(10px);
-                                }
-                                to {
-                                    opacity: 1;
-                                    transform: translateY(0);
-                                }
+                                display: block; /* Keep textual display block for transition, but hide visually */
+                                opacity: 0;
+                                transform: translateY(10px);
+                                pointer-events: none;
+                                z-index: -1;
                             }
                         </style>
                     </div>
@@ -1529,43 +1517,40 @@
             }
         </script>
 
-        <!-- Receive Stock Modal - IMPROVED VERSION -->
+        <!-- Receive Stock Modal - REFINED VERSION -->
         <div id="receiveStockModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-amber-50 rounded-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-600" style="background-color: #FFF1DA;">
                     <!-- Header -->
-                    <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-4 text-white rounded-t-2xl z-10">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h3 class="text-xl font-bold flex items-center gap-2">
-                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-1.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                    </svg>
-                                    Receive Stock from Supplier
-                                </h3>
-                                <p class="text-slate-300 text-xs mt-1">Record materials received from purchase orders</p>
-                            </div>
-                            <button onclick="closeReceiveStockModal()" class="text-white hover:text-slate-300 hover:bg-white/10 rounded-xl p-2 transition-all">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    <div class="flex justify-between items-center p-5 border-b-2" style="border-color: #374151;">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-amber-500/10 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-1.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
-                            </button>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold" style="color: #374151;">Receive Stock from Supplier</h3>
+                                <p class="text-gray-600 text-xs mt-0.5">Record materials received from purchase orders</p>
+                            </div>
                         </div>
+                        <button onclick="closeReceiveStockModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-xl p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
                     
                     <!-- Form Content -->
-                    <div class="p-4">
+                    <div class="p-5 overflow-y-auto custom-scrollbar" style="max-height: calc(90vh - 85px);">
                         <form id="receiveStockForm" method="POST">
                             <!-- Purchase Order & Date Selection -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                                 <div>
-                                    <label class="block text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-2">
                                         Purchase Order *
                                     </label>
-                                    <select name="purchase_order_id" id="purchaseOrderSelect" onchange="loadPurchaseOrderItems(this.value)" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 text-sm font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" required>
+                                    <select name="purchase_order_id" id="purchaseOrderSelect" onchange="loadPurchaseOrderItems(this.value)" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" required>
                                         <option value="">Select a purchase order...</option>
                                         @php
                                             $purchaseOrders = \App\Models\PurchaseOrder::with('supplier')->where('status', '!=', 'received')->get();
@@ -1576,39 +1561,32 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <p class="text-xs text-gray-500 mt-1.5">Select the PO you're receiving materials for</p>
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-2">
                                         Received Date *
                                     </label>
-                                    <input type="date" name="received_date" value="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 text-sm font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" required>
-                                    <p class="text-xs text-gray-500 mt-1.5">Date materials were received</p>
+                                    <input type="date" name="received_date" value="{{ date('Y-m-d') }}" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" required>
                                 </div>
                             </div>
                             
                             <!-- Items to Receive Section -->
                             <div class="mb-6">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h4 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                        <span class="w-1 h-6 bg-amber-500 rounded"></span>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-sm font-bold text-gray-800 flex items-center gap-2">
                                         Items to Receive
                                     </h4>
-                                    <span id="itemsCount" class="px-3 py-1 bg-slate-700 text-white text-xs font-bold rounded-xl hidden">0 items</span>
+                                    <span id="itemsCount" class="px-2 py-1 bg-gray-200 text-gray-700 text-xs font-bold rounded-lg hidden">0 items</span>
                                 </div>
                                 
-                                <div class="bg-white rounded-xl border-2 border-slate-300 shadow-lg overflow-hidden">
-                                    <div id="receiveStockItems" class="overflow-y-auto" style="max-height: 50vh;">
+                                <div class="bg-white/50 rounded-xl border border-gray-200 overflow-hidden">
+                                    <div id="receiveStockItems" class="overflow-y-auto custom-scrollbar" style="max-height: 40vh;">
                                         <div class="flex flex-col items-center justify-center py-12 px-3">
-                                            <svg class="w-16 h-16 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-1.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                             </svg>
-                                            <p class="text-slate-500 text-sm font-medium">Please select a purchase order to view items</p>
-                                            <p class="text-slate-400 text-xs mt-1">Materials from the selected PO will appear here</p>
+                                            <p class="text-gray-500 text-sm font-medium">Select a PO to view items</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1616,31 +1594,23 @@
                             
                             <!-- Notes Section -->
                             <div class="mb-6">
-                                <label class="block text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
+                                <label class="block text-xs font-bold text-gray-700 mb-1.5">
                                     Additional Notes (Optional)
                                 </label>
-                                <textarea name="notes" rows="3" class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" placeholder="Add any notes about this delivery (e.g., delivery condition, driver name, special instructions)..."></textarea>
+                                <textarea name="notes" rows="3" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm" placeholder="Add any notes about this delivery..."></textarea>
                             </div>
                             
                             <!-- Action Buttons -->
-                            <div class="flex justify-between items-center pt-2 border-t-2 border-gray-300">
-                                <div class="text-xs text-gray-600">
-                                    <span class="font-semibold">Note:</span> Stock quantities will be updated automatically after submission
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button type="button" onclick="closeReceiveStockModal()" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all shadow-sm">
-                                        Cancel
-                                    </button>
-                                    <button type="submit" class="px-6 py-1.5 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-sm rounded-xl hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Receive Stock
-                                    </button>
-                                </div>
+                            <div class="flex justify-end items-center gap-3 pt-4 border-t border-gray-200">
+                                <button type="button" onclick="closeReceiveStockModal()" class="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-bold text-xs hover:bg-gray-50 transition-all">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-xs rounded-xl hover:from-green-700 hover:to-green-800 shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Receive Stock
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -1913,6 +1883,46 @@
                         });
                 });
             }
+            // Quick Filter Logic
+            function setQuickFilter(period) {
+                const today = new Date();
+                let fromDate = new Date();
+                let toDate = new Date();
+
+                switch(period) {
+                    case 'yesterday':
+                        fromDate.setDate(today.getDate() - 1);
+                        toDate.setDate(today.getDate() - 1);
+                        break;
+                    case 'last_week':
+                        fromDate.setDate(today.getDate() - 7);
+                        // toDate is today
+                        break;
+                    case '1_month':
+                        fromDate.setMonth(today.getMonth() - 1);
+                        // toDate is today
+                        break;
+                    case '1_year':
+                        fromDate.setFullYear(today.getFullYear() - 1);
+                        // toDate is today
+                        break;
+                }
+
+                // Format dates as YYYY-MM-DD
+                const formatDate = (date) => {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                };
+
+                document.getElementById('logDateFromFilter').value = formatDate(fromDate);
+                document.getElementById('logDateToFilter').value = formatDate(toDate);
+                
+                // Trigger reload
+                loadStockLogs();
+            }
+
             // Toast Notification Functions
             function showSuccessNotification(message) {
                 const notif = document.createElement('div');
