@@ -3,269 +3,296 @@
 
 @section('main-content')
     <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+	<!-- Header Section -->
+	<div class="p-5 bg-amber-50 border-b border-amber-200 relative z-10">
+		<div class="flex justify-between items-center">
+			<div>
+				<h1 class="text-xl font-bold text-gray-800">Procurement Management</h1>
+				<p class="text-xs font-medium text-gray-600 mt-2">Manage suppliers, purchase orders, and material sourcing</p>
+			</div>
+			@php
+				$receiveCount = is_countable($openPurchaseOrders ?? $purchaseOrders ?? [])
+					? count($openPurchaseOrders ?? $purchaseOrders ?? [])
+					: 0;
+			@endphp
+			<div class="flex space-x-3 relative z-50">
+				<!-- Export Button -->
+				<div class="relative">
+					<button id="exportButton" onclick="document.getElementById('exportDropdown').classList.toggle('hidden')" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+						</svg>
+						<span>Export</span>
+						<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+						</svg>
+					</button>
+					<!-- Export Dropdown -->
+					<div id="exportDropdown" class="hidden absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+						<div class="py-1">
+							<a href="#" onclick="exportReceipt(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
+								<div class="flex items-center gap-1.5">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+									</svg>
+									<span>Receipt</span>
+								</div>
+							</a>
+						</div>
+					</div>
+				</div>
+				
+				<button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-600 text-white rounded-lg hover:from-slate-600 hover:to-slate-500 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium text-sm">
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" class="text-amber-300"/>
+						<rect x="9" y="9" width="4" height="12" rx="1" fill="currentColor" class="text-amber-400"/>
+						<rect x="15" y="5" width="4" height="16" rx="1" fill="currentColor" class="text-amber-500"/>
+						<path stroke="currentColor" stroke-width="2" d="M3 21h18"/>
+					</svg>
+					<span>Reports</span>
+				</button>
+			</div>
+		</div>
+	</div>
     <div class="flex-1 p-5 bg-amber-50 overflow-y-auto">
-        <!-- Header Section -->
-        <div class="mb-5">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Procurement Management</h1>
-                    <p class="text-gray-600 mt-1.5">Manage suppliers, purchase orders, and material sourcing</p>
-                </div>
-                @php
-                    $receiveCount = is_countable($openPurchaseOrders ?? $purchaseOrders ?? [])
-                        ? count($openPurchaseOrders ?? $purchaseOrders ?? [])
-                        : 0;
-                @endphp
-                <div class="flex space-x-3">
-                    <button onclick="openReceivedStockReportsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition flex items-center gap-2">
-                        <svg class="h-6 w-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <rect x="3" y="13" width="4" height="8" rx="1" fill="currentColor" class="text-amber-300"/>
-                            <rect x="9" y="9" width="4" height="12" rx="1" fill="currentColor" class="text-amber-400"/>
-                            <rect x="15" y="5" width="4" height="16" rx="1" fill="currentColor" class="text-amber-500"/>
-                            <path stroke="currentColor" stroke-width="2" d="M3 21h18"/>
-                        </svg>
-                        <span>Reports</span>
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Metrics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
-            <!-- Total Spent Card -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Total Spent</h3>
-                        @php
-                            $totalSpentFormatted = number_format($totalSpent, 0);
-                            $totalSpentLength = strlen($totalSpentFormatted);
-                            $totalSpentSize = $totalSpentLength > 15 ? 'text-lg' : ($totalSpentLength > 12 ? 'text-xl' : 'text-2xl');
-                        @endphp
-                        <p class="{{ $totalSpentSize }} font-bold mt-2 bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text text-transparent">₱{{ $totalSpentFormatted }}</p>
-                        <p class="text-slate-300 text-xs mt-1">All purchase orders</p>
-                    </div>
-                    <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                      @include('components.icons.dollar', ['class' => 'w-5 h-5 text-amber-400'])
-                    </div>
-                </div>
-            </div>
+		<!-- Metrics Cards -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-6 px-5">
+			<!-- Total Spent Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Total Spent</h3>
+						@php
+							$totalSpentFormatted = number_format($totalSpent, 0);
+							$totalSpentLength = strlen($totalSpentFormatted);
+							$totalSpentSize = $totalSpentLength > 15 ? 'text-lg' : ($totalSpentLength > 12 ? 'text-xl' : 'text-2xl');
+						@endphp
+						<p class="{{ $totalSpentSize }} font-bold mt-2 bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text text-transparent">₱{{ $totalSpentFormatted }}</p>
+						<p class="text-slate-300 text-xs mt-1">All purchase orders</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+					  @include('components.icons.dollar', ['class' => 'w-5 h-5 text-amber-400'])
+					</div>
+				</div>
+			</div>
 
-            <!-- Payments Made Card -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Payments Made</h3>
-                        @php
-                            $paymentsMadeFormatted = number_format($paymentsMade, 0);
-                            $paymentsMadeLength = strlen($paymentsMadeFormatted);
-                            $paymentsMadeSize = $paymentsMadeLength > 15 ? 'text-lg' : ($paymentsMadeLength > 12 ? 'text-xl' : 'text-2xl');
-                        @endphp
-                        <p class="{{ $paymentsMadeSize }} font-bold mt-2 bg-gradient-to-r from-green-300 to-green-100 bg-clip-text text-transparent">₱{{ $paymentsMadeFormatted }}</p>
-                        <p class="text-slate-300 text-xs mt-1">Paid to suppliers</p>
-                    </div>
-                    <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                        @include('components.icons.dollar', ['class' => 'w-5 h-5 text-green-400'])
-                    </div>
-                </div>
-            </div>
+			<!-- Payments Made Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Payments Made</h3>
+						@php
+							$paymentsMadeFormatted = number_format($paymentsMade, 0);
+							$paymentsMadeLength = strlen($paymentsMadeFormatted);
+							$paymentsMadeSize = $paymentsMadeLength > 15 ? 'text-lg' : ($paymentsMadeLength > 12 ? 'text-xl' : 'text-2xl');
+						@endphp
+						<p class="{{ $paymentsMadeSize }} font-bold mt-2 bg-gradient-to-r from-green-300 to-green-100 bg-clip-text text-transparent">₱{{ $paymentsMadeFormatted }}</p>
+						<p class="text-slate-300 text-xs mt-1">Paid to suppliers</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+						@include('components.icons.dollar', ['class' => 'w-5 h-5 text-green-400'])
+					</div>
+				</div>
+			</div>
 
-            <!-- Pending Payments Card -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Pending Payments</h3>
-                        @php
-                            $pendingPaymentsFormatted = number_format($pendingPayments, 0);
-                            $pendingPaymentsLength = strlen($pendingPaymentsFormatted);
-                            $pendingPaymentsSize = $pendingPaymentsLength > 15 ? 'text-lg' : ($pendingPaymentsLength > 12 ? 'text-xl' : 'text-2xl');
-                        @endphp
-                        <p class="{{ $pendingPaymentsSize }} font-bold mt-2 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">₱{{ $pendingPaymentsFormatted }}</p>
-                        <p class="text-slate-300 text-xs mt-1">Outstanding amount</p>
-                    </div>
-                    <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                         @include('components.icons.dollar', ['class' => 'w-5 h-5 text-yellow-400'])
-                    </div>
-                </div>
-            </div>
+			<!-- Pending Payments Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Pending Payments</h3>
+						@php
+							$pendingPaymentsFormatted = number_format($pendingPayments, 0);
+							$pendingPaymentsLength = strlen($pendingPaymentsFormatted);
+							$pendingPaymentsSize = $pendingPaymentsLength > 15 ? 'text-lg' : ($pendingPaymentsLength > 12 ? 'text-xl' : 'text-2xl');
+						@endphp
+						<p class="{{ $pendingPaymentsSize }} font-bold mt-2 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">₱{{ $pendingPaymentsFormatted }}</p>
+						<p class="text-slate-300 text-xs mt-1">Outstanding amount</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+						 @include('components.icons.dollar', ['class' => 'w-5 h-5 text-yellow-400'])
+					</div>
+				</div>
+			</div>
 
-            <!-- Active Suppliers Card -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Suppliers</h3>
-                        <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">{{ $activeSuppliers }}</p>
-                        <p class="text-slate-300 text-xs mt-1">Suppliers</p>
-                    </div>
-                    <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                      @include('components.icons.cart', ['class' => 'w-5 h-5 text-blue-400'])
-                    </div>
-                </div>
-            </div>
+			<!-- Active Suppliers Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Suppliers</h3>
+						<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">{{ $activeSuppliers }}</p>
+						<p class="text-slate-300 text-xs mt-1">Suppliers</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+					  @include('components.icons.cart', ['class' => 'w-5 h-5 text-blue-400'])
+					</div>
+				</div>
+			</div>
 
-            <!-- Low Stock Alerts Card -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Low Stock Alerts</h3>
-                        <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">{{ $lowStockAlerts }}</p>
-                        <p class="text-slate-300 text-xs mt-1">Items requiring attention</p>
-                    </div>
-                    <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                        @include('components.icons.cart', ['class' => 'w-5 h-5 text-red-400'])
-                    </div>
-                </div>
-            </div>
-        </div>
+			<!-- Low Stock Alerts Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Low Stock Alerts</h3>
+						<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">{{ $lowStockAlerts }}</p>
+						<p class="text-slate-300 text-xs mt-1">Items requiring attention</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+						@include('components.icons.cart', ['class' => 'w-5 h-5 text-red-400'])
+					</div>
+				</div>
+			</div>
+		</div>
 
-        <!-- Procurement Management Section -->
-        <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 shadow-xl border border-slate-600">
-            <div class="flex justify-between items-center mb-3">
-                <div>
-                    <h2 class="text-lg font-bold text-white">Procurement Management</h2>
-                    <p class="text-slate-300 text-xs mt-1">Manage purchase orders and supplier relationships</p>
-                </div>
-                <div id="purchaseOrdersButton" class="flex space-x-2">
-                    <button onclick="openAddPurchaseOrderModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center space-x-1.5 font-medium text-sm">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>New Purchase Order</span>
-                    </button>
-                </div>
-                <div id="suppliersButton" class="flex space-x-2 hidden">
-                    <button onclick="openAddSupplierModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center space-x-1.5 font-medium text-sm">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>New Supplier</span>
-                    </button>
-                </div>
-            </div>
+		<!-- Procurement Management Section -->
+		<!-- Main Content Container (with Padding) -->
+		<div class="px-5 pb-5">
+			<section class="bg-gradient-to-br from-slate-700 to-slate-800 text-white p-3 rounded-xl overflow-visible shadow-xl border border-slate-600">
+				<div class="flex justify-between items-center mb-6">
+					<div>
+						<h2 class="text-xl font-bold text-white">Procurement Management</h2>
+						<p class="text-slate-300 text-xs font-medium mt-2">Manage purchase orders and supplier relationships</p>
+					</div>
+					<div id="purchaseOrdersButton" class="flex space-x-2">
+						<button onclick="openAddPurchaseOrderModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-1.5 font-medium">
+							<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+							</svg>
+							<span>New Purchase Order</span>
+						</button>
+					</div>
+					<div id="suppliersButton" class="flex space-x-2 hidden">
+						<button onclick="openAddSupplierModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-1.5 font-medium">
+							<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+							</svg>
+							<span>New Supplier</span>
+						</button>
+					</div>
+				</div>
 
-            <!-- Search and Filter Bar -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex-1 max-w-md">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                        </div>
-                        <input id="searchInput" type="text" placeholder="Search orders or suppliers..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                </div>
+				<!-- Search and Filter Bar -->
+				<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+					<div class="flex-1 max-w-md">
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+								</svg>
+							</div>
+							<input id="searchInput" type="text" placeholder="Search orders or suppliers..." class="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-slate-400">
+						</div>
+					</div>
 
-                <div class="flex items-center space-x-2">
-                    <select id="statusFilter" class="px-3 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                        <option value="all">All Status</option>
-                        <option value="paid">Paid</option>
-                        <option value="partial">Partial</option>
-                        <option value="pending">Pending</option>
-                    </select>
+					<div class="flex items-center space-x-2">
+						<select id="statusFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+							<option value="all">All Status</option>
+							<option value="paid">Paid</option>
+							<option value="partial">Partial</option>
+							<option value="pending">Pending</option>
+						</select>
+					</div>
+				</div>
 
-                    
-                </div>
-            </div>
+				<!-- Tabs -->
+				<div class="flex space-x-2 w-full mb-6">
+					<button onclick="showTab('purchase-orders')" id="purchase-orders-tab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Orders</button>
+					<button onclick="showTab('suppliers')" id="suppliers-tab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Suppliers</button>
+				</div>
 
-            <!-- Tabs -->
-            <div class="flex space-x-2 w-full mb-6">
-                <button onclick="showTab('purchase-orders')" id="purchase-orders-tab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Orders</button>
-                <button onclick="showTab('suppliers')" id="suppliers-tab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Suppliers</button>
-            </div>
-
-            <!-- Purchase Orders Table -->
-            <div id="purchase-orders-table" class="overflow-y-auto" style="max-height: 60vh;">
-                <table class="w-full border-collapse text-left text-sm text-white">
-                    <thead class="bg-slate-800 text-slate-300 sticky top-0">
-                        <tr>
-                            <th class="px-4 py-3 font-medium">Order #</th>
-                            <th class="px-4 py-3 font-medium">Supplier</th>
-                            <th class="px-4 py-3 font-medium">Order Date</th>
-                            <th class="px-4 py-3 font-medium">Expected Delivery</th>
-                            <th class="px-4 py-3 font-medium">Total Amount</th>
-                            <th class="px-4 py-3 font-medium">Payment Status</th>
-                            <th class="px-4 py-3 font-medium">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-600">
-                        @forelse($purchaseOrders ?? [] as $order)
-                        <tr class="hover:bg-slate-600 transition cursor-pointer">
-                            <td class="px-4 py-3 font-mono text-slate-300">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
-                            <td class="px-4 py-3 text-slate-300 font-medium">{{ $order->supplier->name }}</td>
-                            <td class="px-4 py-3 text-slate-300">{{ $order->order_date->format('M d, Y') }}</td>
-                            <td class="px-4 py-3 text-slate-300">{{ $order->expected_delivery->format('M d, Y') }}</td>
-                            <td class="px-4 py-3 font-bold text-slate-300">₱{{ number_format($order->total_amount, 2) }}</td>
-                            <td class="px-4 py-3">
-                                @if($order->payment_status === 'Paid')
-                                    <span class="text-xs font-semibold text-green-400">{{ $order->payment_status }}</span>
-                                @elseif($order->payment_status === 'Partial')
-                                    <span class="text-xs font-semibold text-yellow-400">{{ $order->payment_status }}</span>
-                                @else
-                                    <span class="text-xs font-semibold text-slate-400">{{ $order->payment_status }}</span>
-                                @endif
-                            </td>
-                            <td class="py-3 px-4">
-                                <div class="flex space-x-2">
-                                    <button onclick="event.stopPropagation(); openViewOrderModal({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded" title="View Items">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="event.stopPropagation(); editOrder({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="event.stopPropagation(); deleteOrder({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8" class="py-8 px-4 text-center text-slate-400">No purchase orders found</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+				<!-- Purchase Orders Table -->
+				<div id="purchase-orders-table" class="overflow-x-auto rounded-xl border border-slate-600" style="max-height: 60vh;">
+					<table class="w-full text-left border-collapse">
+						<thead class="bg-slate-700/50 text-slate-300 border-b border-slate-600 sticky top-0 z-10">
+							<tr>
+								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Order #</th>
+								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Supplier</th>
+								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Order Date</th>
+								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Expected Delivery</th>
+								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Total Amount</th>
+								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Payment Status</th>
+								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Action</th>
+							</tr>
+						</thead>
+						<tbody id="procurementTbody" class="divide-y divide-slate-600">
+							@forelse($purchaseOrders ?? [] as $order)
+							<tr class="border-b border-slate-600 hover:bg-slate-700/50 transition-colors duration-200 cursor-pointer data-row">
+								<td class="px-4 py-3 font-mono text-slate-300">{{ $order->order_number ?? 'PO-' . str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
+								<td class="px-4 py-3 text-slate-300 font-medium">{{ $order->supplier->name }}</td>
+								<td class="px-4 py-3 text-slate-300">{{ $order->order_date->format('M d, Y') }}</td>
+								<td class="px-4 py-3 text-slate-300">{{ $order->expected_delivery->format('M d, Y') }}</td>
+								<td class="px-4 py-3 font-bold text-slate-300">₱{{ number_format($order->total_amount, 2) }}</td>
+								<td class="px-4 py-3">
+									@if($order->payment_status === 'Paid')
+										<span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">{{ $order->payment_status }}</span>
+									@elseif($order->payment_status === 'Partial')
+										<span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">{{ $order->payment_status }}</span>
+									@else
+										<span class="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30">{{ $order->payment_status }}</span>
+									@endif
+								</td>
+								<td class="py-3 px-4">
+									<div class="flex space-x-2">
+										<button onclick="event.stopPropagation(); openViewOrderModal({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded text-slate-400 hover:text-white transition-colors" title="View Items">
+											<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+												<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+												<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+											</svg>
+										</button>
+										<button onclick="event.stopPropagation(); editOrder({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded text-slate-400 hover:text-amber-400 transition-colors">
+											<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+												<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+											</svg>
+										</button>
+										<button onclick="event.stopPropagation(); deleteOrder({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded text-slate-400 hover:text-red-400 transition-colors">
+											<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+											</svg>
+										</button>
+									</div>
+								</td>
+							</tr>
+							@empty
+							<tr>
+								<td colspan="8" class="py-8 px-4 text-center text-slate-400">No purchase orders found</td>
+							</tr>
+							@endforelse
+						</tbody>
+					</table>
+				</div>
 
             <!-- Suppliers Table -->
-            <div id="suppliers-table" class="overflow-y-auto hidden" style="max-height: 60vh;">
-                <table class="w-full border-collapse text-left text-sm text-white">
-                    <thead class="bg-slate-800 text-slate-300 sticky top-0">
+            <div id="suppliers-table" class="overflow-y-auto custom-scrollbar hidden" style="max-height: 60vh;">
+                <table class="w-full border-separate border-spacing-y-2 text-left text-xs">
+                    <thead class="text-gray-700 bg-gray-100/80 sticky top-0 z-10">
                         <tr>
-                            <th class="px-4 py-3 font-medium">Name</th>
-                            <th class="px-4 py-3 font-medium">Contact Person</th>
-                            <th class="px-4 py-3 font-medium">Phone</th>
-                            <th class="px-4 py-3 font-medium">Email</th>
-                            <th class="px-4 py-3 font-medium">Payment Terms</th>
-                            <th class="px-4 py-3 font-medium">Action</th>
+                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-tl-xl text-left">Name</th>
+                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Contact Person</th>
+                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Phone</th>
+                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Email</th>
+                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Payment Terms</th>
+                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-tr-xl text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-600">
+                    <tbody class="text-gray-600">
                         @forelse($suppliers ?? [] as $supplier)
-                        <tr class="hover:bg-slate-600 transition cursor-pointer">
-                            <td class="px-4 py-3 font-medium text-slate-300">{{ $supplier->name }}</td>
-                            <td class="px-4 py-3 text-slate-300">{{ $supplier->contact_person }}</td>
-                            <td class="px-4 py-3 text-slate-300">{{ $supplier->phone }}</td>
-                            <td class="px-4 py-3 text-slate-300">{{ $supplier->email }}</td>
-                            <td class="px-4 py-3 text-slate-300">{{ $supplier->payment_terms }}</td>
-                            <td class="py-3 px-4">
-                                <div class="flex space-x-2">
-                                    <button onclick="event.stopPropagation(); editSupplier({{ $supplier->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                        <tr class="bg-white hover:bg-amber-50 transition-all duration-200 shadow-sm hover:shadow-md group">
+                            <td class="px-4 py-4 font-bold text-gray-900 border-l-4 border-amber-500 rounded-l-xl">{{ $supplier->name }}</td>
+                            <td class="px-4 py-4 text-gray-700">{{ $supplier->contact_person }}</td>
+                            <td class="px-4 py-4 text-gray-700">{{ $supplier->phone }}</td>
+                            <td class="px-4 py-4 text-gray-700">{{ $supplier->email }}</td>
+                            <td class="px-4 py-4 text-gray-700">{{ $supplier->payment_terms }}</td>
+                            <td class="px-4 py-4 text-center rounded-r-xl">
+                                <div class="flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="event.stopPropagation(); editSupplier({{ $supplier->id }})" class="p-1.5 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors" title="Edit Supplier">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                         </svg>
                                     </button>
-                                    <button onclick="event.stopPropagation(); deleteSupplier({{ $supplier->id }})" class="p-1 hover:bg-slate-500 rounded">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    <button onclick="event.stopPropagation(); deleteSupplier({{ $supplier->id }})" class="p-1.5 hover:bg-red-100 text-red-600 rounded-lg transition-colors" title="Delete Supplier">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                     </button>
                                 </div>
@@ -273,7 +300,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="py-8 px-4 text-center text-slate-400">No suppliers found</td>
+                            <td colspan="6" class="py-8 px-4 text-center text-slate-400">No suppliers found</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -715,53 +742,60 @@
     </div>
 
     <!-- View Order Items Modal -->
-    <div id="viewOrderItemsModal" class="fixed inset-0 bg-black/70 hidden overflow-y-auto" style="z-index: 99999;">
-        <div class="rounded-lg shadow-2xl max-w-4xl w-[95%] mx-auto my-8 p-8" style="background-color: #FFF1DA;">
+    <div id="viewOrderItemsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="if(event.target === this) closeViewOrderItemsModal()">
+        <div class="bg-amber-50 rounded-xl shadow-2xl max-w-4xl w-full mx-auto my-8 p-0 overflow-hidden border-2 border-slate-700 max-h-[90vh] overflow-y-auto">
             <!-- Header -->
-            <div class="flex items-center justify-between mb-8 border-b-2 pb-6" style="border-color: #374151;">
+            <div class="sticky top-0 bg-gradient-to-r from-slate-700 to-slate-800 p-4 text-white z-10 flex items-center justify-between">
                 <div>
-                    <h3 class="text-3xl font-bold" id="viewOrderHeaderNumber" style="color: #374151;">Order #-</h3>
-                    <p class="mt-1" id="viewOrderHeaderSupplier" style="color: #666;">-</p>
+                    <h3 class="text-xl font-bold flex items-center gap-2" id="viewOrderHeaderNumber">
+                        Order #-
+                    </h3>
+                    <p class="text-slate-300 text-xs mt-0.5" id="viewOrderHeaderSupplier">-</p>
                 </div>
-                <button class="text-2xl transition" style="color: #999;" onclick="closeViewOrderItemsModal()">✕</button>
+                <button class="text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 rounded-lg p-2 transition-all" onclick="closeViewOrderItemsModal()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
 
-            <!-- Order Information Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                    <p class="text-sm font-semibold" style="color: #374151;">Order Number</p>
-                    <p class="text-lg font-bold mt-2" id="viewOrderDetailNumber" style="color: #374151;">-</p>
+            <!-- Content -->
+            <div class="p-6">
+                <!-- Order Information Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="p-4 rounded-xl border-l-4 border-slate-700 env-card-bg shadow-sm">
+                        <p class="text-xs font-bold text-gray-500 uppercase">Order Number</p>
+                        <p class="text-lg font-bold mt-1 text-gray-900" id="viewOrderDetailNumber">-</p>
+                    </div>
+                    <div class="p-4 rounded-xl border-l-4 border-slate-700 env-card-bg shadow-sm">
+                        <p class="text-xs font-bold text-gray-500 uppercase">Supplier</p>
+                        <p class="text-lg font-bold mt-1 text-gray-900" id="viewOrderDetailSupplier">-</p>
+                    </div>
+                    <div class="p-4 rounded-xl border-l-4 border-slate-700 env-card-bg shadow-sm">
+                        <p class="text-xs font-bold text-gray-500 uppercase">Total Items</p>
+                        <p class="text-lg font-bold mt-1 text-gray-900" id="viewOrderTotalItems">0</p>
+                    </div>
+                    <div class="p-4 rounded-xl border-l-4 border-green-600 env-card-bg shadow-sm bg-green-50">
+                        <p class="text-xs font-bold text-gray-500 uppercase">Order Total</p>
+                        <p class="text-lg font-bold mt-1 text-green-700" id="viewOrderTotalAmount">₱0.00</p>
+                    </div>
                 </div>
-                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                    <p class="text-sm font-semibold" style="color: #374151;">Supplier</p>
-                    <p class="text-lg font-bold mt-2" id="viewOrderDetailSupplier" style="color: #374151;">-</p>
-                </div>
-                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                    <p class="text-sm font-semibold" style="color: #374151;">Total Items</p>
-                    <p class="text-lg font-bold mt-2" id="viewOrderTotalItems" style="color: #374151;">0</p>
-                </div>
-                <div class="p-4 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #388E3C;">
-                    <p class="text-sm font-semibold" style="color: #374151;">Order Total</p>
-                    <p class="text-lg font-bold mt-2" id="viewOrderTotalAmount" style="color: #388E3C;">₱0.00</p>
-                </div>
-            </div>
 
-            <!-- Items Section -->
-            <div class="mb-8">
-                <h4 class="text-xl font-bold mb-4 flex items-center" style="color: #374151;">
-                    <span class="w-1 h-6 rounded mr-3" style="background-color: #374151;"></span>
-                    Materials & Items Ordered
-                </h4>
-                <div id="viewOrderItemsContainer" class="space-y-3">
-                    <div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #999;">
-                        Loading items...
+                <!-- Items Section -->
+                <div class="mb-2">
+                    <h4 class="text-lg font-bold mb-4 flex items-center text-gray-800">
+                        <span class="w-1.5 h-6 bg-amber-500 rounded mr-2"></span>
+                        Materials & Items Ordered
+                    </h4>
+                    <div id="viewOrderItemsContainer" class="space-y-3">
+                        <div class="p-8 rounded-xl border-2 border-dashed border-slate-300 text-center text-gray-500">
+                            Loading items...
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Close Button -->
-            <div class="flex justify-end">
-                <button class="px-6 py-3 rounded-lg font-semibold transition text-white" style="background-color: #374151;" onclick="closeViewOrderItemsModal()">Close</button>
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button class="px-6 py-2 rounded-xl font-bold transition text-white bg-slate-700 hover:bg-slate-800 shadow-lg" onclick="closeViewOrderItemsModal()">Close Details</button>
             </div>
         </div>
     </div>
@@ -973,29 +1007,28 @@
     </div>
 
     <!-- Improved Received Stock Reports Modal -->
-    <div id="receivedStockReportsModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 backdrop-blur-sm transition-opacity duration-300">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="rounded-2xl w-full lg:w-[60%] max-h-[95vh] shadow-2xl transform transition-all duration-300 scale-95 opacity-0 modal-content overflow-hidden border border-slate-600" style="background-color: #FFF1DA;">
-                
-                <!-- Modal Header -->
-                <div class="flex justify-between items-center p-5 border-b-2" style="border-color: #374151;">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-amber-500/10 p-2 rounded-lg">
-                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold" style="color: #374151;">Procurement Reports</h3>
-                            <p class="text-gray-600 text-xs mt-0.5">Track and manage incoming inventory</p>
-                        </div>
-                    </div>
-                    <button onclick="closeReceivedStockReportsModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-xl p-2 transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    <div id="receivedStockReportsModal" class="fixed inset-0 bg-black/60 hidden z-50 backdrop-blur-sm transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="bg-amber-50 rounded-xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl border-2 border-slate-700 flex flex-col modal-content">
+            
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-slate-700 to-slate-800 p-4 text-white flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                        <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                    </button>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold">Procurement Reports</h3>
+                        <p class="text-slate-300 text-xs mt-0.5">Track and manage incoming inventory</p>
+                    </div>
                 </div>
+                <button onclick="closeReceivedStockReportsModal()" class="text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 rounded-lg p-2 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
 
                 <div class="px-5 pt-4 pb-2">
                     <!-- Search Bar -->
@@ -1273,13 +1306,13 @@
             document.getElementById('viewOrderItemsModal').classList.remove('hidden');
 
             const itemsContainer = document.getElementById('viewOrderItemsContainer');
-            itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #999;">Loading items...</div>';
+            itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center bg-white border-slate-300 text-slate-500">Loading items...</div>';
 
             fetch(`/procurement/purchase-orders/${orderId}/items?include_received=1`)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.success || !data.items || data.items.length === 0) {
-                        itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #999;">No items found for this order.</div>';
+                        itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center bg-white border-slate-300 text-slate-500">No items found for this order.</div>';
                         return;
                     }
 
@@ -1313,30 +1346,31 @@
                         const ordered = Number(item.ordered_quantity || 0);
                         
                         return `
-                            <div class="p-5 rounded-lg border-l-4 hover:shadow-md transition" style="background-color: rgba(255,255,255,0.85); border-left-color: #374151;">
+                        return `
+                            <div class="p-5 rounded-lg border-l-4 hover:shadow-md transition bg-white border-slate-700 shadow-sm">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
-                                        <h5 class="font-bold text-lg" style="color: #374151;">${item.material_name || 'Unknown Material'}</h5>
-                                        <p class="text-sm mt-1" style="color: #666;">Unit Price: <span class="font-semibold" style="color: #374151;">₱${Number(item.unit_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                                        <h5 class="font-bold text-lg text-gray-700">${item.material_name || 'Unknown Material'}</h5>
+                                        <p class="text-sm mt-1 text-gray-500">Unit Price: <span class="font-semibold text-gray-700">₱${Number(item.unit_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
                                     </div>
                                     <div class="text-right">
-                                        <div class="inline-block px-4 py-2 rounded-full font-bold text-lg" style="background-color: #F57C00; color: white;">
+                                        <div class="inline-block px-4 py-2 rounded-full font-bold text-lg bg-amber-500 text-white shadow-sm">
                                             ${Number(ordered).toFixed(2)} <span class="text-sm">units</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-3 pt-3 grid grid-cols-3 gap-4" style="border-top: 1px solid #E8D5BF;">
+                                <div class="mt-3 pt-3 grid grid-cols-3 gap-4 border-t border-slate-200">
                                     <div>
-                                        <p class="text-xs font-semibold" style="color: #666;">Received</p>
-                                        <p class="text-sm font-bold" style="color: #374151;">${Number(received).toFixed(2)}</p>
+                                        <p class="text-xs font-semibold text-gray-500">Received</p>
+                                        <p class="text-sm font-bold text-gray-700">${Number(received).toFixed(2)}</p>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-semibold" style="color: #666;">Remaining</p>
-                                        <p class="text-sm font-bold" style="color: #374151;">${Number(ordered - received).toFixed(2)}</p>
+                                        <p class="text-xs font-semibold text-gray-500">Remaining</p>
+                                        <p class="text-sm font-bold text-gray-700">${Number(ordered - received).toFixed(2)}</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-xs font-semibold" style="color: #666;">Line Total</p>
-                                        <p class="text-sm font-bold" style="color: #388E3C;">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                        <p class="text-xs font-semibold text-gray-500">Line Total</p>
+                                        <p class="text-sm font-bold text-green-700">₱${Number(lineTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                     </div>
                                 </div>
                             </div>
@@ -1348,7 +1382,7 @@
                     itemsContainer.innerHTML = itemsHTML;
                 })
                 .catch(() => {
-                    itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center" style="background-color: rgba(255,255,255,0.7); border-color: #374151; color: #e74c3c;">Failed to load items for this order.</div>';
+                    itemsContainer.innerHTML = '<div class="p-6 rounded-lg border text-center bg-white border-red-300 text-red-500">Failed to load items for this order.</div>';
                 });
         }
 
@@ -1438,6 +1472,55 @@
                 tbody.innerHTML = '<tr><td colspan="8" class="py-8 px-4 text-center text-red-400">Error loading data</td></tr>';
             }
         }
+
+    // Add row selection functionality
+    const procurementTbody = document.getElementById('procurementTbody');
+    if (procurementTbody) {
+        procurementTbody.addEventListener('click', function(e) {
+            const row = e.target.closest('tr.data-row');
+
+            // Ignore clicks on action buttons
+            if (e.target.closest('button') || e.target.closest('form')) {
+                return;
+            }
+
+            if (row) {
+                // Remove selection from all rows
+                const allRows = procurementTbody.querySelectorAll('tr.data-row');
+                allRows.forEach(r => {
+                    r.classList.remove('!bg-slate-500', 'border-l-4', 'border-amber-500', 'bg-slate-600');
+                    r.classList.add('hover:bg-slate-600'); 
+                });
+
+                // Add selection to clicked row using Tailwind classes
+                // We use !bg-slate-500 to override hover effects more strongly if needed, 
+                // but standard classes usually work if specificity is managed. 
+                // Based on sales.blade.php, they used !bg-gray-600. Let's use a distinct color for selection.
+                row.classList.remove('hover:bg-slate-600');
+                row.classList.add('!bg-slate-500', 'border-l-4', 'border-amber-500');
+            }
+        });
+    }
+
+    // Export Functions
+    function exportReceipt(event) {
+        event.preventDefault();
+        document.getElementById('exportDropdown').classList.add('hidden');
+
+        // Check if a row is selected
+        const selectedRow = document.querySelector('tr.data-row.border-amber-500');
+
+        if (selectedRow) {
+            // Get order number from the selected row (first column)
+            // The order number is in the first td
+            const orderNumber = selectedRow.querySelector('td:first-child').innerText.trim();
+            window.open(`/procurement/receipt/${orderNumber}`, '_blank');
+            return;
+        }
+
+        // If no row is selected, prompt user
+        alert('Please select an order by clicking on a row in the table to export as receipt.');
+    }
 
         // Apply Quick Filter
         function applyReportQuickFilter(type) {
@@ -1944,4 +2027,5 @@
             });
             </script>
 
+</div>
 @endsection
