@@ -87,7 +87,7 @@ $paymentBg = [
 		<span id="successNotificationText">Success!</span>
 	</div>
 	<!-- Header -->
-	<div class="bg-amber-50 p-5 relative z-50 border-b border-amber-200">
+	<div class="bg-amber-50 p-5 relative z-10 border-b border-amber-200">
 		<div class="flex justify-between items-center">
 			<div>
 				<h1 class="text-xl font-bold text-gray-800">Sales & Orders</h1>
