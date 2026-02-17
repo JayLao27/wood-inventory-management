@@ -15,12 +15,12 @@ class SalesOrderController extends Controller
     {
         // Use pagination instead of loading all
         $salesOrders = SalesOrder::with(['customer', 'items.product'])
-            ->where('status', '!=', 'Cancelled')
+            ->whereNotIn('status', ['Cancelled', 'Delivered'])
             ->latest()
             ->paginate(20);
 
         $archiveOrders = SalesOrder::with(['customer', 'items.product'])
-            ->where('status', 'Cancelled')
+            ->whereIn('status', ['Cancelled', 'Delivered'])
             ->latest()
             ->get();
 
@@ -38,7 +38,6 @@ class SalesOrderController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'delivery_date' => 'required|date|after_or_equal:today',
-            'due_date' => 'nullable|date|after_or_equal:today',
             'note' => 'nullable|string',
             'items' => 'nullable|array',
             'items.*.product_id' => 'required_with:items|exists:products,id',
@@ -58,7 +57,7 @@ class SalesOrderController extends Controller
                     'customer_id' => $validated['customer_id'],
                     'order_date' => now()->toDateString(),
                     'delivery_date' => $validated['delivery_date'],
-                    'due_date' => $validated['due_date'] ?? $validated['delivery_date'],
+                    'due_date' => $validated['delivery_date'],
                     'status' => 'Pending',
                     'total_amount' => 0,
                     'paid_amount' => 0,
@@ -192,18 +191,23 @@ class SalesOrderController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'delivery_date' => 'required|date|after_or_equal:today',
-            'due_date' => 'nullable|date|after_or_equal:today',
-            'status' => 'nullable|in:In production,Confirmed,Pending,Delivered,Ready,Cancelled',
+            'status' => 'nullable|in:In production,Pending,Delivered,Ready,Cancelled',
 
             'payment_status' => 'nullable|in:Pending,Partial,Paid',
             'note' => 'nullable|string',
         ]);
 
+        // Restrict manual status edit if already Ready or Delivered
+        $newStatus = $validated['status'] ?? $sales_order->status;
+        if (in_array($sales_order->status, ['Ready', 'Delivered'])) {
+            $newStatus = $sales_order->status;
+        }
+
         $sales_order->update([
             'customer_id' => $validated['customer_id'],
             'delivery_date' => $validated['delivery_date'],
-            'due_date' => $validated['due_date'] ?? $sales_order->due_date ?? $validated['delivery_date'],
-            'status' => $validated['status'] ?? $sales_order->status,
+            'due_date' => $validated['delivery_date'],
+            'status' => $newStatus,
             'payment_status' => $validated['payment_status'] ?? $sales_order->payment_status,
             'note' => $validated['note'] ?? null,
         ]);
@@ -262,6 +266,23 @@ public function RemoveCustomer($id)
     {
         $sales_order->update(['status' => 'Cancelled']);
         return redirect()->back()->with('success', 'Order has been moved to Archive.');
+    }
+
+    public function deliver(SalesOrder $sales_order)
+    {
+        if ($sales_order->status !== 'Ready') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only orders in "Ready" status can be delivered.'
+            ], 400);
+        }
+
+        $sales_order->update(['status' => 'Delivered']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order #' . $sales_order->order_number . ' has been marked as Delivered.'
+        ]);
     }
 
 
