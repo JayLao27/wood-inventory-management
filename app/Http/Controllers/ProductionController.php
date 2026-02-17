@@ -72,7 +72,7 @@ class ProductionController extends Controller
                 'sales_order_id' => 'required|exists:sales_orders,id',
                 'product_id' => 'required|exists:products,id',
                 'quantity' => 'required|integer|min:1',
-                'due_date' => 'required|date|after_or_equal:today',
+                'due_date' => 'required|date',
                 'assigned_to' => 'required|string|max:255',
                 'priority' => 'nullable|in:low,medium,high',
             ]);
