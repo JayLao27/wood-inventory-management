@@ -66,6 +66,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/procurement/purchase-orders/{purchaseOrder}/items', [ProcurementController::class, 'getPurchaseOrderItems'])
         ->name('procurement.purchase-order.items')
         ->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::post('/procurement/item/{item}/cancel', [App\Http\Controllers\SalesOrderController::class, 'cancelPurchaseItem'])
+        ->name('procurement.item.cancel')
+        ->middleware('role:admin,procurement_officer');
+
     Route::post('/procurement/purchase-orders/{purchaseOrder}/receive-stock', [ProcurementController::class, 'receiveStock'])
         ->name('procurement.purchase-order.receive-stock')
         ->middleware('role:admin,procurement_officer,inventory_clerk');
@@ -108,6 +112,10 @@ Route::middleware('auth')->group(function () {
     // Sales
     Route::resource('sales-orders', SalesOrderController::class)
         ->middleware('role:admin,sales_clerk');
+    Route::post('/sales-orders/item/{item}/cancel', [App\Http\Controllers\SalesOrderController::class, 'cancelItem'])
+        ->name('sales-orders.item.cancel')
+        ->middleware('role:admin,sales_clerk');
+
     Route::get('/sales', [SalesOrderController::class, 'index'])
         ->name('sales')
         ->middleware('role:admin,sales_clerk');

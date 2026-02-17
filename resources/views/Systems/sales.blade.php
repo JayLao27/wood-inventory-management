@@ -229,7 +229,9 @@ $paymentBg = [
 			<div class="flex space-x-2 w-full mb-6">
 				<button id="salesTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Orders</button>
 				<button id="customersTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Customers</button>
+				<button id="archiveTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Archive</button>
 			</div>
+
 
 			<!-- Sales Orders Table -->
 			<div id="salesTable" class="overflow-y-auto overflow-x-visible" style="max-height: 60vh;">
@@ -294,16 +296,17 @@ $paymentBg = [
 							<td class="px-3 py-3">
 								@php
 								$productsSummary = [];
-								foreach($customer->salesOrders as $order) {
+								foreach($customer->salesOrders->where('status', '!=', 'Cancelled') as $order) {
 									foreach($order->items as $item) {
 										$productName = $item->product->product_name ?? 'Unknown Product';
 										if (!isset($productsSummary[$productName])) {
 											$productsSummary[$productName] = 0;
 										}
-										$productsSummary[$productName] += $item->quantity;
+										$productsSummary[$productName] += ($item->quantity - $item->cancelled_quantity);
 									}
 								}
 								@endphp
+
 								<div class="flex space-x-2">
 									@php
 									$customerData = [
@@ -347,7 +350,39 @@ $paymentBg = [
 					</tbody>
 				</table>
 			</div>
+			<!-- Archive Table -->
+			<div id="archiveTable" class="hidden overflow-y-auto overflow-x-visible" style="max-height: 60vh;">
+				<table class="w-full border-collapse text-left text-xs text-white">
+					<thead class="bg-slate-800 text-slate-300 sticky top-0">
+						<tr>
+							<th class="px-3 py-3 font-medium">Order #</th>
+							<th class="px-3 py-3 font-medium">Customer</th>
+							<th class="px-3 py-3 font-medium">Order Date</th>
+							<th class="px-3 py-3 font-medium">Delivery Date</th>
+							<th class="px-3 py-3 font-medium">Total Amount</th>
+							<th class="px-3 py-3 font-medium">Payment Status</th>
+							<th class="px-3 py-3 font-medium">Action</th>
+						</tr>
+					</thead>
+					<tbody id="archiveTbody" class="divide-y divide-slate-600">
+						@forelse($archiveOrders as $order)
+						@include('partials.sales-order-row', ['order' => $order])
+						@empty
+						<tr>
+							<td colspan="7" class="text-center py-4">No archived orders.</td>
+						</tr>
+						@endforelse
+
+
+						<tr id="archiveNoMatch" class="hidden">
+							<td colspan="7" class="text-center py-4">No matches found</td>
+						</tr>
+					</tbody>
+
+				</table>
+			</div>
 		</section>
+
 
 		<!-- View Customer Modal -->
 		<div id="viewCustomerModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden" style="z-index: 99999;">
@@ -1090,8 +1125,11 @@ $paymentBg = [
 	(function() {
 		const salesTab = document.getElementById('salesTab');
 		const customersTab = document.getElementById('customersTab');
+		const archiveTab = document.getElementById('archiveTab');
 		const salesTable = document.getElementById('salesTable');
 		const customerTable = document.getElementById('customerTable');
+		const archiveTable = document.getElementById('archiveTable');
+
 		const headerBtn = document.getElementById('headerBtn');
 		const searchInput = document.getElementById('searchInput');
 		const statusFilter = document.getElementById('statusFilter');
@@ -1108,34 +1146,47 @@ $paymentBg = [
 		const newItemLineTotal = document.getElementById('newItemLineTotal');
 
 		function setMode(mode) {
+			salesTable.classList.add('hidden');
+			customerTable.classList.add('hidden');
+			archiveTable.classList.add('hidden');
+			
+			const allTabs = [salesTab, customersTab, archiveTab];
+			allTabs.forEach(t => {
+				t.style.backgroundColor = '#475569';
+				t.style.color = '#FFFFFF';
+				t.style.borderColor = '#64748b';
+			});
+
 			if (mode === 'sales') {
 				salesTable.classList.remove('hidden');
-				customerTable.classList.add('hidden');
 				headerBtn.textContent = '+ New Order';
 				headerBtn.setAttribute('onclick', 'openModal("newOrderModal")');
 				salesTab.style.backgroundColor = '#FFF1DA';
 				salesTab.style.color = '#111827';
 				salesTab.style.borderColor = 'transparent';
-				customersTab.style.backgroundColor = '#475569';
-				customersTab.style.color = '#FFFFFF';
-				customersTab.style.borderColor = '#64748b';
-			} else {
-				salesTable.classList.add('hidden');
+			} else if (mode === 'customers') {
 				customerTable.classList.remove('hidden');
 				headerBtn.textContent = '+ New Customer';
 				headerBtn.setAttribute('onclick', 'openModal("newCustomerModal")');
 				customersTab.style.backgroundColor = '#FFF1DA';
 				customersTab.style.color = '#111827';
 				customersTab.style.borderColor = 'transparent';
-				salesTab.style.backgroundColor = '#475569';
-				salesTab.style.color = '#FFFFFF';
-				salesTab.style.borderColor = '#64748b';
+			} else if (mode === 'archive') {
+				archiveTable.classList.remove('hidden');
+				headerBtn.textContent = 'Archive View';
+				headerBtn.setAttribute('onclick', '');
+				archiveTab.style.backgroundColor = '#FFF1DA';
+				archiveTab.style.color = '#111827';
+				archiveTab.style.borderColor = 'transparent';
 			}
 			applyFilters();
 		}
 
+
 		salesTab.addEventListener('click', () => setMode('sales'));
 		customersTab.addEventListener('click', () => setMode('customers'));
+		archiveTab.addEventListener('click', () => setMode('archive'));
+
 
 		function stringIncludes(haystack, needle) {
 			return haystack.toLowerCase().includes(needle.toLowerCase());
@@ -1146,10 +1197,15 @@ $paymentBg = [
 			const sVal = statusFilter ? statusFilter.value : '';
 			const pVal = paymentFilter.value;
 			const inSales = !salesTable.classList.contains('hidden');
+			const inArchive = !archiveTable.classList.contains('hidden');
+			const inCustomers = !customerTable.classList.contains('hidden');
 
-			if (inSales) {
+			if (inSales || inArchive) {
 				let any = false;
-				const rows = salesTbody.querySelectorAll('tr.data-row');
+				const tbody = inSales ? salesTbody : document.getElementById('archiveTbody');
+				const noMatch = inSales ? salesNoMatch : document.getElementById('archiveNoMatch');
+				
+				const rows = tbody.querySelectorAll('tr.data-row');
 				rows.forEach(tr => {
 					let show = true;
 					if (q) {
@@ -1165,8 +1221,8 @@ $paymentBg = [
 					tr.classList.toggle('hidden', !show);
 					any = any || show;
 				});
-				salesNoMatch.classList.toggle('hidden', any);
-			} else {
+				noMatch.classList.toggle('hidden', any);
+			} else if (inCustomers) {
 				let any = false;
 				const rows = customersTbody.querySelectorAll('tr.data-row');
 				rows.forEach(tr => {
@@ -1181,9 +1237,10 @@ $paymentBg = [
 					tr.classList.toggle('hidden', !show);
 					any = any || show;
 				});
-				customersNoMatch.classList.toggle('hidden', any);
+				if (customersNoMatch) customersNoMatch.classList.toggle('hidden', any);
 			}
 		}
+
 
 		searchInput.addEventListener('input', applyFilters);
 		if (statusFilter) statusFilter.addEventListener('change', applyFilters);
@@ -1654,6 +1711,10 @@ document.addEventListener('DOMContentLoaded', function() {
     @foreach($salesOrders as $order)
         @include('partials.sales-order-modals', ['order' => $order])
     @endforeach
+    @foreach($archiveOrders as $order)
+        @include('partials.sales-order-modals', ['order' => $order])
+    @endforeach
+
     @endpush
 </div>
 @endsection

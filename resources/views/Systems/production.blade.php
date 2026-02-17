@@ -441,7 +441,7 @@
         </div>
 
             <!-- View Work Order Modal -->
-            <div id="viewWorkOrderModal" class="modal-overlay fi    xed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeViewWorkOrderModal()">
+            <div id="viewWorkOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeViewWorkOrderModal()">
                 <div class="modal-content bg-amber-50 rounded-xl max-w-[700px] w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
                     <div class="p-3.5">
                         <!-- Header -->
@@ -971,13 +971,16 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(response => {
+                .then(async response => {
                     const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                    const isJson = contentType && contentType.includes('application/json');
+                    const data = isJson ? await response.json() : null;
+
+                    if (!response.ok) {
+                        const errorMessage = (data && data.message) ? data.message : `HTTP error! status: ${response.status}`;
+                        throw new Error(errorMessage);
                     }
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return response.json();
+                    return data;
                 })
                 .then(data => {
                     closeCompleteConfirmModal();
@@ -1021,11 +1024,16 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(response => {
+                .then(async response => {
+                    const contentType = response.headers.get('content-type');
+                    const isJson = contentType && contentType.includes('application/json');
+                    const data = isJson ? await response.json() : null;
+
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        const errorMessage = (data && data.message) ? data.message : `HTTP error! status: ${response.status}`;
+                        throw new Error(errorMessage);
                     }
-                    return response.json();
+                    return data;
                 })
                 .then(data => {
                     closeCancelConfirmModal();
@@ -1257,13 +1265,16 @@
                         },
                         body: formData
                     })
-                    .then(response => {
+                    .then(async response => {
                         const contentType = response.headers.get('content-type');
-                        if (!contentType || !contentType.includes('application/json')) {
-                            throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                        const isJson = contentType && contentType.includes('application/json');
+                        const data = isJson ? await response.json() : null;
+
+                        if (!response.ok) {
+                            const errorMessage = (data && data.message) ? data.message : `HTTP error! status: ${response.status}`;
+                            throw new Error(errorMessage);
                         }
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        return response.json();
+                        return data;
                     })
                     .then(data => {
                         if (data.success) {
