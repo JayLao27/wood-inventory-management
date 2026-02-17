@@ -270,10 +270,10 @@ public function RemoveCustomer($id)
 
     public function deliver(SalesOrder $sales_order)
     {
-        if ($sales_order->status !== 'Ready') {
+        if ($sales_order->status !== 'Ready' || $sales_order->payment_status !== 'Paid') {
             return response()->json([
                 'success' => false,
-                'message' => 'Only orders in "Ready" status can be delivered.'
+                'message' => 'Only fully paid orders in "Ready" status can be delivered.'
             ], 400);
         }
 
