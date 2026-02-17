@@ -3,9 +3,23 @@
 
 @section('main-content')
     <!-- Main Content -->
+    <style>
+        /* New Dimmer Hover Effect */
+        .data-row {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .data-row:hover {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+            /* Dims the row */
+            filter: brightness(1.1);
+            /* Slightly pops the text */
+        }
+    </style>
     <div class="flex-1 flex flex-col overflow-hidden">
 	<!-- Header Section -->
-	<div class="p-5 bg-amber-50 border-b border-amber-200 relative z-10">
+	<div class="p-5 bg-amber-50 border-b border-amber-200 relative z-30">
 		<div class="flex justify-between items-center">
 			<div>
 				<h1 class="text-xl font-bold text-gray-800">Procurement Management</h1>
@@ -235,20 +249,20 @@
 								<td class="py-3 px-4">
 									<div class="flex space-x-2">
 										<button onclick="event.stopPropagation(); openViewOrderModal({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded text-slate-400 hover:text-white transition-colors" title="View Items">
-											<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-												<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-												<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-											</svg>
+											<svg class="w-4 h-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke-width="3" stroke="currentColor" fill="none">
+                                                <path d="M53.79,33.1a.51.51,0,0,0,0-.4C52.83,30.89,45.29,17.17,32,16.84S11,30.61,9.92,32.65a.48.48,0,0,0,0,.48C11.1,35.06,19.35,48.05,29.68,49,41.07,50,50.31,42,53.79,33.1Z"/>
+                                                <circle cx="31.7" cy="32.76" r="6.91"/>
+                                            </svg>
 										</button>
 										<button onclick="event.stopPropagation(); editOrder({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded text-slate-400 hover:text-amber-400 transition-colors">
-											<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-												<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-											</svg>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
 										</button>
 										<button onclick="event.stopPropagation(); deleteOrder({{ $order->id }})" class="p-1 hover:bg-slate-500 rounded text-slate-400 hover:text-red-400 transition-colors">
-											<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-											</svg>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
 										</button>
 									</div>
 								</td>
@@ -263,34 +277,34 @@
 				</div>
 
             <!-- Suppliers Table -->
-            <div id="suppliers-table" class="overflow-y-auto custom-scrollbar hidden" style="max-height: 60vh;">
-                <table class="w-full border-separate border-spacing-y-2 text-left text-xs">
-                    <thead class="text-gray-700 bg-gray-100/80 sticky top-0 z-10">
+            <div id="suppliers-table" class="overflow-y-auto hidden" style="max-height: 60vh;">
+                <table class="w-full border-collapse text-left text-xs text-white">
+                    <thead class="bg-slate-800 text-slate-300 sticky top-0 z-10">
                         <tr>
-                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-tl-xl text-left">Name</th>
-                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Contact Person</th>
-                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Phone</th>
-                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Email</th>
-                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-left">Payment Terms</th>
-                            <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-tr-xl text-center">Action</th>
+                            <th class="px-3 py-3 font-medium rounded-tl-xl">Name</th>
+                            <th class="px-3 py-3 font-medium">Contact Person</th>
+                            <th class="px-3 py-3 font-medium">Phone</th>
+                            <th class="px-3 py-3 font-medium">Email</th>
+                            <th class="px-3 py-3 font-medium">Payment Terms</th>
+                            <th class="px-3 py-3 font-medium text-center rounded-tr-xl">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="text-gray-600">
+                    <tbody class="divide-y divide-slate-600">
                         @forelse($suppliers ?? [] as $supplier)
-                        <tr class="bg-white hover:bg-amber-50 transition-all duration-200 shadow-sm hover:shadow-md group">
-                            <td class="px-4 py-4 font-bold text-gray-900 border-l-4 border-amber-500 rounded-l-xl">{{ $supplier->name }}</td>
-                            <td class="px-4 py-4 text-gray-700">{{ $supplier->contact_person }}</td>
-                            <td class="px-4 py-4 text-gray-700">{{ $supplier->phone }}</td>
-                            <td class="px-4 py-4 text-gray-700">{{ $supplier->email }}</td>
-                            <td class="px-4 py-4 text-gray-700">{{ $supplier->payment_terms }}</td>
-                            <td class="px-4 py-4 text-center rounded-r-xl">
-                                <div class="flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onclick="event.stopPropagation(); editSupplier({{ $supplier->id }})" class="p-1.5 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors" title="Edit Supplier">
+                        <tr class="hover:bg-slate-600 transition cursor-pointer data-row">
+                            <td class="px-3 py-3 font-medium text-slate-300 border-l-4 border-amber-500">{{ $supplier->name }}</td>
+                            <td class="px-3 py-3 text-slate-300">{{ $supplier->contact_person }}</td>
+                            <td class="px-3 py-3 text-slate-300">{{ $supplier->phone }}</td>
+                            <td class="px-3 py-3 text-slate-300">{{ $supplier->email }}</td>
+                            <td class="px-3 py-3 text-slate-300">{{ $supplier->payment_terms }}</td>
+                            <td class="px-3 py-3 text-center">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <button onclick="event.stopPropagation(); editSupplier({{ $supplier->id }})" class="p-1.5 hover:bg-slate-500 rounded text-slate-400 hover:text-amber-400 transition-colors" title="Edit Supplier">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                         </svg>
                                     </button>
-                                    <button onclick="event.stopPropagation(); deleteSupplier({{ $supplier->id }})" class="p-1.5 hover:bg-red-100 text-red-600 rounded-lg transition-colors" title="Delete Supplier">
+                                    <button onclick="event.stopPropagation(); deleteSupplier({{ $supplier->id }})" class="p-1.5 hover:bg-slate-500 rounded text-slate-400 hover:text-red-400 transition-colors" title="Delete Supplier">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -1346,7 +1360,6 @@
                         const ordered = Number(item.ordered_quantity || 0);
                         
                         return `
-                        return `
                             <div class="p-5 rounded-lg border-l-4 hover:shadow-md transition bg-white border-slate-700 shadow-sm">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
@@ -1932,6 +1945,10 @@
 
             // payment filter removed; no-op
         });
+
+
+
+
 
         // Purchase Order Confirmation Modal Functions
         function confirmPurchaseOrder(event) {
