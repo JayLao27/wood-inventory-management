@@ -353,6 +353,17 @@ class ProductionController extends Controller
                 'completion_quantity' => 0,
             ]);
 
+            // Revert Sales Order status to Pending if no other active work orders exist
+            if ($workOrder->salesOrder) {
+                $hasActiveWorkOrders = $workOrder->salesOrder->workOrders()
+                    ->where('status', '!=', 'cancelled')
+                    ->exists();
+                
+                if (!$hasActiveWorkOrders) {
+                    $workOrder->salesOrder->update(['status' => 'Pending']);
+                }
+            }
+
             // Release reserved materials back to inventory
             if ($workOrder->product && $workOrder->product->materials) {
                 foreach ($workOrder->product->materials as $material) {

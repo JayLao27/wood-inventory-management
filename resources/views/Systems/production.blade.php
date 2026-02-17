@@ -998,9 +998,11 @@
                 });
             }
 
-            function openCancelConfirmModal() {
-                const orderNumber = document.getElementById('vw_orderNumber').textContent;
-                document.getElementById('cancelConfirmOrderNumber').textContent = orderNumber;
+            function openCancelConfirmModal(id, orderNumber) {
+                if (id) currentWorkOrderId = id;
+                const displayNum = orderNumber || document.getElementById('vw_orderNumber').textContent;
+                document.getElementById('cancelConfirmOrderNumber').textContent = displayNum;
+                
                 const modal = document.getElementById('cancelConfirmModal');
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
