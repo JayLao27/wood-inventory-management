@@ -255,6 +255,7 @@ $paymentBg = [
 							<th class="px-3 py-3 font-medium">Order #</th>
 							<th class="px-3 py-3 font-medium">Customer</th>
 							<th class="px-3 py-3 font-medium">Order Date</th>
+							<th class="px-3 py-3 font-medium">Due Date</th>
 							<th class="px-3 py-3 font-medium">Delivery Date</th>
 							<th class="px-3 py-3 font-medium">Total Amount</th>
 							<th class="px-3 py-3 font-medium">Payment Status</th>
@@ -553,23 +554,45 @@ $paymentBg = [
 									@enderror
 								</div>
 
-								<!-- Delivery Date -->
-								<div>
-									<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-1.5">
-										<svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-										</svg>
-										Delivery Date <span class="text-red-500">*</span>
-									</label>
-									<input type="date" name="delivery_date" min="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('delivery_date') border-red-500 @enderror" value="{{ old('delivery_date') }}" required>
-									@error('delivery_date')
-									<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
-										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-											<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-										</svg>
-										{{ $message }}
-									</p>
-									@enderror
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+									<!-- Delivery Date -->
+									<div>
+										<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+											<svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+											</svg>
+											Delivery Date <span class="text-red-500">*</span>
+										</label>
+										<input type="date" name="delivery_date" id="newOrderDeliveryDate" min="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('delivery_date') border-red-500 @enderror" value="{{ old('delivery_date') }}" required>
+										@error('delivery_date')
+										<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
+											<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+											</svg>
+											{{ $message }}
+										</p>
+										@enderror
+									</div>
+
+									<!-- Due Date -->
+									<div>
+										<label class="block text-base font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+											<svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+											</svg>
+											Due Date
+										</label>
+										<input type="date" name="due_date" id="newOrderDueDate" min="{{ date('Y-m-d') }}" class="w-full border-2 border-gray-300 rounded-xl px-3 py-3 text-base font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white shadow-sm @error('due_date') border-red-500 @enderror" value="{{ old('due_date') }}">
+										<p class="text-gray-400 text-[10px] mt-1">Optional. Defaults to delivery date if empty.</p>
+										@error('due_date')
+										<p class="text-red-500 text-xs mt-2 flex items-center gap-1">
+											<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-11a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+											</svg>
+											{{ $message }}
+										</p>
+										@enderror
+									</div>
 								</div>
 
 								<!-- Product Selection Section -->
@@ -1384,6 +1407,45 @@ $paymentBg = [
 		@endif
 	@endif
 
+	// Auto-sync Due Date with Delivery Date
+	document.addEventListener('DOMContentLoaded', function() {
+		// For New Order Modal
+		const newDeliveryDate = document.getElementById('newOrderDeliveryDate');
+		const newDueDate = document.getElementById('newOrderDueDate');
+		if (newDeliveryDate && newDueDate) {
+			newDeliveryDate.addEventListener('change', function() {
+				if (!newDueDate.value || newDueDate.dataset.autoSynced === 'true' || newDueDate.value === this.dataset.lastAutoValue) {
+					newDueDate.value = this.value;
+					newDueDate.dataset.autoSynced = 'true';
+					this.dataset.lastAutoValue = this.value;
+				}
+			});
+			newDueDate.addEventListener('input', function() {
+				this.dataset.autoSynced = 'false';
+			});
+		}
+
+		// For Edit Order Modals (Delegated)
+		document.addEventListener('change', function(e) {
+			if (e.target.classList.contains('editDeliveryDate')) {
+				const container = e.target.closest('form') || e.target.closest('div.grid');
+				const dueInput = container.querySelector('.editDueDate');
+				if (dueInput) {
+					if (!dueInput.value || dueInput.dataset.autoSynced === 'true' || dueInput.value === e.target.dataset.lastAutoValue) {
+						dueInput.value = e.target.value;
+						dueInput.dataset.autoSynced = 'true';
+						e.target.dataset.lastAutoValue = e.target.value;
+					}
+				}
+			}
+		});
+		document.addEventListener('input', function(e) {
+			if (e.target.classList.contains('editDueDate')) {
+				e.target.dataset.autoSynced = 'false';
+			}
+		});
+	});
+
 	// Show success notification if exists
 	@if (session('success'))
 		document.addEventListener('DOMContentLoaded', function() {
@@ -1708,6 +1770,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							<th class="px-3 py-3 font-medium rounded-tl-lg">Order #</th>
 							<th class="px-3 py-3 font-medium">Customer</th>
 							<th class="px-3 py-3 font-medium">Order Date</th>
+							<th class="px-3 py-3 font-medium">Due Date</th>
 							<th class="px-3 py-3 font-medium">Delivery Date</th>
 							<th class="px-3 py-3 font-medium">Status</th>
 							<th class="px-3 py-3 font-medium">Total Amount</th>
