@@ -283,21 +283,19 @@ $paymentBg = [
 				<table class="w-full border-collapse text-left text-xs text-white">
 					<thead class="bg-slate-800 text-slate-300 sticky top-0">
 						<tr>
-							<th class="px-3 py-3 font-medium">Name</th>
+							<th class="px-3 py-3 font-medium rounded-tl-xl">Name</th>
 							<th class="px-3 py-3 font-medium">Type</th>
 							<th class="px-3 py-3 font-medium">Contact</th>
 							<th class="px-3 py-3 font-medium">Email</th>
 							<th class="px-3 py-3 font-medium">Total Orders</th>
 							<th class="px-3 py-3 font-medium">Total Spent</th>
-							<th class="px-3 py-3 font-medium">Action</th>
+							<th class="px-3 py-3 font-medium text-center rounded-tr-xl">Action</th>
 						</tr>
 					</thead>
 					<tbody id="customersTbody" class="divide-y divide-slate-600">
 						@forelse($customers as $customer)
 						<tr class="hover:bg-slate-600 transition cursor-pointer data-row">
-							<td class="px-3 py-3">
-								<div class="font-medium text-slate-300">{{ $customer->name }}</div>
-							</td>
+							<td class="px-3 py-3 font-medium text-slate-300 border-l-4 border-amber-500">{{ $customer->name }}</td>
 							<td class="px-3 py-3">
 								@php $ctBg = $customerTypeBg[$customer->customer_type] ?? '#e5e7eb'; @endphp
 								<span class="inline-block text-xs font-semibold text-white px-2 py-0.5 rounded" style="background: {{ $ctBg }};">{{ $customer->customer_type }}</span>
@@ -306,7 +304,7 @@ $paymentBg = [
 							<td class="px-3 py-3 text-slate-300">{{ $customer->email }}</td>
 							<td class="px-3 py-3 text-slate-300">{{ $customer->totalOrders() }}</td>
 							<td class="px-3 py-3 font-bold text-slate-300">₱{{ number_format($customer->totalSpent(), 2) }}</td>
-							<td class="px-3 py-3">
+							<td class="px-3 py-3 text-center">
 								@php
 								$productsSummary = [];
 								foreach($customer->salesOrders->where('status', '!=', 'Cancelled') as $order) {
@@ -320,7 +318,7 @@ $paymentBg = [
 								}
 								@endphp
 
-								<div class="flex space-x-2">
+								<div class="flex items-center justify-center space-x-2">
 									@php
 									$customerData = [
 										'id' => $customer->id,
@@ -333,21 +331,21 @@ $paymentBg = [
 										'productsSummary' => $productsSummary,
 									];
 									@endphp
-									<button class="p-1 hover:bg-slate-500 rounded" title="View" data-customer='@json($customerData)' onclick="openViewCustomerModalFromData(this)">
-										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-											<path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-											<path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-										</svg>
+									<button class="p-1.5 hover:bg-slate-500 rounded text-slate-400 hover:text-white transition-colors" title="View" data-customer='@json($customerData)' onclick="openViewCustomerModalFromData(this)">
+										<svg class="w-4 h-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke-width="3" stroke="currentColor" fill="none">
+                                            <path d="M53.79,33.1a.51.51,0,0,0,0-.4C52.83,30.89,45.29,17.17,32,16.84S11,30.61,9.92,32.65a.48.48,0,0,0,0,.48C11.1,35.06,19.35,48.05,29.68,49,41.07,50,50.31,42,53.79,33.1Z"/>
+                                            <circle cx="31.7" cy="32.76" r="6.91"/>
+                                        </svg>
 									</button>
-									<button onclick="openEditCustomerModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', '{{ $customer->customer_type }}', '{{ $customer->phone }}', '{{ $customer->email }}')" class="p-1 hover:bg-slate-500 rounded" title="Edit">
-										<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-											<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-										</svg>
+									<button onclick="openEditCustomerModal({{ $customer->id }}, '{{ addslashes($customer->name) }}', '{{ $customer->customer_type }}', '{{ $customer->phone }}', '{{ $customer->email }}')" class="p-1.5 hover:bg-slate-500 rounded text-slate-400 hover:text-amber-400 transition-colors" title="Edit">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
 									</button>
-									<button type="button" onclick="openDeleteCustomerModal({{ $customer->id }}, '{{ $customer->name }}')" class="p-1 hover:bg-slate-500 rounded" title="Delete">
-										<svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-											<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-										</svg>
+									<button type="button" onclick="openDeleteCustomerModal({{ $customer->id }}, '{{ $customer->name }}')" class="p-1.5 hover:bg-slate-500 rounded text-slate-400 hover:text-red-400 transition-colors" title="Delete">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
 									</button>
 								</div>
 							</td>
