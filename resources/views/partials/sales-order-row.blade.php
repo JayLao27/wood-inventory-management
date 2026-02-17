@@ -70,16 +70,16 @@
     <td class="px-3 py-3">
         <div class="flex space-x-2 items-center justify-center">
             <button onclick="openModal('viewOrderModal-{{ $order->id }}')" class="p-1.5 {{ $isArchive ? 'hover:bg-gray-200 text-gray-600' : 'hover:bg-slate-500 text-white' }} rounded-lg transition-all" title="View">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                <svg class="w-4 h-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke-width="3" stroke="currentColor" fill="none">
+                    <path d="M53.79,33.1a.51.51,0,0,0,0-.4C52.83,30.89,45.29,17.17,32,16.84S11,30.61,9.92,32.65a.48.48,0,0,0,0,.48C11.1,35.06,19.35,48.05,29.68,49,41.07,50,50.31,42,53.79,33.1Z"/>
+                    <circle cx="31.7" cy="32.76" r="6.91"/>
                 </svg>
             </button>
             @if(!in_array($order->status, ['Cancelled', 'Delivered']))
             <button onclick="openModal('editOrderModal-{{ $order->id }}')" class="p-1.5 {{ $isArchive ? 'hover:bg-gray-200 text-gray-600' : 'hover:bg-slate-500 text-white' }} rounded-lg transition-all" title="Edit">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
             </button>
             @if($order->status === 'Ready' && $order->payment_status === 'Paid')
             <button type="button" onclick="openDeliverOrderModal({{ $order->id }}, '{{ $order->order_number }}')" class="p-1.5 {{ $isArchive ? 'hover:bg-gray-200 text-green-600' : 'hover:bg-slate-500 text-green-400' }} rounded-lg transition-all" title="Deliver Order">
@@ -91,9 +91,9 @@
             @endif
             @if(!in_array($order->payment_status, ['Paid', 'Partial']) && $order->status === 'Pending')
             <button type="button" onclick="openCancelSalesOrderModal({{ $order->id }}, '{{ $order->order_number }}')" class="p-1.5 {{ $isArchive ? 'hover:bg-gray-200 text-red-600' : 'hover:bg-slate-500 text-red-400' }} rounded-lg transition-all" title="Cancel">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l1-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
             </button>
             @endif
             @endif
