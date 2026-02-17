@@ -2,142 +2,144 @@
 
 @section('main-content')
         <!-- Main Content -->
-        <div class="flex-1 p-5 bg-amber-50 overflow-y-auto">
-            <!-- Header Section -->
-            <div class="mb-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-900">Production Management</h1>
-                        <p class="text-gray-600 mt-2">Plan, track, and manage furniture production workflow</p>
-                    </div>
-                    <button onclick="openProductionHistoryModal()" class="px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-600 text-white rounded-lg hover:from-slate-600 hover:to-slate-500 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <span>Production History</span>
-                    </button>
-                </div>
-            </div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+	<!-- Header Section -->
+	<div class="p-5 bg-amber-50 border-b border-amber-200 relative z-10">
+		<div class="flex justify-between items-center">
+			<div>
+				<h1 class="text-xl font-bold text-gray-800">Production Management</h1>
+				<p class="text-xs font-medium text-gray-600 mt-2">Plan, track, and manage furniture production workflow</p>
+			</div>
+			<button onclick="openProductionHistoryModal()" class="px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-600 text-white rounded-lg hover:from-slate-600 hover:to-slate-500 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium text-sm">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+				</svg>
+				<span>Production History</span>
+			</button>
+		</div>
+	</div>
+    <div class="flex-1 p-5 bg-amber-50 overflow-y-auto">
 
-            <!-- Status Overview Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-                <!-- Pending Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Pending</p>
-                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">{{ $statusCounts['pending'] ?? 0 }}</p>
-                            <p class="text-slate-400 text-xs mt-1">Awaiting start</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                                @include('components.icons.time', ['class' => 'w-5 h-5 text-yellow-400'])  
-                        </div>
-                    </div>
-                </div>
+			<!-- Status Overview Cards -->
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6 px-5">
+				<!-- Pending Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Pending</p>
+							<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">{{ $statusCounts['pending'] ?? 0 }}</p>
+							<p class="text-slate-400 text-xs mt-1">Awaiting start</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+								@include('components.icons.time', ['class' => 'w-5 h-5 text-yellow-400'])  
+						</div>
+					</div>
+				</div>
 
-                <!-- In Progress Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">In Progress</p>
-                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">{{ $statusCounts['in_progress'] ?? 0 }}</p>
-                            <p class="text-slate-400 text-xs mt-1">Currently working</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                            @include('components.icons.tool', ['class' => 'w-5 h-5 text-blue-400'])
-                        </div>
-                    </div>
-                </div>
+				<!-- In Progress Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">In Progress</p>
+							<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">{{ $statusCounts['in_progress'] ?? 0 }}</p>
+							<p class="text-slate-400 text-xs mt-1">Currently working</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+							@include('components.icons.tool', ['class' => 'w-5 h-5 text-blue-400'])
+						</div>
+					</div>
+				</div>
 
-        </script>
-        
-                <!-- Completed Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Completed</p>
-                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-green-300 to-green-100 bg-clip-text text-transparent">{{ $statusCounts['completed'] ?? 0 }}</p>
-                            <p class="text-slate-400 text-xs mt-1">This month</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                            @include('components.icons.checkmark', ['class' => 'w-5 h-5 text-green-400'])
-                        </div>
-                    </div>
-                </div>
+				<!-- Completed Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Completed</p>
+							<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-green-300 to-green-100 bg-clip-text text-transparent">{{ $statusCounts['completed'] ?? 0 }}</p>
+							<p class="text-slate-400 text-xs mt-1">This month</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+							@include('components.icons.checkmark', ['class' => 'w-5 h-5 text-green-400'])
+						</div>
+					</div>
+				</div>
 
-                <!-- Overdue Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Overdue</p>
-                            <p class="text-2xl font-bold mt-2 bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">{{ $statusCounts['overdue'] ?? 0 }}</p>
-                            <p class="text-slate-400 text-xs mt-1">Requires attention</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
-                           @include('components.icons.alert', ['class' => 'w-5 h-5 text-red-400'])
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<!-- Overdue Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Overdue</p>
+							<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">{{ $statusCounts['overdue'] ?? 0 }}</p>
+							<p class="text-slate-400 text-xs mt-1">Requires attention</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+							@include('components.icons.alert', ['class' => 'w-5 h-5 text-red-400'])
+						</div>
+					</div>
+				</div>
+			</div>
 
             
-            <!-- Production Workflow Section -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 shadow-xl border border-slate-600">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">Production Workflow</h2>
-                        <p class="text-slate-300 text-xs font-medium mt-2">Manage your raw materials and finished products</p>
-                    </div>
-                    <div class="flex space-x-3">
-                        <button onclick="openWorkOrderModal()" class="relative px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Work Orders</span>
-                            @if($pendingItemsCount > 0)
-                            <span class="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">{{ $pendingItemsCount }}</span>
-                            @endif
-                        </button>
-                    </div>
-                </div>
+			<!-- Main Content Container (with Padding) -->
+			<div class="px-5 pb-5">
+				<!-- Production Workflow Section -->
+				<section class="bg-gradient-to-br from-slate-700 to-slate-800 text-white p-3 rounded-xl overflow-visible shadow-xl border border-slate-600">
+					<header class="flex justify-between items-center mb-6">
+						<div>
+							<h2 class="text-xl font-bold text-white">Production Workflow</h2>
+							<p class="text-slate-300 text-xs font-medium mt-2">Manage your raw materials and finished products</p>
+						</div>
+						<div class="flex space-x-3">
+							<button onclick="openWorkOrderModal()" class="relative px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+								<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+								</svg>
+								<span>Work Orders</span>
+								@if($pendingItemsCount > 0)
+								<span class="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">{{ $pendingItemsCount }}</span>
+								@endif
+							</button>
+						</div>
+					</header>
 
-                <!-- Search Bar and Status Filter -->
-                <div class="flex justify-between items-center mb-12">
-                    <div class="flex-1 max-w-md">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </div>
-                            <input id="workOrderSearchInput" type="text" placeholder="Search work orders..." class="w-[850px] pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                    </div>
-                    <div>
-                        <select id="statusFilterSelect" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-                            <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="quality_check">Quality Check</option>
-                            <option value="completed">Completed</option>
-                            <option value="overdue">Overdue</option>
-                        </select>
-                    </div>
-                </div>
+					<!-- Search Bar and Status Filter -->
+					<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+						<div class="flex-1 max-w-md">
+							<div class="relative">
+								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+									</svg>
+								</div>
+								<input id="workOrderSearchInput" type="text" placeholder="Search work orders..." class="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-slate-400">
+							</div>
+						</div>
+						<div>
+							<select id="statusFilterSelect" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+								<option value="all">All Status</option>
+								<option value="pending">Pending</option>
+								<option value="in_progress">In Progress</option>
+								<option value="quality_check">Quality Check</option>
+								<option value="completed">Completed</option>
+								<option value="overdue">Overdue</option>
+							</select>
+						</div>
+					</div>
 
-                <!-- Work Orders List -->
-                @php
-                    $visibleWorkOrders = ($workOrders ?? collect())->whereNotIn('status', ['completed', 'cancelled']);
-                @endphp
-                <div class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;" id="workOrderTableBody">
-                    @foreach($visibleWorkOrders as $workOrder)
-                        @include('partials.work-order-row', ['workOrder' => $workOrder])
-                    @endforeach
-                    <div id="workOrderEmptyState" class="py-12 px-4 text-center text-slate-400 {{ $visibleWorkOrders->count() > 0 ? 'hidden' : '' }}">
-                        No active production found
-                    </div>
-                </div>
-            </div>
+					<!-- Work Orders List -->
+					@php
+						$visibleWorkOrders = ($workOrders ?? collect())->whereNotIn('status', ['completed', 'cancelled']);
+					@endphp
+					<div class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;" id="workOrderTableBody">
+						@foreach($visibleWorkOrders as $workOrder)
+							@include('partials.work-order-row', ['workOrder' => $workOrder])
+						@endforeach
+						<div id="workOrderEmptyState" class="py-12 px-4 text-center text-slate-400 {{ $visibleWorkOrders->count() > 0 ? 'hidden' : '' }}">
+							No active production found
+						</div>
+					</div>
+				</section>
+			</div>
         </div>
 
         <!-- Add Work Order Modal -->
@@ -1539,4 +1541,5 @@
             ])
         @endforeach
 
+</div>
 @endsection
