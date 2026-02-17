@@ -1792,22 +1792,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Delivery Confirmation Modal -->
 <div id="deliverOrderModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-[99999]" style="cursor: default;">
-	<div class="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border-2 border-slate-600 animate-fadeIn" onclick="event.stopPropagation()">
-		<div class="text-center">
-			<div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	<div class="rounded-2xl shadow-2xl max-w-sm w-full p-6 border-2 border-slate-700 animate-fadeIn" style="background-color: #FFF1DA;" onclick="event.stopPropagation()">
+		<div class="text-center mb-5">
+			<div class="w-12 h-12 bg-green-500/10 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
 				</svg>
 			</div>
-			<h3 class="text-xl font-bold text-white mb-2">Confirm Delivery</h3>
-			<p class="text-slate-400 mb-6 text-sm">Are you sure order <span id="deliverOrderNumber" class="text-green-400 font-bold"></span> has been delivered? It will be moved to the Archive.</p>
+			<h3 class="font-bold text-sm mb-1" style="color: #374151;">Confirm Delivery?</h3>
+			<p class="text-xs" style="color: #666;">
+				Mark order <span id="deliverOrderNumber" class="font-semibold text-green-600">-</span> as delivered?
+			</p>
 		</div>
 		<form id="deliverOrderForm" method="POST">
 			@csrf
-			<div class="flex gap-3">
-				<button type="button" onclick="closeModal('deliverOrderModal')" class="flex-1 px-4 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition-all font-bold text-sm">Cancel</button>
-				<button type="submit" class="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-bold text-sm shadow-lg shadow-green-900/20">Confirm Delivery</button>
+			<div class="flex justify-center gap-2">
+				<button type="button" onclick="closeModal('deliverOrderModal')" class="px-4 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all text-xs font-medium text-gray-700">
+					No, Keep Working
+				</button>
+				<button type="submit" class="px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-xs font-medium shadow-md hover:shadow-lg">
+					Yes, Deliver
+				</button>
 			</div>
 		</form>
 	</div>
@@ -1822,13 +1828,13 @@ function filterArchive(status) {
 	// Update button styles
 	document.querySelectorAll('.archive-filter-btn').forEach(btn => {
 		btn.classList.remove('bg-amber-500', 'text-white', 'shadow-lg');
-		btn.classList.add('text-slate-300', 'hover:bg-slate-500/50');
+		btn.classList.add('text-gray-500', 'hover:bg-gray-200');
 	});
 	
 	const btnId = 'archiveFilter' + (status === 'all' ? 'All' : status);
 	const activeBtn = document.getElementById(btnId);
 	if (activeBtn) {
-		activeBtn.classList.remove('text-slate-300', 'hover:bg-slate-500/50');
+		activeBtn.classList.remove('text-gray-500', 'hover:bg-gray-200');
 		activeBtn.classList.add('bg-amber-500', 'text-white', 'shadow-lg');
 	}
 
