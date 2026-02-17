@@ -90,6 +90,51 @@ async function confirmSalesOrder(event) {
     return false;
 }
 
+// Handle Deliver Order Form
+document.addEventListener('DOMContentLoaded', function () {
+    const deliverForm = document.getElementById('deliverOrderForm');
+    if (deliverForm) {
+        deliverForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Marking Delivered...';
+
+            try {
+                const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccessNotification(data.message);
+                    closeModal('deliverOrderModal');
+                    // Reload to reflect changes in table and archive
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showErrorNotification(data.message || 'Error delivering order.');
+                }
+            } catch (error) {
+                console.error(error);
+                showErrorNotification('An error occurred. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    }
+});
+
 async function submitEditOrder(event, orderId) {
     event.preventDefault();
     const form = event.target;
