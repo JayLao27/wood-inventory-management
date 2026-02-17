@@ -62,7 +62,25 @@ class ProductionController extends Controller
         // Use pending items count instead of recalculating from pending orders
         $statusCounts['pending'] = $pendingItemsCount;
 
-        return view('Systems.production', compact('workOrders', 'statusCounts', 'pendingSalesOrders', 'pendingItemsCount'));
+        // Color maps for modals
+        $customerTypeBg = [
+            'Wholesale' => '#64B5F6',
+            'Retail' => '#6366F1',
+            'Contractor' => '#BA68C8',
+        ];
+        $statusBg = [
+            'In production' => '#FFB74D',
+            'Pending' => '#64B5F6',
+            'Delivered' => '#81C784',
+            'Ready' => '#BA68C8',
+        ];
+        $paymentBg = [
+            'Pending' => '#ffffff',
+            'Partial' => '#FFB74D',
+            'Paid' => '#81C784',
+        ];
+
+        return view('Systems.production', compact('workOrders', 'statusCounts', 'pendingSalesOrders', 'pendingItemsCount', 'customerTypeBg', 'statusBg', 'paymentBg'));
     }
 
     public function store(Request $request)
