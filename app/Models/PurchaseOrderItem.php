@@ -11,6 +11,7 @@ class PurchaseOrderItem extends Model
         'purchase_order_id',
         'material_id',
         'quantity',
+        'cancelled_quantity',
         'unit_price',
         'total_price',
         'reference_type',
