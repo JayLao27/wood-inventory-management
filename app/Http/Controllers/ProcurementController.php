@@ -513,4 +513,13 @@ class ProcurementController extends Controller
             ], 500);
         }
     }
+
+    public function exportReceipt($orderNumber)
+    {
+        $purchaseOrder = PurchaseOrder::with(['supplier', 'items.material'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        return view('exports.procurement-receipt', compact('purchaseOrder'));
+    }
 }
