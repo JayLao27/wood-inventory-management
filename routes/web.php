@@ -88,6 +88,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/procurement/purchase-orders/{id}', [ProcurementController::class, 'destroyPurchaseOrder'])
         ->name('procurement.purchase-order.destroy')
         ->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::get('/procurement/receipt/{orderNumber}', [ProcurementController::class, 'exportReceipt'])
+        ->name('procurement.receipt')
+        ->middleware('role:admin,procurement_officer,inventory_clerk');
 
     // Production & Work Orders
     Route::get('/production', [ProductionController::class, 'index'])
