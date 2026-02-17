@@ -185,8 +185,14 @@
                                 <div onclick="selectSalesOrder({{ $salesOrder->id }}, '{{ addslashes($salesOrder->order_number) }}', '{{ addslashes($salesOrder->customer->name ?? '') }}', '{{ $salesOrder->delivery_date }}', {{ json_encode($itemsData) }})" 
                                      class="group relative p-5 border-2 border-gray-300 rounded-xl hover:border-blue-400 hover:shadow-lg cursor-pointer transition-all duration-300 bg-white hover:bg-blue-50">
                                     
-                                    <!-- Status Indicator -->
-                                    <div class="absolute top-5 right-5">
+                                    <!-- Actions -->
+                                    <div class="absolute top-5 right-5 flex items-center gap-2">
+                                        <button type="button" onclick="event.stopPropagation(); openModal('viewOrderModal-{{ $salesOrder->id }}')" class="p-1.5 bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 rounded-lg transition-all" title="View Details">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
                                         <span class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-semibold group-hover:bg-blue-600 group-hover:text-white transition-colors">
                                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
@@ -499,10 +505,7 @@
                         </div>
 
                         <!-- Close Button -->
-                        <div class="flex justify-between gap-2">
-                            <button type="button" onclick="openCancelConfirmModal()" class="px-3.5 py-1.5 rounded-lg hover:shadow-lg transition-all duration-200 text-xs font-medium text-white bg-red-600 hover:bg-red-700">
-                                Cancel Order
-                            </button>
+                        <div class="">
                             <button type="button" onclick="closeViewWorkOrderModal()" class="px-3.5 py-1.5 rounded-lg hover:shadow-lg transition-all duration-200 text-xs font-medium text-white" style="background-color: #374151;">
                                 Close
                             </button>
@@ -623,6 +626,14 @@
                                 <input type="date" id="historyEndDate" class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
                             </div>
                         </div>
+                        <!-- Quick Filters -->
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <button onclick="applyHistoryQuickFilter('yesterday')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">Yesterday</button>
+                            <button onclick="applyHistoryQuickFilter('last-week')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">Last Week</button>
+                            <button onclick="applyHistoryQuickFilter('1-month')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">1 Month</button>
+                            <button onclick="applyHistoryQuickFilter('1-year')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">1 Year</button>
+                        </div>
+
                         <!-- Clear Filters Button -->
                         <div class="flex justify-end mb-2">
                             <button onclick="clearHistoryFilters()" class="inline-flex items-center gap-1 px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-all text-xs font-medium">
@@ -637,7 +648,7 @@
                     <!-- History List -->
                     <div class="space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar" id="historyListContainer">
                         @forelse($workOrders->where('status', 'completed') as $workOrder)
-                            <div class="history-item group relative p-3 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-300" 
+                            <div onclick="viewWorkOrder({{ $workOrder->id }})" class="history-item group relative p-3 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer" 
                                  data-order-number="{{ strtolower($workOrder->order_number) }}" 
                                  data-product-name="{{ strtolower($workOrder->product_name) }}" 
                                  data-assigned-to="{{ strtolower($workOrder->assigned_to) }}" 
@@ -673,33 +684,25 @@
                                     </div>
 
                                     <!-- Details Grid -->
-                                    <div class="grid grid-cols-3 gap-2 bg-gray-50 rounded-md p-2 mb-2 border border-gray-100">
+                                    <div class="grid grid-cols-4 gap-2 bg-gray-50 rounded-md p-2 mb-2 border border-gray-100">
                                         <div>
-                                            <p class="text-xs font-semibold text-gray-500 uppercase mb-0.5">Quantity</p>
+                                            <p class="text-[10px] font-semibold text-gray-500 uppercase mb-0.5">Quantity</p>
                                             <p class="text-xs font-bold text-gray-800">{{ $workOrder->quantity }} pcs</p>
                                         </div>
                                         <div>
-                                            <p class="text-xs font-semibold text-gray-500 uppercase mb-0.5">Assigned To</p>
+                                            <p class="text-[10px] font-semibold text-gray-500 uppercase mb-0.5">Assigned</p>
                                             <p class="text-xs font-bold text-gray-800">{{ $workOrder->assigned_to }}</p>
                                         </div>
                                         <div>
-                                            <p class="text-xs font-semibold text-gray-500 uppercase mb-0.5">Completed</p>
-                                            <p class="text-xs font-bold text-gray-800">{{ $workOrder->updated_at->format('M d, Y') }}</p>
+                                            <p class="text-[10px] font-semibold text-blue-500 uppercase mb-0.5">Started</p>
+                                            <p class="text-xs font-bold text-gray-800">{{ $workOrder->starting_date ? \Carbon\Carbon::parse($workOrder->starting_date)->format('M d') : 'N/A' }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] font-semibold text-green-600 uppercase mb-0.5">Completed</p>
+                                            <p class="text-xs font-bold text-gray-800">{{ $workOrder->updated_at->format('M d') }}</p>
                                         </div>
                                     </div>
 
-                                    <!-- Timeline -->
-                                    <div class="flex items-center gap-1.5 text-xs text-gray-600">
-                                        <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        <span class="text-xs">Started: <strong class="text-gray-800">{{ $workOrder->starting_date ? \Carbon\Carbon::parse($workOrder->starting_date)->format('M d') : 'N/A' }}</strong></span>
-                                        <span class="text-gray-400">•</span>
-                                        <svg class="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                        <span class="text-xs">Due: <strong class="text-gray-800">{{ $workOrder->due_date->format('M d') }}</strong></span>
-                                    </div>
                                 </div>
                             </div>
                         @empty
@@ -941,6 +944,23 @@
                 const modal = document.getElementById('viewWorkOrderModal');
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+            }
+
+            // Generic Modal Helpers
+            function openModal(id) {
+                const modal = document.getElementById(id);
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+            }
+
+            function closeModal(id) {
+                const modal = document.getElementById(id);
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
             }
 
             let currentWorkOrderId = null;
@@ -1189,6 +1209,44 @@
                 if (emptyState) {
                     emptyState.classList.toggle('hidden', totalItems !== 0);
                 }
+            }
+
+            function applyHistoryQuickFilter(type) {
+                const startInput = document.getElementById('historyStartDate');
+                const endInput = document.getElementById('historyEndDate');
+                const now = new Date();
+                const today = now.toISOString().split('T')[0];
+                
+                let start = '';
+                let end = today;
+
+                switch(type) {
+                    case 'yesterday':
+                        const yesterday = new Date(now);
+                        yesterday.setDate(now.getDate() - 1);
+                        start = yesterday.toISOString().split('T')[0];
+                        end = start;
+                        break;
+                    case 'last-week':
+                        const lastWeek = new Date(now);
+                        lastWeek.setDate(now.getDate() - 7);
+                        start = lastWeek.toISOString().split('T')[0];
+                        break;
+                    case '1-month':
+                        const oneMonth = new Date(now);
+                        oneMonth.setMonth(now.getMonth() - 1);
+                        start = oneMonth.toISOString().split('T')[0];
+                        break;
+                    case '1-year':
+                        const oneYear = new Date(now);
+                        oneYear.setFullYear(now.getFullYear() - 1);
+                        start = oneYear.toISOString().split('T')[0];
+                        break;
+                }
+
+                if (startInput) startInput.value = start;
+                if (endInput) endInput.value = end;
+                filterProductionHistory();
             }
 
             // Clear history filters
@@ -1470,5 +1528,15 @@
                 });
             @endif
         </script>
+
+        <!-- Dynamic Sales Order Modals for Pending Items -->
+        @foreach($pendingSalesOrders ?? [] as $order)
+            @include('partials.sales-order-modals', [
+                'order' => $order,
+                'customerTypeBg' => $customerTypeBg,
+                'statusBg' => $statusBg,
+                'paymentBg' => $paymentBg
+            ])
+        @endforeach
 
 @endsection
