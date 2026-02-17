@@ -146,6 +146,11 @@ class ProductionController extends Controller
                 'status' => 'in_progress',
             ]);
 
+            // Automatically update Sales Order status to In production
+            if ($salesOrder->status === 'Pending') {
+                $salesOrder->update(['status' => 'In production']);
+            }
+
             // Stock out: create inventory movements (out) and deduct material stock
             foreach ($materialsNeeded as $entry) {
                 $material = $entry['material'];
@@ -260,6 +265,11 @@ class ProductionController extends Controller
             'status' => 'in_progress',
             'starting_date' => now()->toDateString()
         ]);
+
+        // Ensure Sales Order status is In production
+        if ($workOrder->salesOrder && $workOrder->salesOrder->status === 'Pending') {
+            $workOrder->salesOrder->update(['status' => 'In production']);
+        }
         return redirect()->back()->with('success', 'Work order started.');
     }
 
@@ -303,6 +313,16 @@ class ProductionController extends Controller
                     'sales_order_id' => $workOrder->sales_order_id,
                     'purchase_order_id' => null,
                 ]);
+            }
+        }
+
+        // Check if all work orders for this sales order are completed
+        if ($workOrder->salesOrder) {
+            $totalWorkOrders = $workOrder->salesOrder->workOrders()->where('status', '!=', 'cancelled')->count();
+            $completedWorkOrders = $workOrder->salesOrder->workOrders()->where('status', 'completed')->count();
+            
+            if ($totalWorkOrders > 0 && $totalWorkOrders === $completedWorkOrders) {
+                $workOrder->salesOrder->update(['status' => 'Ready']);
             }
         }
         
