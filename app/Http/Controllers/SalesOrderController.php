@@ -38,6 +38,7 @@ class SalesOrderController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'delivery_date' => 'required|date|after_or_equal:today',
+            'due_date' => 'nullable|date|after_or_equal:today',
             'note' => 'nullable|string',
             'items' => 'nullable|array',
             'items.*.product_id' => 'required_with:items|exists:products,id',
@@ -57,6 +58,7 @@ class SalesOrderController extends Controller
                     'customer_id' => $validated['customer_id'],
                     'order_date' => now()->toDateString(),
                     'delivery_date' => $validated['delivery_date'],
+                    'due_date' => $validated['due_date'] ?? $validated['delivery_date'],
                     'status' => 'Pending',
                     'total_amount' => 0,
                     'paid_amount' => 0,
@@ -190,6 +192,7 @@ class SalesOrderController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'delivery_date' => 'required|date|after_or_equal:today',
+            'due_date' => 'nullable|date|after_or_equal:today',
             'status' => 'nullable|in:In production,Confirmed,Pending,Delivered,Ready,Cancelled',
 
             'payment_status' => 'nullable|in:Pending,Partial,Paid',
@@ -199,6 +202,7 @@ class SalesOrderController extends Controller
         $sales_order->update([
             'customer_id' => $validated['customer_id'],
             'delivery_date' => $validated['delivery_date'],
+            'due_date' => $validated['due_date'] ?? $sales_order->due_date ?? $validated['delivery_date'],
             'status' => $validated['status'] ?? $sales_order->status,
             'payment_status' => $validated['payment_status'] ?? $sales_order->payment_status,
             'note' => $validated['note'] ?? null,
