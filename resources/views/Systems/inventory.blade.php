@@ -2,155 +2,167 @@
 
 @section('main-content')
         <!-- Main Content -->
-        <div class="flex-1 p-5 bg-amber-50 overflow-y-auto">
-            <!-- Header Section -->
-            <div class="mb-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Inventory Management</h1>
-                        <p class="text-gray-600 mt-1.5">Track and manage raw materials and finished products</p>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="openReceiveStockModal()" class="px-3.5 py-1.5 bg-green-700 text-white rounded-xl hover:bg-green-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Receive Stock
-                        </button>
-                        <button onclick="openStockLogsModal()" class="px-3.5 py-1.5 bg-slate-700 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Stock Logs
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+	<!-- Header Section -->
+	<div class="p-5 bg-amber-50 border-b border-amber-200 relative z-10">
+		<div class="flex justify-between items-center">
+			<div>
+				<h1 class="text-xl font-bold text-gray-800">Inventory Management</h1>
+				<p class="text-xs font-medium text-gray-600 mt-2">Track and manage raw materials and finished products</p>
+			</div>
+			<div class="flex space-x-3">
+				<button onclick="openReceiveStockModal()" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium text-sm">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+					</svg>
+					Receive Stock
+				</button>
+				<button onclick="openStockLogsModal()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium text-sm">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+					</svg>
+					Stock Logs
+				</button>
+			</div>
+		</div>
+	</div>
+    <div class="flex-1 p-5 bg-amber-50 overflow-y-auto">
 
-            <!-- Metrics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-                <!-- Total Items Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Total Materials</p>
-                            <p class="text-2xl font-bold mt-1.5 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $totalMaterials ?? 10 }}</p>
-                            <p class="text-slate-300 text-xs font-medium mt-1.5">{{ $totalMaterials ?? 10 }} Items</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
-                            @include('components.icons.package', ['class' => 'w-5 h-5 text-amber-400'])
-                        </div>
-                    </div>
-                    <div class="mt-2 pt-2 border-t border-slate-600/50">
-                        <div class="flex items-center justify-between text-xs text-slate-400">
-                            <span>Inventory Status</span>
-                            <span class="text-green-400 font-semibold">Active</span>
-                        </div>
-                    </div>
-                </div>
+			<!-- Metrics Cards -->
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6 px-5">
+				<!-- Total Items Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Total Materials</p>
+							<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $totalMaterials ?? 10 }}</p>
+							<p class="text-slate-300 text-xs font-medium mt-1">{{ $totalMaterials ?? 10 }} Items</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+							@include('components.icons.package', ['class' => 'w-5 h-5 text-amber-400'])
+						</div>
+					</div>
+					<div class="mt-2 pt-2 border-t border-slate-600/50">
+						<div class="flex items-center justify-between text-xs text-slate-400">
+							<span>Inventory Status</span>
+							<span class="text-green-400 font-semibold">Active</span>
+						</div>
+					</div>
+				</div>
 
-                <!-- Low Stock Alerts Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Low Stock Alerts</p>
-                            <p class="text-2xl font-bold mt-1.5 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-400' : 'bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent' }}">{{ $lowStockAlerts ?? 3 }}</p>
-                            <p class="text-xs font-medium mt-1.5 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-300' : 'text-slate-300' }}">{{ $lowStockAlerts ?? 3 }} Items</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
-                            @include('components.icons.cart', ['class' => ($lowStockAlerts ?? 3) > 4 ? 'w-5 h-5 text-red-400 animate-pulse' : 'w-5 h-5 text-amber-400'])
-                        </div>
-                    </div>
-                    <div class="mt-2 pt-2 border-t border-slate-600/50">
-                        <div class="w-full bg-slate-600 rounded-full h-1.5 overflow-hidden">
-                            <div class="{{ ($lowStockAlerts ?? 3) > 4 ? 'bg-red-500' : 'bg-amber-500' }} h-1.5 rounded-full transition-all duration-500" 
-                                 style="width: {{ min((($lowStockAlerts ?? 3) / max($totalMaterials ?? 10, 1)) * 100, 100) }}%"></div>
-                        </div>
-                    </div>
-                </div>
+				<!-- Low Stock Alerts Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Low Stock Alerts</p>
+							<p class="text-2xl font-bold mt-2 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-400' : 'bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent' }}">{{ $lowStockAlerts ?? 3 }}</p>
+							<p class="text-xs font-medium mt-1 {{ ($lowStockAlerts ?? 3) > 4 ? 'text-red-300' : 'text-slate-300' }}">{{ $lowStockAlerts ?? 3 }} Items</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+							@include('components.icons.cart', ['class' => ($lowStockAlerts ?? 3) > 4 ? 'w-5 h-5 text-red-400 animate-pulse' : 'w-5 h-5 text-amber-400'])
+						</div>
+					</div>
+					<div class="mt-2 pt-2 border-t border-slate-600/50">
+						<div class="w-full bg-slate-600 rounded-full h-1.5 overflow-hidden">
+							<div class="{{ ($lowStockAlerts ?? 3) > 4 ? 'bg-red-500' : 'bg-amber-500' }} h-1.5 rounded-full transition-all duration-500" 
+								 style="width: {{ min((($lowStockAlerts ?? 3) / max($totalMaterials ?? 10, 1)) * 100, 100) }}%"></div>
+						</div>
+					</div>
+				</div>
 
-                <!-- New Order Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">New Orders</p>
-                            <p class="text-2xl font-bold mt-1.5 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $newOrders ?? 2 }}</p>
-                            <p class="text-slate-300 text-xs font-medium mt-1.5">Finished products</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
-                            @include('components.icons.cart', ['class' => 'w-5 h-5 text-blue-400'])
-                        </div>
-                    </div>
-                    <div class="mt-2 pt-2 border-t border-slate-600/50">
-                        <div class="flex items-center justify-between text-xs text-slate-400">
-                            <span>This week</span>
-                            <span class="text-blue-400 font-semibold">+{{ $newOrders ?? 2 }}</span>
-                        </div>
-                    </div>
-                </div>
+				<!-- New Order Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">New Orders</p>
+							<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $newOrders ?? 2 }}</p>
+							<p class="text-slate-300 text-xs font-medium mt-1">Finished products</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+							@include('components.icons.cart', ['class' => 'w-5 h-5 text-blue-400'])
+						</div>
+					</div>
+					<div class="mt-2 pt-2 border-t border-slate-600/50">
+						<div class="flex items-center justify-between text-xs text-slate-400">
+							<span>This week</span>
+							<span class="text-blue-400 font-semibold">+{{ $newOrders ?? 2 }}</span>
+						</div>
+					</div>
+				</div>
 
-                <!-- Pending Deliveries Card -->
-                <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-slate-600">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Pending Deliveries</p>
-                            <p class="text-2xl font-bold mt-1.5 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $pendingDeliveries ?? 3 }}</p>
-                            <p class="text-slate-300 text-xs font-medium mt-1.5">Awaiting delivery</p>
-                        </div>
-                        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
-                            @include('components.icons.cart', ['class' => 'w-5 h-5 text-purple-400'])
-                        </div>
-                    </div>
-                    <div class="mt-2 pt-2 border-t border-slate-600/50">
-                        <div class="flex items-center justify-between text-xs text-slate-400">
-                            <span>Purchase orders</span>
-                            <span class="text-purple-400 font-semibold">{{ $pendingDeliveries ?? 3 }} PO</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<!-- Pending Deliveries Card -->
+				<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+					<div class="flex justify-between items-start">
+						<div>
+							<p class="text-slate-300 text-xs font-semibold uppercase tracking-wide">Pending Deliveries</p>
+							<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">{{ $pendingDeliveries ?? 3 }}</p>
+							<p class="text-slate-300 text-xs font-medium mt-1">Awaiting delivery</p>
+						</div>
+						<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+							@include('components.icons.cart', ['class' => 'w-5 h-5 text-purple-400'])
+						</div>
+					</div>
+					<div class="mt-2 pt-2 border-t border-slate-600/50">
+						<div class="flex items-center justify-between text-xs text-slate-400">
+							<span>Purchase orders</span>
+							<span class="text-purple-400 font-semibold">{{ $pendingDeliveries ?? 3 }} PO</span>
+						</div>
+					</div>
+				</div>
+			</div>
 
-            <!-- Inventory Items Section -->
-            <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-4 shadow-xl border border-slate-600">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">Inventory Items</h2>
-                        <p class="text-slate-300 text-xs font-medium mt-1.5">Manage raw materials from suppliers and finished products from production</p>
-                    </div>
-                    <div id="materialsButton" class="flex space-x-2">
-                        <button onclick="openAddItemModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center space-x-2 font-medium">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Add Item</span>
-                        </button>
-                    </div>
-                    <div id="productsButton" class="flex space-x-2 hidden">
-                        <button onclick="openAddProductModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center space-x-2 font-medium">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Add Product</span>
-                        </button>
-                    </div>
-                </div>
+			<!-- Main Content Container (with Padding) -->
+			<div class="px-5 pb-5">
+				<!-- Inventory Items Section -->
+				<section class="bg-gradient-to-br from-slate-700 to-slate-800 text-white p-3 rounded-xl overflow-visible shadow-xl border border-slate-600">
+					<header class="flex justify-between items-center mb-6">
+						<div>
+							<h2 class="text-xl font-bold text-white">Inventory Items</h2>
+							<p class="text-slate-300 text-xs font-medium mt-2">Manage raw materials from suppliers and finished products</p>
+						</div>
+						<div id="materialsButton" class="flex space-x-2">
+							<button onclick="openAddItemModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-md flex items-center gap-1.5 font-medium">
+								<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+								</svg>
+								<span>Add Item</span>
+							</button>
+						</div>
+						<div id="productsButton" class="flex space-x-2 hidden">
+							<button onclick="openAddProductModal()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-md flex items-center gap-1.5 font-medium">
+								<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+								</svg>
+								<span>Add Product</span>
+							</button>
+						</div>
+					</header>
 
-                <!-- Search + Filters -->
-                @php
-                    $inventoryCategories = collect($materials ?? [])->pluck('category')->filter()->unique()->values();
-                @endphp
-                <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-                    <input type="search" id="searchInput" placeholder="Search items..." class="bg-white/95 backdrop-blur-sm w-full md:w-3/4 rounded-xl px-3.5 py-1.5.5 text-gray-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-lg">
-                    <div class="flex gap-2">
-                        <select id="categoryFilter" class="flex items-center space-x-2 px-3.5 py-1.5.5 bg-slate-600 text-white text-sm font-medium rounded-xl hover:bg-slate-500 transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
-                            <option value="">All Categories</option>
-                            @foreach($inventoryCategories as $category)
-                                <option value="{{ $category }}">{{ $category }}</option>
-                            @endforeach
-                            <option value="Products">Products</option>
-                        </select>
-                    </div>
-                </div>
+					<!-- Search + Filters -->
+					@php
+						$inventoryCategories = collect($materials ?? [])->pluck('category')->filter()->unique()->values();
+					@endphp
+					<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+						<div class="flex-1 max-w-md">
+							<div class="relative">
+								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+									</svg>
+								</div>
+								<input type="search" id="searchInput" placeholder="Search items..." class="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-slate-400">
+							</div>
+						</div>
+						<div class="flex gap-2">
+							<select id="categoryFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+								<option value="">All Categories</option>
+								@foreach($inventoryCategories as $category)
+									<option value="{{ $category }}">{{ $category }}</option>
+								@endforeach
+								<option value="Products">Products</option>
+							</select>
+						</div>
+					</div>
 
                 <!-- Tabs -->
                 <div class="flex space-x-2 w-full mb-6">
@@ -161,7 +173,7 @@
                 <!-- Materials Table -->
                 <div id="materials-table" class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;">
                     @forelse($materials ?? [] as $material)
-                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer" data-name="{{ $material->name }}" data-category="{{ $material->category }}" onclick="openStockModal('material', {{ $material->id }})">
+                    <div class="p-4 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer" data-name="{{ $material->name }}" data-category="{{ $material->category }}" onclick="openStockModal('material', {{ $material->id }})">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-bold text-white text-lg">{{ $material->name }}</h3>
@@ -208,7 +220,7 @@
                 <!-- Products Table -->
                 <div id="products-table" class="space-y-3 overflow-y-auto custom-scrollbar hidden" style="max-height:60vh;">
                     @forelse($products ?? [] as $product)
-                    <div class="p-2 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer" data-name="{{ $product->product_name }}" data-category="Products" onclick="openStockModal('product', {{ $product->id }})">
+                    <div class="p-4 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer" data-name="{{ $product->product_name }}" data-category="Products" onclick="openStockModal('product', {{ $product->id }})">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <h3 class="font-bold text-white text-lg">{{ $product->product_name }}</h3>
@@ -1976,4 +1988,5 @@
             @endif
         </script>
 
+</div>
 @endsection
