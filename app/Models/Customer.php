@@ -15,11 +15,12 @@ class Customer extends Model
 
     public function totalOrders()
     {
-        return $this->salesOrders()->count();
+        return $this->salesOrders()->where('status', '!=', 'Cancelled')->count();
     }
 
     public function totalSpent()
     {
-        return $this->salesOrders()->sum('total_amount');
+        return $this->salesOrders()->where('status', '!=', 'Cancelled')->sum('total_amount');
     }
+
 }
