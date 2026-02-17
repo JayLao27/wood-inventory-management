@@ -141,7 +141,7 @@ $paymentBg = [
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
 					</svg>
-					<span>Archive</span>
+					<span>Order History</span>
 				</button>
 			</div>
 
@@ -1736,13 +1736,41 @@ document.addEventListener('DOMContentLoaded', function() {
 			</div>
 
 			<div class="px-5 pt-4 pb-2">
-				<input type="search" id="archiveSearchInput" placeholder="Search archived orders..." class="bg-white w-full rounded-lg px-4 py-2 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 border border-gray-300 mb-4 transition-all">
+				<input type="search" id="archiveSearchInput" placeholder="Search archived orders..." class="bg-white w-full rounded-lg px-4 py-2 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 border border-gray-300 mb-3 transition-all">
+				
+				<!-- Date Range Filters -->
+				<div class="grid grid-cols-2 gap-3 mb-3">
+					<div>
+						<label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">From</label>
+						<input type="date" id="archiveStartDate" class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+					</div>
+					<div>
+						<label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">To</label>
+						<input type="date" id="archiveEndDate" class="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+					</div>
+				</div>
+
+				<!-- Quick Filters -->
+				<div class="flex flex-wrap gap-2 mb-3">
+					<button onclick="applyArchiveQuickFilter('yesterday')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">Yesterday</button>
+					<button onclick="applyArchiveQuickFilter('last-week')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">Last Week</button>
+					<button onclick="applyArchiveQuickFilter('1-month')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">1 Month</button>
+					<button onclick="applyArchiveQuickFilter('1-year')" class="px-3 py-1 bg-white border border-gray-300 rounded-full text-[10px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">1 Year</button>
+				</div>
 				
 				<!-- Archive Filter Buttons -->
-				<div class="flex items-center gap-2 bg-gray-100/50 p-2 rounded-xl border border-gray-200">
-					<button onclick="filterArchive('all')" id="archiveFilterAll" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500 text-white shadow-lg archive-filter-btn">All Archived</button>
-					<button onclick="filterArchive('Cancelled')" id="archiveFilterCancelled" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:bg-gray-200 archive-filter-btn">Cancelled</button>
-					<button onclick="filterArchive('Delivered')" id="archiveFilterDelivered" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:bg-gray-200 archive-filter-btn">Delivered</button>
+				<div class="flex justify-between items-center mb-4">
+					<div class="flex items-center gap-2 bg-white/50 p-1.5 rounded-xl border border-gray-200">
+						<button onclick="filterArchive('all')" id="archiveFilterAll" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500 text-white shadow-lg archive-filter-btn">All Archived</button>
+						<button onclick="filterArchive('Cancelled')" id="archiveFilterCancelled" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:bg-gray-200 archive-filter-btn">Cancelled</button>
+						<button onclick="filterArchive('Delivered')" id="archiveFilterDelivered" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:bg-gray-200 archive-filter-btn">Delivered</button>
+					</div>
+					<button onclick="clearArchiveFilters()" class="inline-flex items-center gap-1 px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-all text-xs font-medium">
+						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+						Clear Filters
+					</button>
 				</div>
 			</div>
 
@@ -1751,13 +1779,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				<table class="w-full border-separate border-spacing-y-2 text-left text-xs">
 					<thead class="text-gray-700 bg-gray-100/80 sticky top-0 z-10">
 						<tr>
-							<th class="px-4 py-3 font-bold rounded-tl-xl">Order #</th>
+							<th class="px-4 py-3 font-bold rounded-tl-xl text-center">Order #</th>
 							<th class="px-4 py-3 font-bold">Customer</th>
-							<th class="px-4 py-3 font-bold text-center">Order Date</th>
-							<th class="px-4 py-3 font-bold text-center">Delivery Date</th>
-							<th class="px-4 py-3 font-bold text-center">Status</th>
+							<th class="px-4 py-3 font-bold text-center">Started</th>
+							<th class="px-4 py-3 font-bold text-center">Completed</th>
+							<th class="px-4 py-3 font-bold text-center border-l border-gray-200">Status</th>
 							<th class="px-4 py-3 font-bold text-right">Total Amount</th>
-							<th class="px-4 py-3 font-bold text-center">Payment</th>
+							<th class="px-4 py-3 font-bold text-center border-x border-gray-200">Payment</th>
 							<th class="px-4 py-3 font-bold rounded-tr-xl text-center">Action</th>
 						</tr>
 					</thead>
@@ -1843,6 +1871,8 @@ function filterArchive(status) {
 
 function applyArchiveFilters() {
 	const q = document.getElementById('archiveSearchInput')?.value.trim().toLowerCase() || '';
+	const start = document.getElementById('archiveStartDate')?.value || '';
+	const end = document.getElementById('archiveEndDate')?.value || '';
 	const tbody = document.getElementById('archiveTbody');
 	const rows = tbody.querySelectorAll('tr.data-row');
 	const noMatch = document.getElementById('archiveNoMatch');
@@ -1851,16 +1881,77 @@ function applyArchiveFilters() {
 	rows.forEach(tr => {
 		const text = (tr.textContent || '').toLowerCase();
 		const status = tr.getAttribute('data-status');
+		const completedDate = tr.getAttribute('data-completed-date');
 		
 		const matchesSearch = !q || text.includes(q);
 		const matchesStatus = currentArchiveStatus === 'all' || status === currentArchiveStatus;
 		
-		const show = matchesSearch && matchesStatus;
+		let matchesDate = true;
+		if (start || end) {
+			if (completedDate) {
+				if (start && completedDate < start) matchesDate = false;
+				if (end && completedDate > end) matchesDate = false;
+			} else {
+				matchesDate = false;
+			}
+		}
+		
+		const show = matchesSearch && matchesStatus && matchesDate;
 		tr.classList.toggle('hidden', !show);
 		any = any || show;
 	});
 
 	if (noMatch) noMatch.classList.toggle('hidden', any);
+}
+
+function applyArchiveQuickFilter(type) {
+	const startInput = document.getElementById('archiveStartDate');
+	const endInput = document.getElementById('archiveEndDate');
+	const now = new Date();
+	const today = now.toISOString().split('T')[0];
+	
+	let start = '';
+	let end = today;
+
+	switch(type) {
+		case 'yesterday':
+			const yesterday = new Date(now);
+			yesterday.setDate(now.getDate() - 1);
+			start = yesterday.toISOString().split('T')[0];
+			end = start;
+			break;
+		case 'last-week':
+			const lastWeek = new Date(now);
+			lastWeek.setDate(now.getDate() - 7);
+			start = lastWeek.toISOString().split('T')[0];
+			break;
+		case '1-month':
+			const oneMonth = new Date(now);
+			oneMonth.setMonth(now.getMonth() - 1);
+			start = oneMonth.toISOString().split('T')[0];
+			break;
+		case '1-year':
+			const oneYear = new Date(now);
+			oneYear.setFullYear(now.getFullYear() - 1);
+			start = oneYear.toISOString().split('T')[0];
+			break;
+	}
+
+	if (startInput) startInput.value = start;
+	if (endInput) endInput.value = end;
+	applyArchiveFilters();
+}
+
+function clearArchiveFilters() {
+	const searchInput = document.getElementById('archiveSearchInput');
+	const startInput = document.getElementById('archiveStartDate');
+	const endInput = document.getElementById('archiveEndDate');
+	
+	if (searchInput) searchInput.value = '';
+	if (startInput) startInput.value = '';
+	if (endInput) endInput.value = '';
+	
+	filterArchive('all');
 }
 
 function openDeliverOrderModal(id, number) {
@@ -1871,12 +1962,16 @@ function openDeliverOrderModal(id, number) {
 	modal.classList.add('flex');
 }
 
-// Archive modal search
+// Archive modal events
 document.addEventListener('DOMContentLoaded', function() {
 	const archiveSearch = document.getElementById('archiveSearchInput');
 	if (archiveSearch) {
 		archiveSearch.addEventListener('input', applyArchiveFilters);
 	}
+	const archiveStart = document.getElementById('archiveStartDate');
+	const archiveEnd = document.getElementById('archiveEndDate');
+	if (archiveStart) archiveStart.addEventListener('change', applyArchiveFilters);
+	if (archiveEnd) archiveEnd.addEventListener('change', applyArchiveFilters);
 });
 </script>
 
