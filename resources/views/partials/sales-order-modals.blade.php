@@ -30,7 +30,18 @@
             </div>
             <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                 <p class="text-xs font-semibold" style="color: #374151;">Status</p>
-                <p class="text-base font-bold mt-2 px-2 py-1 rounded text-white text-center" style="background: {{ $statusBg[$order->status] ?? '#e5e7eb' }};">{{ $order->status }}</p>
+                @php
+                    $modalStatusColors = [
+                        'Pending' => 'text-slate-500',
+                        'In production' => 'text-amber-600',
+                        'Confirmed' => 'text-blue-600',
+                        'Ready' => 'text-purple-600',
+                        'Delivered' => 'text-green-600',
+                        'Cancelled' => 'text-red-600 font-bold',
+                    ];
+                    $mStColor = $modalStatusColors[$order->status] ?? 'text-slate-600';
+                @endphp
+                <p class="text-base font-bold mt-2 {{ $mStColor }}">{{ $order->status }}</p>
             </div>
         </div>
 
@@ -130,30 +141,15 @@
                             <input type="text" value="{{ $order->customer->name }} ({{ $order->customer->customer_type }})" class="text-black w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
                             <input type="hidden" name="customer_id" value="{{ $order->customer_id }}">
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4">
                             <div>
                                 <label class="block text-sm font-bold text-gray-900 mb-3">Delivery Date</label>
                                 <input type="date" name="delivery_date" min="{{ date('Y-m-d') }}" value="{{ $order->delivery_date }}" class="editDeliveryDate w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-3">Due Date</label>
-                                <input type="date" name="due_date" min="{{ date('Y-m-d') }}" value="{{ $order->due_date }}" class="editDueDate w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
-                            </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-3">Status</label>
-                                <select name="status" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
-                                    <option value="Pending" {{ $order->status === 'Pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="In production" {{ $order->status === 'In production' ? 'selected' : '' }}>In production</option>
-                                    <option value="Confirmed" {{ $order->status === 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                    <option value="Ready" {{ $order->status === 'Ready' ? 'selected' : '' }}>Ready</option>
-                                    <option value="Delivered" {{ $order->status === 'Delivered' ? 'selected' : '' }}>Delivered</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-900 mb-3">Notes</label>
-                                <textarea name="note" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" rows="1">{{ $order->note }}</textarea>
+                                <label class="block text-sm font-bold text-gray-900 mb-2">Notes</label>
+                                <textarea name="note" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" rows="2">{{ $order->note }}</textarea>
                             </div>
                         </div>
                         <div class="flex justify-end space-x-2 mt-6">
