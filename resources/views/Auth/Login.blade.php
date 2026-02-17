@@ -228,10 +228,7 @@
 							<input type="checkbox" name="remember" 
 								class="w-4 h-4 border-2 border-[#D2691E] rounded text-[#D2691E] focus:ring-2 focus:ring-[#D2691E] focus:ring-offset-0 cursor-pointer">
 							<span class="group-hover:text-[#D2691E] transition-colors">Remember me</span>
-						</label>
-						<a href="#" class="text-sm text-[#D2691E] hover:text-[#A0522D] font-medium transition-colors">
-							Forgot password?
-						</a>
+					
 					</div>
 
 					<!-- Submit Button -->
