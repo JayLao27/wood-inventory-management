@@ -8,6 +8,8 @@
     data-order-id="{{ $order->id }}" 
     data-status="{{ $order->status }}" 
     data-payment="{{ $order->payment_status }}"
+    data-order-date="{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('Y-m-d') }}"
+    data-completed-date="{{ $order->updated_at->format('Y-m-d') }}"
     @if($isArchive) style="background-color: rgba(255,255,255,0.7);" @endif>
     <td class="px-3 py-3 font-mono {{ $rowTextColor }}">{{ $order->order_number }}</td>
     <td class="px-3 py-3">
@@ -36,8 +38,8 @@
         @endif
     </td>
     @endif
-    <td class="px-3 py-3 {{ $rowTextColor }}">
-        {{ $delivery->format('M d, Y') }}
+    <td class="px-3 py-3 {{ $rowTextColor }} text-center">
+        {{ $isArchive ? $order->updated_at->format('M d, Y') : $delivery->format('M d, Y') }}
     </td>
     <td class="px-3 py-3">
         @php
@@ -79,7 +81,7 @@
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                 </svg>
             </button>
-            @if($order->status === 'Ready')
+            @if($order->status === 'Ready' && $order->payment_status === 'Paid')
             <button type="button" onclick="openDeliverOrderModal({{ $order->id }}, '{{ $order->order_number }}')" class="p-1.5 {{ $isArchive ? 'hover:bg-gray-200 text-green-600' : 'hover:bg-slate-500 text-green-400' }} rounded-lg transition-all" title="Deliver Order">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
