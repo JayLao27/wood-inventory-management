@@ -31,127 +31,130 @@
 		$monthlyPerformance = $monthlyPerformance ?? [];
 	@endphp
 	<!-- Main Content -->
-	<div class="flex-1 p-8 bg-amber-50 overflow-y-auto">
-		<!-- Header -->
-		<div class="mb-8">
-			<div class="flex justify-between items-center">
-				<div>
-					<h1 class="text-4xl font-bold text-gray-800">Accounting & Finance</h1>
-					<p class="text-lg text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
-				</div>
-				<div class="flex space-x-3">
-					<div class="relative">
-						<button id="exportButtonAccounting" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-							</svg>
-							<span>Export</span>
-							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-								<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-							</svg>
-						</button>
-						<!-- Export Dropdown -->
-						<div id="exportDropdownAccounting" class="hidden fixed w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
-							<div class="py-1">
-								<a href="#" onclick="exportTransactionReceipt(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-									<div class="flex items-center gap-2">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-										</svg>
-										<span>Transaction Receipt</span>
-									</div>
-								</a>
-								<a href="#" onclick="exportFinancialReport(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-									<div class="flex items-center gap-2">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-										</svg>
-										<span>Financial Report</span>
-									</div>
-								</a>
-								<a href="#" onclick="exportTransactionHistory(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-									<div class="flex items-center gap-2">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-										</svg>
-										<span>Transaction History</span>
-									</div>
-								</a>
-							</div>
+	<div class="flex-1 flex flex-col overflow-hidden">
+	<!-- Header -->
+	<div class="bg-amber-50 p-5 relative z-10 border-b border-amber-200">
+		<div class="flex justify-between items-center">
+			<div>
+				<h1 class="text-xl font-bold text-gray-800">Accounting & Finance</h1>
+				<p class="text-base text-gray-600 mt-2">Track finances, manage budgets, and generate financial reports</p>
+			</div>
+			<div class="flex space-x-3 relative z-50">
+				<div class="relative">
+					<button id="exportButtonAccounting" class="flex items-center gap-2 bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-lg text-sm text-white transition">
+						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+						</svg>
+						<span>Export</span>
+						<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+						</svg>
+					</button>
+					<!-- Export Dropdown -->
+					<div id="exportDropdownAccounting" class="hidden absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+						<div class="py-1">
+							<a href="#" onclick="exportTransactionReceipt(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
+								<div class="flex items-center gap-1.5">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+									</svg>
+									<span>Transaction Receipt</span>
+								</div>
+							</a>
+							<a href="#" onclick="exportFinancialReport(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
+								<div class="flex items-center gap-1.5">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+									</svg>
+									<span>Financial Report</span>
+								</div>
+							</a>
+							<a href="#" onclick="exportTransactionHistory(event)" class="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 transition">
+								<div class="flex items-center gap-1.5">
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+									</svg>
+									<span>Transaction History</span>
+								</div>
+							</a>
 						</div>
 					</div>
-					
+				</div>
+				
+			</div>
+		</div>
+	</div>
+
+	<!-- Dashboard Content -->
+	<div class="flex-1 p-5 bg-amber-50 overflow-y-auto">
+		<!-- Summary Cards Row -->
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+			<!-- Total Revenue Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Total Revenue</h3>
+						<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text text-transparent">₱{{ number_format($totalRevenue, 2) }}</p>
+						<p class="text-slate-300 text-xs mt-1">
+							<span class="{{ $lastMonthRevenuePercentage >= 1 ? 'text-green-400' : 'text-slate-300' }}">{{ $lastMonthRevenuePercentage > 0 ? '+' : '' }}{{ $lastMonthRevenuePercentage }}% from last month</span>
+						</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+						@include('components.icons.dollar', ['class' => 'w-5 h-5 text-amber-400'])
+					</div>
+				</div>
+			</div>
+
+			<!-- Total Expenses Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Total Expenses</h3>
+						<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">₱{{ number_format($totalExpenses, 2) }}</p>
+						<p class="text-slate-300 text-xs mt-1">
+							<span class="{{ $lastMonthExpensesPercentage >= 1 ? 'text-red-400' : 'text-slate-300' }}">{{ $lastMonthExpensesPercentage > 0 ? '+' : '' }}{{ $lastMonthExpensesPercentage }}% from last month</span>
+						</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+						@include('components.icons.dollar', ['class' => 'w-5 h-5 text-red-400'])
+					</div>
+				</div>
+			</div>
+
+			<!-- Net Profit Card -->
+			<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl p-3 text-white shadow-xl border border-slate-600 hover:shadow-2xl transition-all duration-300">
+				<div class="flex justify-between items-start">
+					<div>
+						<h3 class="text-xs font-medium text-slate-300 font-semibold uppercase tracking-wide">Net Profit</h3>
+						<p class="text-2xl font-bold mt-2 bg-gradient-to-r from-green-300 to-green-100 bg-clip-text text-transparent">₱{{ number_format($netProfit, 2) }}</p>
+						<p class="text-slate-300 text-xs mt-1">
+							<span class="{{ $lastMonthNetProfitPercentage >= 1 ? 'text-green-400' : 'text-slate-300' }}">{{ $lastMonthNetProfitPercentage > 0 ? '+' : '' }}{{ $lastMonthNetProfitPercentage }}% from last month</span>
+						</p>
+					</div>
+					<div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+						@include('components.icons.dollar', ['class' => 'w-5 h-5 text-green-400'])
+					</div>
 				</div>
 			</div>
 		</div>
-
-		<!-- Dashboard Content -->
-			<!-- Summary Cards -->
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-				<!-- Total Revenue Card -->
-				<div class="bg-slate-700 text-white p-6 rounded-xl">
-					<div class="flex justify-between items-start">
-						<div class="flex-1">
-							<h3 class="text-sm font-medium text-slate-300">Total Revenue</h3>
-							<p class="text-3xl font-bold mt-2">₱{{ number_format($totalRevenue, 2) }}</p>
-							<div class="flex items-center mt-2">
-								<span class="text-sm {{ $lastMonthRevenuePercentage >= 1 ? 'text-green-400' : 'text-white' }}">+{{ $lastMonthRevenuePercentage }}% from last month</span>
-							</div>
-						</div>	
-					<div >
-						@include('components.icons.dollar', ['class' => 'icon-dollar'])
-				</div>
-					</div>
-				</div>
-
-				<!-- Total Expenses Card -->
-				<div class="bg-slate-700 text-white p-6 rounded-xl">
-					<div class="flex justify-between items-start">
-						<div class="flex-1">
-							<h3 class="text-sm font-medium text-slate-300">Total Expenses</h3>
-							<p class="text-3xl font-bold mt-2">₱{{ number_format($totalExpenses, 2) }}</p>
-							<div class="flex items-center mt-2">
-								<span class="text-sm {{ $lastMonthExpensesPercentage >= 1 ? 'text-red-400' : 'text-white' }}">+{{ $lastMonthExpensesPercentage }}% from last month</span>
-							</div>
-						</div>
-						<div >
-							@include('components.icons.dollar', ['class' => 'icon-dollar'])
-					</div>
-					</div>
-				</div>
-
-				<!-- Net Profit Card -->
-				<div class="bg-slate-700 text-white p-6 rounded-xl">
-					<div class="flex justify-between items-start">
-						<div class="flex-1">
-							<h3 class="text-sm font-medium text-slate-300">Net Profit</h3>
-							<p class="text-3xl font-bold mt-2 text-white">₱{{ number_format($netProfit, 2) }}</p>
-							<div class="flex items-center mt-2">
-								<span class="text-sm {{ $lastMonthNetProfitPercentage >= 1 ? 'text-green-400' : 'text-white' }}">+{{ $lastMonthNetProfitPercentage }}% from last month</span>
-							</div>
-						</div>
-								<div >
-							@include('components.icons.dollar', ['class' => 'icon-dollar'])
-					</div>
-					</div>
-				</div>
-			</div>
 			<!-- Main Content Grid -->
 			<div class="grid grid-cols-1 gap-6">
 				<!-- Financial Transactions Section (Full Width) -->
 				<div class="w-full">
-					<div class="bg-slate-700 text-white p-6 rounded-xl">
-						<div class="mb-6 flex justify-between items-start">
+					<div class="bg-gradient-to-br from-slate-700 to-slate-800 text-white p-3 rounded-xl overflow-visible shadow-xl border border-slate-600">
+						<div class="flex justify-between items-center mb-6">
 							<div>
-								<h2 class="text-xl font-semibold mb-1">Financial Transactions</h2>
-								<p class="text-slate-300 text-sm">Track all income, expenses, and financial activities</p>
+								<h2 class="text-xl font-bold text-white">Financial Transactions</h2>
+								<p class="text-slate-300 text-xs font-medium mt-2">Track all income, expenses, and financial activities</p>
 							</div>
-							<button onclick="openAddTransaction()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-1.5 font-medium">
-								<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-								</svg>
-								<span>Add Transaction</span>
-							</button>
+							<div class="flex items-center gap-2">
+								<button onclick="openAddTransaction()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl flex items-center gap-1.5 font-medium">
+									<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+									</svg>
+									<span>Add Transaction</span>
+								</button>
+							</div>
 						</div>
 
 						<!-- Tabs -->
@@ -161,58 +164,61 @@
 						</div>
 
 						<div id="transactionContent">
-							<!-- Search and Filters -->
-							<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-								<div class="flex-1 max-w-md">
-									<div class="relative">
-										<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-											<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-											</svg>
-										</div>
-										<input type="text" id="searchInput" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-white text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+						<!-- Search and Filters -->
+						<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+							<div class="flex-1 max-w-md">
+								<div class="relative">
+									<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+										<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+										</svg>
 									</div>
-								</div>
-								<div class="flex gap-2">
-									<select id="statusFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-										<option value="all">All Status</option>
-										<option value="paid">Paid</option>
-										<option value="partial">Partial</option>
-									</select>
-									<select id="categoryFilter" class="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
-										<option value="all">All Categories</option>
-										<option value="Income">Income</option>
-										<option value="Expense">Expense</option>
-									</select>
+									<input type="text" id="searchInput" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-slate-400">
 								</div>
 							</div>
+							<div class="flex gap-2">
+								<select id="statusFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+									<option value="all">All Status</option>
+									<option value="paid">Paid</option>
+									<option value="partial">Partial</option>
+									<option value="unpaid">Unpaid</option>
+								</select>
+								<select id="categoryFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+									<option value="all">All Categories</option>
+									<option value="Income">Income</option>
+									<option value="Expense">Expense</option>
+								</select>
+							</div>
+						</div>
 
 							<!-- Transactions Table -->
-							<div class="overflow-y-auto max-h-[60vh]">
-								<table class="w-full border-collapse text-left text-sm text-white">
-								<thead class="bg-slate-800 text-slate-300 sticky top-0">
-									<tr>
-										<th class="px-4 py-3 font-medium">Transaction #</th>
-										<th class="px-4 py-3 font-medium">Date</th>
-										<th class="px-4 py-3 font-medium">Type</th>
-										<th class="px-4 py-3 font-medium">Category</th>
-										<th class="px-4 py-3 font-medium">Description</th>
-										<th class="px-4 py-3 font-medium">Amount</th>
+						<div class="overflow-x-auto rounded-xl border border-slate-600">
+							<table class="w-full text-left border-collapse">
+								<thead>
+									<tr class="bg-slate-700/50 text-slate-300 border-b border-slate-600">
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Transaction #</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Date</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Type</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Category</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Description</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Amount</th>
+
 									</tr>
 								</thead>
-								<tbody class="divide-y divide-slate-600">
+								<tbody class="divide-y divide-slate-600" id="transactionTableBody">
 									@forelse($transactions as $transaction)
-										<tr class="transaction-row hover:bg-slate-600 transition cursor-pointer" 
+										<tr class="border-b border-slate-600 hover:bg-slate-700/50 transition-colors duration-200 transaction-row cursor-pointer" onclick="selectRow(this)"
 											data-type="{{ $transaction->transaction_type }}"
-										data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@elseif($transaction->salesOrder){{ strtolower($transaction->salesOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif"
-										data-id="TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}"
-										data-date="{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}"
-										data-category="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->customer->name ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->supplier->name ?? '') }}@endif"
-										data-description="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->order_number ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->order_number ?? '') }}@else{{ strtolower($transaction->description ?? '') }}@endif">
+											data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@elseif($transaction->salesOrder){{ strtolower($transaction->salesOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif"
+											data-id="TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}"
+											data-date="{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}"
+											data-category="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->customer->name ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->supplier->name ?? '') }}@endif"
+											data-description="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->order_number ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->order_number ?? '') }}@else{{ strtolower($transaction->description ?? '') }}@endif">
 											<td class="px-4 py-3 font-mono text-slate-300">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
-											<td class="px-4 py-3 text-slate-300">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
+											<td class="px-4 py-3 font-medium text-slate-200">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
 											<td class="px-4 py-3">
-												<span class="text-xs font-semibold {{ $transaction->transaction_type === 'Income' ? 'text-green-400' : 'text-red-400' }}">
+												<span class="px-2 py-1 rounded-full text-xs font-semibold
+													{{ $transaction->transaction_type === 'Income' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30' }}">
 													{{ $transaction->transaction_type }}
 												</span>
 											</td>
