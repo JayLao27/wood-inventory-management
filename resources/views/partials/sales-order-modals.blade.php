@@ -11,7 +11,7 @@
         </div>
 
         <!-- Order Information Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
             <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                 <p class="text-xs font-semibold" style="color: #374151;">Customer Type</p>
                 <p class="text-base font-bold mt-2" style="color: {{ $customerTypeBg[$order->customer?->customer_type] ?? '#374151' }};">{{ $order->customer?->customer_type }}</p>
@@ -19,6 +19,10 @@
             <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                 <p class="text-xs font-semibold" style="color: #374151;">Order Date</p>
                 <p class="text-base font-bold mt-2" style="color: #374151;">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</p>
+            </div>
+            <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
+                <p class="text-xs font-semibold" style="color: #374151;">Due Date</p>
+                <p class="text-base font-bold mt-2" style="color: #374151;">{{ $order->due_date ? \Illuminate\Support\Carbon::parse($order->due_date)->format('M d, Y') : '-' }}</p>
             </div>
             <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                 <p class="text-xs font-semibold" style="color: #374151;">Delivery Date</p>
@@ -126,13 +130,31 @@
                             <input type="text" value="{{ $order->customer->name }} ({{ $order->customer->customer_type }})" class="text-black w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 bg-gray-100 text-sm transition-all" readonly>
                             <input type="hidden" name="customer_id" value="{{ $order->customer_id }}">
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-900 mb-3">Delivery Date</label>
-                            <input type="date" name="delivery_date" min="{{ date('Y-m-d') }}" value="{{ $order->delivery_date }}" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Delivery Date</label>
+                                <input type="date" name="delivery_date" min="{{ date('Y-m-d') }}" value="{{ $order->delivery_date }}" class="editDeliveryDate w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Due Date</label>
+                                <input type="date" name="due_date" min="{{ date('Y-m-d') }}" value="{{ $order->due_date }}" class="editDueDate w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-900 mb-3">Notes</label>
-                            <textarea name="note" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" rows="3">{{ $order->note }}</textarea>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Status</label>
+                                <select name="status" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all">
+                                    <option value="Pending" {{ $order->status === 'Pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="In production" {{ $order->status === 'In production' ? 'selected' : '' }}>In production</option>
+                                    <option value="Confirmed" {{ $order->status === 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                    <option value="Ready" {{ $order->status === 'Ready' ? 'selected' : '' }}>Ready</option>
+                                    <option value="Delivered" {{ $order->status === 'Delivered' ? 'selected' : '' }}>Delivered</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-900 mb-3">Notes</label>
+                                <textarea name="note" class="w-full border-2 text-black border-gray-300 rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm transition-all" rows="1">{{ $order->note }}</textarea>
+                            </div>
                         </div>
                         <div class="flex justify-end space-x-2 mt-6">
                             <button type="button" class="px-6 py-1.5 border-2 border-gray-300 rounded-xl text-gray-700 font-bold text-sm hover:bg-gray-100 transition-all" onclick="closeModal('editOrderModal-{{ $order->id }}')">Cancel</button>
