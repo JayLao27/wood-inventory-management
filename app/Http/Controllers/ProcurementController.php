@@ -453,10 +453,24 @@ class ProcurementController extends Controller
                 $query->whereDate('created_at', '<=', $request->date_to);
             }
 
-            // Apply material filter
-            if ($request->has('material') && $request->material) {
-                $query->whereHas('item', function ($q) use ($request) {
-                    $q->where('name', $request->material);
+
+            // Apply search filter
+            if ($request->has('search') && $request->search) {
+                $search = $request->search;
+                
+                // Find matching materials
+                $materialIds = Material::where('name', 'like', "%{$search}%")->pluck('id');
+                
+                // Find matching POs (by number or supplier)
+                $purchaseOrderIds = PurchaseOrder::where('order_number', 'like', "%{$search}%")
+                    ->orWhereHas('supplier', function($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })->pluck('id');
+
+                $query->where(function($q) use ($search, $materialIds, $purchaseOrderIds) {
+                    $q->whereIn('item_id', $materialIds)
+                      ->orWhereIn('reference_id', $purchaseOrderIds)
+                      ->orWhere('notes', 'like', "%{$search}%");
                 });
             }
 
