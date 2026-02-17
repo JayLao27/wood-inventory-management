@@ -17,13 +17,20 @@
                 <p class="text-base font-bold mt-2" style="color: {{ $customerTypeBg[$order->customer?->customer_type] ?? '#374151' }};">{{ $order->customer?->customer_type }}</p>
             </div>
             <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
-                <p class="text-xs font-semibold" style="color: #374151;">Order Date</p>
-                <p class="text-base font-bold mt-2" style="color: #374151;">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</p>
+                <p class="text-[10px] font-bold text-gray-500 uppercase">Started</p>
+                <p class="text-base font-bold mt-1" style="color: #374151;">{{ \Illuminate\Support\Carbon::parse($order->order_date)->format('M d, Y') }}</p>
             </div>
+            @if(in_array($order->status, ['Delivered', 'Cancelled']))
+            <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #10B981;">
+                <p class="text-[10px] font-bold text-green-600 uppercase">Completed</p>
+                <p class="text-base font-bold mt-1 text-green-700">{{ $order->updated_at->format('M d, Y') }}</p>
+            </div>
+            @else
             <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                 <p class="text-xs font-semibold" style="color: #374151;">Due Date</p>
                 <p class="text-base font-bold mt-2" style="color: #374151;">{{ $order->due_date ? \Illuminate\Support\Carbon::parse($order->due_date)->format('M d, Y') : '-' }}</p>
             </div>
+            @endif
             <div class="p-3 rounded-lg border-l-4" style="background-color: rgba(255,255,255,0.7); border-left-color: #374151;">
                 <p class="text-xs font-semibold" style="color: #374151;">Delivery Date</p>
                 <p class="text-base font-bold mt-2" style="color: #374151;">{{ \Illuminate\Support\Carbon::parse($order->delivery_date)->format('M d, Y') }}</p>
