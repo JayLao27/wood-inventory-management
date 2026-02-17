@@ -15,14 +15,22 @@ class SalesOrderController extends Controller
     {
         // Use pagination instead of loading all
         $salesOrders = SalesOrder::with(['customer', 'items.product'])
+            ->where('status', '!=', 'Cancelled')
             ->latest()
             ->paginate(20);
+
+        $archiveOrders = SalesOrder::with(['customer', 'items.product'])
+            ->where('status', 'Cancelled')
+            ->latest()
+            ->get();
+
         
         // Use cache for reference data
         $customers = CacheService::getCustomers();
         $products = CacheService::getProducts();
 
-        return view('Systems.sales', compact('salesOrders', 'customers', 'products'));
+        return view('Systems.sales', compact('salesOrders', 'archiveOrders', 'customers', 'products'));
+
     }
 
     public function store(Request $request)
@@ -146,12 +154,44 @@ class SalesOrderController extends Controller
         return redirect()->back()->with('success', 'Sales order created.');
     }
 
+    public function cancelItem(Request $request, SalesOrderItem $item)
+    {
+        $request->validate([
+            'cancel_quantity' => 'required|integer|min:1|max:' . ($item->quantity - $item->cancelled_quantity),
+            'reason' => 'nullable|string'
+        ]);
+
+        $item->increment('cancelled_quantity', $request->cancel_quantity);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Item quantity cancelled successfully.'
+        ]);
+    }
+
+    public function cancelPurchaseItem(Request $request, PurchaseOrderItem $item)
+    {
+        $request->validate([
+            'cancel_quantity' => 'required|numeric|min:0.01|max:' . ($item->quantity - $item->cancelled_quantity),
+            'reason' => 'nullable|string'
+        ]);
+
+        $item->increment('cancelled_quantity', $request->cancel_quantity);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase item quantity cancelled successfully.'
+        ]);
+    }
+
+
     public function update(Request $request, SalesOrder $sales_order)
     {
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'delivery_date' => 'required|date|after_or_equal:today',
-            'status' => 'nullable|in:In production,Confirmed,Pending,Delivered,Ready',
+            'status' => 'nullable|in:In production,Confirmed,Pending,Delivered,Ready,Cancelled',
+
             'payment_status' => 'nullable|in:Pending,Partial,Paid',
             'note' => 'nullable|string',
         ]);
@@ -216,10 +256,10 @@ public function RemoveCustomer($id)
 
     public function destroy(SalesOrder $sales_order)
     {
-         $salesOrder = SalesOrder::findOrFail($sales_order->id);
-        $salesOrder->delete();
-        return redirect()->back()->with('success', 'Order is Cancelled deleted.');
+        $sales_order->update(['status' => 'Cancelled']);
+        return redirect()->back()->with('success', 'Order has been moved to Archive.');
     }
+
 
     private function generateOrderNumber(): string
     {
