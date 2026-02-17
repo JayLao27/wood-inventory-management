@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
             $table->date('order_date');
             $table->date('delivery_date');
-            $table->enum('status', ['In production', 'Confirmed', 'Pending', 'Delivered', 'Ready'])->default('Pending');
+            $table->date('due_date')->nullable();
+            $table->enum('status', ['In production', 'Confirmed', 'Pending', 'Delivered', 'Ready', 'Cancelled'])->default('Pending');
             $table->decimal('total_amount', 12, 2)->default(0);
             $table->decimal('paid_amount', 12, 2)->default(0);
             $table->enum('payment_status', ['Pending', 'Partial', 'Paid'])->default('Pending');
