@@ -245,11 +245,11 @@
 								<td class="px-4 py-3 font-bold text-slate-300">₱{{ number_format($order->total_amount, 2) }}</td>
 								<td class="px-4 py-3">
 									@if($order->payment_status === 'Paid')
-										<span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">{{ $order->payment_status }}</span>
+										<span class="text-xs font-bold text-green-400">{{ $order->payment_status }}</span>
 									@elseif($order->payment_status === 'Partial')
-										<span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">{{ $order->payment_status }}</span>
+										<span class="text-xs font-bold text-amber-400">{{ $order->payment_status }}</span>
 									@else
-										<span class="px-2 py-1 rounded-full text-xs font-semibold bg-white/10 text-slate-400 border border-slate-500/30">Pending</span>
+										<span class="text-xs font-bold text-slate-400">Pending</span>
 									@endif
 								</td>
 								<td class="py-3 px-4">
