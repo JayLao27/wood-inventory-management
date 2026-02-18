@@ -21,7 +21,8 @@ class PurchaseOrder extends Model
         'quality_status',
         'approved_by',
         'approval_date',
-        'updated_date'
+        'updated_date',
+        'payment_status',
     ];
 
     protected $casts = [
