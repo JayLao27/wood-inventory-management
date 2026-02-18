@@ -157,13 +157,6 @@
 							</div>
 						</div>
 
-						<!-- Tabs -->
-						<div class="flex space-x-2 w-full mb-6">
-							<button onclick="showAccountingTab('transaction')" id="transactionTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Transactions</button>
-							<button onclick="showAccountingTab('reports')" id="reportsTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Reports</button>
-						</div>
-
-						<div id="transactionContent">
 						<!-- Search and Filters -->
 						<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
 							<div class="flex-1 max-w-md">
@@ -190,6 +183,14 @@
 								</select>
 							</div>
 						</div>
+
+						<!-- Tabs -->
+						<div class="flex space-x-2 w-full mb-6">
+							<button onclick="showAccountingTab('transaction')" id="transactionTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #FFF1DA; border-color: #FDE68A; color: #111827;">Transactions</button>
+							<button onclick="showAccountingTab('reports')" id="reportsTab" class="flex-1 px-5.5 py-3 rounded-xl border-2 font-bold text-sm transition-all shadow-lg" style="background-color: #475569; border-color: #64748b; color: #FFFFFF;">Reports</button>
+						</div>
+
+						<div id="transactionContent">
 
 							<!-- Transactions Table -->
 						<div class="overflow-x-auto rounded-xl border border-slate-600">
