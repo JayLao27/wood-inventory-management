@@ -61,6 +61,32 @@ wood-inventory-management/
 └── public/                       # Public assets and entry point
 ```
 
+## Live Demo
+[View Live Demo](https://rmwoodworks-1.onrender.com)
+
+## Screenshots
+
+### Login
+![Login](login.png)
+
+### Dashboard
+![Dashboard](dashboard.png)
+
+### Accounting
+![Accounting](accounting.png)
+
+### Inventory
+![Inventory](inventory.png)
+
+### Procurement
+![Procurement](procurement.png)
+
+### Production
+![Production](production.png)
+
+### Sales
+![Sales](sales.png)
+
 ## Development Status
 
 **Status**: In Progress
