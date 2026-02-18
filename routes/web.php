@@ -73,6 +73,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/procurement/purchase-orders/{purchaseOrder}/receive-stock', [ProcurementController::class, 'receiveStock'])
         ->name('procurement.purchase-order.receive-stock')
         ->middleware('role:admin,procurement_officer,inventory_clerk');
+    Route::post('/procurement/purchase-orders/{id}/receive', [ProcurementController::class, 'markReceived'])
+        ->name('procurement.purchase-order.receive')
+        ->middleware('role:admin,procurement_officer,inventory_clerk');
     Route::get('/procurement/received-stock-reports', [ProcurementController::class, 'receivedStockReports'])
         ->name('procurement.received-stock-reports')
         ->middleware('role:admin,procurement_officer,inventory_clerk');
