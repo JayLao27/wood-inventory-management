@@ -229,10 +229,20 @@ $paymentBg = [
 			</header>
 
 			<!-- Search + Filters -->
-			<div class="flex flex-col md:flex-row justify-between gap-3 mb-6">
-				<input type="search" id="searchInput" placeholder="Search order or customers..." class="bg-white w-full md:w-3/4 rounded-full px-3 py-1.5 text-gray-900 focus:outline-none">
-				<div class="flex gap-1.5">
-					<select id="paymentFilter" class="flex items-center space-x-2 px-3 py-1.5 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+			<!-- Search + Filters -->
+			<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+				<div class="flex-1 max-w-md">
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+							</svg>
+						</div>
+						<input type="search" id="searchInput" placeholder="Search order or customers..." class="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-slate-400">
+					</div>
+				</div>
+				<div class="flex gap-2">
+					<select id="paymentFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
 						<option value="">All Payment</option>
 						<option value="Pending">Unpaid</option>
 						<option value="Partial">Partial</option>
