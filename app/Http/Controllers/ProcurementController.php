@@ -18,8 +18,15 @@ class ProcurementController extends Controller
         $suppliers = Supplier::all();
         // Add pagination and eager loading
         $purchaseOrders = PurchaseOrder::with(['supplier', 'items.material'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->whereNotIn('status', ['received', 'cancelled'])
+            ->latest()
+            ->get();
+            
+        $archiveOrders = PurchaseOrder::with(['supplier', 'items.material'])
+            ->whereIn('status', ['received', 'cancelled'])
+            ->latest()
+            ->get();
+
         $materials = Material::paginate(25);
         
         $totalSpent = PurchaseOrder::sum('total_amount');
@@ -100,7 +107,8 @@ class ProcurementController extends Controller
             'pendingPayments',
             'activeSuppliers',
             'lowStockAlerts',
-            'openPurchaseOrders'
+            'openPurchaseOrders',
+            'archiveOrders'
         ));
     }
 
@@ -219,10 +227,27 @@ class ProcurementController extends Controller
     public function destroyPurchaseOrder($id)
     {
         $purchaseOrder = PurchaseOrder::findOrFail($id);
-        $purchaseOrder->items()->delete();
-        $purchaseOrder->delete();
 
-        return redirect()->route('procurement')->with('success', 'Purchase order cancelled!');
+        if ($purchaseOrder->status === 'received') {
+            return redirect()->back()->with('error', 'Cannot cancel an order that has already been received.');
+        }
+
+        if ($purchaseOrder->payment_status === 'Paid') {
+            return redirect()->back()->with('error', 'Cannot cancel an order that has been paid.');
+        }
+
+        // Check if any items have been partially received
+        $hasReceivedItems = InventoryMovement::where('reference_type', 'purchase_order')
+            ->where('reference_id', $purchaseOrder->id)
+            ->exists();
+
+        if ($hasReceivedItems) {
+            return redirect()->back()->with('error', 'Cannot cancel an order that has started receiving items. Please use the receive items function to manage remaining stock.');
+        }
+
+        $purchaseOrder->update(['status' => 'cancelled']);
+
+        return redirect()->route('procurement')->with('success', 'Purchase order cancelled successfully.');
     }
 
     /**
@@ -521,5 +546,57 @@ class ProcurementController extends Controller
             ->firstOrFail();
 
         return view('exports.procurement-receipt', compact('purchaseOrder'));
+    }
+
+    /**
+     * Mark the entire purchase order as received and update stock for all remaining items.
+     */
+    public function markReceived(Request $request, $id)
+    {
+        $purchaseOrder = PurchaseOrder::with('items')->findOrFail($id);
+
+        if ($purchaseOrder->status === 'received') {
+            return redirect()->back()->with('error', 'Order is already marked as received.');
+        }
+
+        if ($purchaseOrder->status === 'cancelled') {
+            return redirect()->back()->with('error', 'Cannot receive a cancelled order.');
+        }
+
+        DB::transaction(function () use ($purchaseOrder) {
+            foreach ($purchaseOrder->items as $item) {
+                // Calculate remaining quantity
+                $ordered = (float) $item->quantity;
+                $alreadyReceived = (float) InventoryMovement::where('item_type', 'material')
+                    ->where('item_id', $item->material_id)
+                    ->where('reference_type', 'purchase_order')
+                    ->where('reference_id', $purchaseOrder->id)
+                    ->where('movement_type', 'in')
+                    ->sum('quantity');
+
+                $remaining = max($ordered - $alreadyReceived, 0);
+
+                if ($remaining > 0) {
+                    $material = Material::findOrFail($item->material_id);
+                    
+                    InventoryMovement::create([
+                        'item_type' => 'material',
+                        'item_id' => $material->id,
+                        'movement_type' => 'in',
+                        'quantity' => $remaining,
+                        'reference_type' => 'purchase_order',
+                        'reference_id' => $purchaseOrder->id,
+                        'notes' => 'Bulk received from PO ' . $purchaseOrder->order_number 
+                            . ' | Received by: ' . (auth()->user()->name ?? 'System'),
+                    ]);
+
+                    $material->increment('current_stock', $remaining);
+                }
+            }
+
+            $purchaseOrder->update(['status' => 'received']);
+        });
+
+        return redirect()->route('procurement')->with('success', 'Stock received and inventory updated successfully.');
     }
 }
