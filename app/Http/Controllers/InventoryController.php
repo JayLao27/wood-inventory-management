@@ -27,8 +27,8 @@ class InventoryController extends Controller
         $totalValue = $materials->sum(function($material) {
             return $material->current_stock * $material->unit_cost;
         });
-        $newOrders = $products->where('status', 'active')->count();
-        $pendingDeliveries = 0; // This would come from purchase orders
+        $newOrders = \App\Models\SalesOrder::where('status', 'Pending')->count();
+        $pendingDeliveries = \App\Models\PurchaseOrder::whereIn('status', ['Pending', 'Partial'])->count();
         
         return view('Systems.inventory', compact(
             'products', 'materials', 'suppliers', 
