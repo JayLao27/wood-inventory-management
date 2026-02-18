@@ -203,6 +203,7 @@
 										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Category</th>
 										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Description</th>
 										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Amount</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Status</th>
 
 									</tr>
 								</thead>
@@ -218,9 +219,8 @@
 											<td class="px-4 py-3 font-mono text-slate-300">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
 											<td class="px-4 py-3 font-medium text-slate-200">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
 											<td class="px-4 py-3">
-												<span class="px-2 py-1 rounded-full text-xs font-semibold
-													{{ $transaction->transaction_type === 'Income' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30' }}">
-													{{ $transaction->transaction_type }}
+												<span class="text-xs font-bold {{ $transaction->transaction_type === 'Income' ? 'text-green-400' : 'text-red-400' }}">
+													{{ $transaction->transaction_type === 'Income' ? 'Income' : 'Expense' }}
 												</span>
 											</td>
 											<td class="px-4 py-3 font-medium">
@@ -241,8 +241,22 @@
 													<span class="text-slate-400 italic">{{ $transaction->description ?? '-' }}</span>
 												@endif
 											</td>
-											<td class="px-4 py-3 font-bold text-right">
+											<td class="px-4 py-3 font-bold text-left">
 												<span class="text-{{ $transaction->transaction_type === 'Income' ? 'green' : 'orange' }}-300">₱{{ number_format($transaction->amount, 2) }}</span>
+											</td>
+											<td class="px-4 py-3">
+												@php
+													$status = 'Paid'; // Default
+													if ($transaction->salesOrder) {
+														$status = $transaction->salesOrder->payment_status;
+													} elseif ($transaction->purchaseOrder) {
+														$status = $transaction->purchaseOrder->payment_status;
+													}
+													$statusColor = 'text-green-400';
+													if ($status === 'Partial') $statusColor = 'text-amber-400';
+													if ($status === 'Pending' || $status === 'Unpaid') $statusColor = 'text-slate-400';
+												@endphp
+												<span class="text-xs font-bold {{ $statusColor }}">{{ $status }}</span>
 											</td>
 										</tr>
 									@empty
