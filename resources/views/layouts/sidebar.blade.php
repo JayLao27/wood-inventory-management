@@ -34,7 +34,7 @@
                 <div class="relative group cursor-default">
                     <div class="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-300"></div>
                     <div class="relative w-12 h-12 bg-gradient-to-br from-[#2d3342] to-[#1e222e] rounded-2xl flex items-center justify-center shadow-inner border border-slate-600/50">
-                        <img src="{{ asset('images/Logo.png') }}" alt="EMS" class="w-8 h-8 object-contain drop-shadow-md">
+                        <img src="{{ asset('images/logo-white.png') }}" alt="EMS" class="w-8 h-8 object-contain drop-shadow-md">
                     </div>
                 </div>
                 
