@@ -288,7 +288,7 @@
         <!-- Add Item Modal (for Materials) -->
         <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700" style="background-color: #FFF1DA;">
                     <div class="p-4">
                         <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
                             <h3 class="text-xl font-bold text-gray-900">Add New Material</h3>
@@ -372,7 +372,7 @@
         <!-- Add Product Modal -->
         <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700" style="background-color: #FFF1DA;">
                     <div class="p-4">
                         <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
                             <h3 class="text-xl font-bold text-gray-900">Add New Product</h3>
@@ -443,7 +443,7 @@
         <!-- Edit Product Modal -->
         <div id="editProductModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden z-50">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-amber-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700">
+                <div class="rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-slate-700" style="background-color: #FFF1DA;">
                     <div class="p-4">
                         <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-700">
                             <h3 class="text-xl font-bold text-gray-900">Edit Product</h3>
