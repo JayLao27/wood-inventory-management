@@ -77,7 +77,10 @@ User::updateOrCreate(
             SupplierSeeder::class,
             MaterialSeeder::class,
             ProductMaterialSeeder::class, // BOM: materials needed per product
+            SalesOrderSeeder::class,
             PurchaseOrderSeeder::class,
+            WorkOrderSeeder::class,
+            AccountingSeeder::class,
             InventoryMovementSeeder::class,
         ]);
     }

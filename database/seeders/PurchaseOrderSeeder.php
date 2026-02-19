@@ -4,7 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\Material;
+use App\Models\Supplier;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class PurchaseOrderSeeder extends Seeder
 {
@@ -13,120 +16,70 @@ class PurchaseOrderSeeder extends Seeder
      */
     public function run(): void
     {
-        // Purchase Order 1 - Premium Oak Suppliers
-        $po1 = PurchaseOrder::create([
-            'order_number' => 'PO-2025-001',
-            'supplier_id' => 1,
-            'order_date' => now()->subDays(20),
-            'expected_delivery' => now()->subDays(5),
-            'total_amount' => 3500.00,
-            'paid_amount' => 3500.00,
-            'notes' => 'Oak lumber delivery received',
-            'status' => 'received',
-            'assigned_to' => 'John',
-            'quality_status' => 'approved',
-            'approved_by' => 'Manager',
-            'approval_date' => now()->subDays(18),
-            'updated_date' => now()->subDays(5),
-        ]);
+        $materials = Material::all();
+        $suppliers = Supplier::all();
 
-        PurchaseOrderItem::create([
-            'purchase_order_id' => $po1->id,
-            'material_id' => 1,
-            'quantity' => 500,
-            'unit_price' => 5.50,
-            'total_price' => 2750.00,
-        ]);
+        if ($materials->isEmpty() || $suppliers->isEmpty()) {
+            return;
+        }
 
-        PurchaseOrderItem::create([
-            'purchase_order_id' => $po1->id,
-            'material_id' => 6,
-            'quantity' => 2,
-            'unit_price' => 22.50,
-            'total_price' => 45.00,
-        ]);
+        $statuses = ['pending', 'approved', 'received', 'cancelled'];
+        
+        for ($i = 0; $i < 50; $i++) {
+            $supplier = $suppliers->random();
+            $status = $statuses[array_rand($statuses)];
+            
+            $orderDate = Carbon::now()->subDays(rand(1, 60));
+            $expectedDelivery = (clone $orderDate)->addDays(rand(5, 15));
 
-        // Purchase Order 2 - Maple Lumber Co.
-        $po2 = PurchaseOrder::create([
-            'order_number' => 'PO-2025-002',
-            'supplier_id' => 2,
-            'order_date' => now()->subDays(15),
-            'expected_delivery' => now()->addDays(5),
-            'total_amount' => 7200.00,
-            'paid_amount' => 3600.00,
-            'notes' => 'Maple plywood order',
-            'status' => 'approved',
-            'assigned_to' => 'Sarah',
-            'quality_status' => 'pending',
-            'approved_by' => 'Manager',
-            'approval_date' => now()->subDays(14),
-            'updated_date' => now()->subDays(2),
-        ]);
+            $po = PurchaseOrder::create([
+                'order_number' => 'PO-' . now()->year . '-' . str_pad($i + 1, 4, '0', STR_PAD_LEFT),
+                'supplier_id' => $supplier->id,
+                'order_date' => $orderDate,
+                'expected_delivery' => $expectedDelivery,
+                'total_amount' => 0, // Will update
+                'paid_amount' => 0,
+                'notes' => 'Random purchase order',
+                'status' => $status,
+                'assigned_to' => ['John', 'Mike', 'Sarah'][rand(0, 2)],
+                'quality_status' => $status === 'received' ? 'approved' : 'pending',
+                'approved_by' => in_array($status, ['approved', 'received']) ? 'Manager' : null,
+                'approval_date' => in_array($status, ['approved', 'received']) ? now() : null,
+                'updated_date' => now(),
+            ]);
 
-        PurchaseOrderItem::create([
-            'purchase_order_id' => $po2->id,
-            'material_id' => 2,
-            'quantity' => 150,
-            'unit_price' => 45.00,
-            'total_price' => 6750.00,
-        ]);
+            $totalAmount = 0;
+            $itemsCount = rand(1, 3);
 
-        // Purchase Order 3 - Exotic Woods Trading
-        $po3 = PurchaseOrder::create([
-            'order_number' => 'PO-2025-003',
-            'supplier_id' => 3,
-            'order_date' => now()->subDays(10),
-            'expected_delivery' => now()->addDays(8),
-            'total_amount' => 2625.00,
-            'paid_amount' => 0,
-            'notes' => 'Walnut veneer shipment',
-            'status' => 'pending',
-            'assigned_to' => 'Carlos',
-            'quality_status' => 'pending',
-            'approved_by' => null,
-            'approval_date' => null,
-            'updated_date' => now(),
-        ]);
+            for ($j = 0; $j < $itemsCount; $j++) {
+                $material = $materials->random();
+                $quantity = rand(10, 100);
+                $unitPrice = $material->unit_price ?? 10.0; // Fallback if no price
+                $totalPrice = $quantity * $unitPrice;
 
-        PurchaseOrderItem::create([
-            'purchase_order_id' => $po3->id,
-            'material_id' => 3,
-            'quantity' => 300,
-            'unit_price' => 8.75,
-            'total_price' => 2625.00,
-        ]);
+                PurchaseOrderItem::create([
+                    'purchase_order_id' => $po->id,
+                    'material_id' => $material->id,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'total_price' => $totalPrice,
+                ]);
 
-        // Purchase Order 4 - Cedar & Pine Mills
-        $po4 = PurchaseOrder::create([
-            'order_number' => 'PO-2025-004',
-            'supplier_id' => 4,
-            'order_date' => now()->subDays(8),
-            'expected_delivery' => now()->addDays(3),
-            'total_amount' => 4000.00,
-            'paid_amount' => 2000.00,
-            'notes' => 'Pine lumber and cedar shingles',
-            'status' => 'approved',
-            'assigned_to' => 'Emma',
-            'quality_status' => 'pending',
-            'approved_by' => 'Manager',
-            'approval_date' => now()->subDays(7),
-            'updated_date' => now()->subDays(1),
-        ]);
+                $totalAmount += $totalPrice;
+            }
 
-        PurchaseOrderItem::create([
-            'purchase_order_id' => $po4->id,
-            'material_id' => 4,
-            'quantity' => 200,
-            'unit_price' => 12.00,
-            'total_price' => 2400.00,
-        ]);
+            // Update PO totals
+            $paidAmount = 0;
+            if ($status === 'received') {
+                $paidAmount = $totalAmount;
+            } elseif ($status === 'approved') {
+                $paidAmount = $totalAmount / 2;
+            }
 
-        PurchaseOrderItem::create([
-            'purchase_order_id' => $po4->id,
-            'material_id' => 5,
-            'quantity' => 50,
-            'unit_price' => 35.00,
-            'total_price' => 1750.00,
-        ]);
+            $po->update([
+                'total_amount' => $totalAmount,
+                'paid_amount' => $paidAmount,
+            ]);
+        }
     }
 }
