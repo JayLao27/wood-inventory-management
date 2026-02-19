@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('product_name')->nullable(); // Kept for flexibility
             $table->integer('quantity');
             $table->integer('completion_quantity')->default(0);
-            $table->enum('status', ['pending', 'in_progress', 'quality_check', 'completed', 'overdue'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'completed', 'overdue', 'cancelled'])->default('pending');
             $table->date('due_date');
             $table->date('starting_date')->nullable();
             $table->string('assigned_to');
