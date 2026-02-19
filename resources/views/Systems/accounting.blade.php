@@ -196,34 +196,33 @@
 						<div class="overflow-x-auto rounded-xl border border-slate-600">
 							<table class="w-full text-left border-collapse">
 								<thead>
-									<tr class="bg-slate-700/50 text-slate-300 border-b border-slate-600">
-										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Transaction #</th>
-										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Date</th>
-										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Type</th>
-										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Category</th>
-										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Description</th>
-										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Amount</th>
-										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Status</th>
-
+									<tr class="table w-full table-fixed bg-slate-700/50 text-slate-300 border-b border-slate-600">
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider w-1/6">Transaction #</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider w-1/6">Date</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider w-1/12">Type</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider w-1/6">Category</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider w-1/6">Description</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider w-1/6">Amount</th>
+										<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider w-1/12">Status</th>
 									</tr>
 								</thead>
-								<tbody class="divide-y divide-slate-600" id="transactionTableBody">
+								<tbody class="divide-y divide-slate-600 block overflow-y-auto custom-scrollbar" style="max-height: 50vh;" id="transactionTableBody">
 									@forelse($transactions as $transaction)
-										<tr class="border-b border-slate-600 hover:bg-slate-700/50 transition-colors duration-200 transaction-row cursor-pointer" onclick="selectRow(this)"
+										<tr class="table w-full table-fixed border-b border-slate-600 hover:bg-slate-700/50 transition-colors duration-200 transaction-row cursor-pointer" onclick="selectRow(this)"
 											data-type="{{ $transaction->transaction_type }}"
 											data-status="@if($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->payment_status ?? 'paid') }}@elseif($transaction->salesOrder){{ strtolower($transaction->salesOrder->payment_status ?? 'paid') }}@else{{ 'paid' }}@endif"
 											data-id="TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}"
 											data-date="{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}"
 											data-category="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->customer->name ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->supplier->name ?? '') }}@endif"
 											data-description="@if($transaction->salesOrder){{ strtolower($transaction->salesOrder->order_number ?? '') }}@elseif($transaction->purchaseOrder){{ strtolower($transaction->purchaseOrder->order_number ?? '') }}@else{{ strtolower($transaction->description ?? '') }}@endif">
-											<td class="px-4 py-3 font-mono text-slate-300">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
-											<td class="px-4 py-3 font-medium text-slate-200">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
-											<td class="px-4 py-3">
+											<td class="px-4 py-3 font-mono text-slate-300 w-1/6">TO-{{ \Carbon\Carbon::parse($transaction->date)->format('Y') }}-{{ str_pad($transaction->id, 3, '0', STR_PAD_LEFT) }}</td>
+											<td class="px-4 py-3 font-medium text-slate-200 w-1/6">{{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}</td>
+											<td class="px-4 py-3 w-1/12">
 												<span class="text-xs font-bold {{ $transaction->transaction_type === 'Income' ? 'text-green-400' : 'text-red-400' }}">
 													{{ $transaction->transaction_type === 'Income' ? 'Income' : 'Expense' }}
 												</span>
 											</td>
-											<td class="px-4 py-3 font-medium">
+											<td class="px-4 py-3 font-medium w-1/6">
 												@if($transaction->salesOrder)
 													<span class="text-blue-300">{{ $transaction->salesOrder->customer->name ?? 'N/A' }}</span>
 												@elseif($transaction->purchaseOrder)
@@ -232,7 +231,7 @@
 													<span class="text-slate-400">N/A</span>
 												@endif
 											</td>
-											<td class="px-4 py-3">
+											<td class="px-4 py-3 w-1/6">
 												@if($transaction->salesOrder)
 													<span class="text-slate-300">{{ $transaction->salesOrder->order_number }}</span>
 												@elseif($transaction->purchaseOrder)
@@ -241,10 +240,10 @@
 													<span class="text-slate-400 italic">{{ $transaction->description ?? '-' }}</span>
 												@endif
 											</td>
-											<td class="px-4 py-3 font-bold text-left">
+											<td class="px-4 py-3 font-bold text-left w-1/6">
 												<span class="text-{{ $transaction->transaction_type === 'Income' ? 'green' : 'orange' }}-300">₱{{ number_format($transaction->amount, 2) }}</span>
 											</td>
-											<td class="px-4 py-3">
+											<td class="px-4 py-3 w-1/12">
 												@php
 													$status = 'Paid'; // Default
 													if ($transaction->salesOrder) {
@@ -260,7 +259,7 @@
 											</td>
 										</tr>
 									@empty
-										<tr>
+										<tr class="table w-full table-fixed">
 											<td colspan="6" class="px-4 py-12 text-center text-slate-400">
 												<div class="flex flex-col items-center space-y-2">
 													<svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,6 +328,25 @@
 					<button onclick="showPurchaseOrders()" id="purchaseOrdersTab" class="flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all bg-gray-300 text-gray-700 hover:bg-gray-400">
 						Purchase Orders (Expense)
 					</button>
+				</div>
+
+				<!-- Search and Filter -->
+				<div class="flex gap-4 mb-4">
+					<div class="relative flex-1">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+							</svg>
+						</div>
+						<input type="text" id="modalSearchInput" placeholder="Search by Order # or Name..." class="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800">
+					</div>
+					<div class="w-48">
+						<select id="modalStatusFilter" class="w-full h-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-800">
+							<option value="all">All Status</option>
+							<option value="unpaid">Unpaid / Partial</option>
+							<option value="paid">Fully Paid</option>
+						</select>
+					</div>
 				</div>
 
 				<!-- Sales Orders List -->
@@ -574,6 +592,7 @@
 			document.getElementById('purchaseOrdersTab').classList.add('bg-slate-600', 'text-slate-300');
 			document.getElementById('purchaseOrdersTab').classList.remove('bg-amber-500', 'text-white', 'shadow-lg');
 			document.getElementById('confirmationSection').classList.add('hidden');
+			filterModalItems(); // Re-apply filters
 		}
 
 		function showPurchaseOrders() {
@@ -585,7 +604,52 @@
 			document.getElementById('salesOrdersTab').classList.add('bg-slate-600', 'text-slate-300');
 			document.getElementById('salesOrdersTab').classList.remove('bg-amber-500', 'text-white', 'shadow-lg');
 			document.getElementById('confirmationSection').classList.add('hidden');
+			filterModalItems(); // Re-apply filters
 		}
+
+		// Modal Filtering Logic
+		function filterModalItems() {
+			const searchTerm = document.getElementById('modalSearchInput').value.toLowerCase();
+			const statusFilter = document.getElementById('modalStatusFilter').value;
+			
+			// Determine which container is active
+			const isSalesActive = !document.getElementById('salesOrdersContainer').classList.contains('hidden');
+			const container = isSalesActive 
+				? document.getElementById('salesOrdersContainer') 
+				: document.getElementById('purchaseOrdersContainer');
+				
+			if (!container) return;
+
+			const items = container.children;
+			
+			Array.from(items).forEach(item => {
+				// skip empty state
+				if (item.classList.contains('text-center')) return;
+
+				const orderNum = item.querySelector('h3')?.textContent.toLowerCase() || '';
+				const name = item.querySelector('.text-sm')?.textContent.toLowerCase() || '';
+				const isPaid = item.querySelector('.bg-green-600')?.textContent === 'Fully Paid';
+				
+				const matchesSearch = orderNum.includes(searchTerm) || name.includes(searchTerm);
+				
+				let matchesStatus = true;
+				if (statusFilter === 'unpaid') {
+					matchesStatus = !isPaid;
+				} else if (statusFilter === 'paid') {
+					matchesStatus = isPaid;
+				}
+
+				if (matchesSearch && matchesStatus) {
+					item.classList.remove('hidden');
+				} else {
+					item.classList.add('hidden');
+				}
+			});
+		}
+
+		// Attach listeners
+		document.getElementById('modalSearchInput').addEventListener('input', filterModalItems);
+		document.getElementById('modalStatusFilter').addEventListener('change', filterModalItems);
 
 		// Transaction selection
 		function selectTransaction(reference, amount, date, type, orderId, remainingBalance = null) {
