@@ -127,33 +127,14 @@
 					@php
 						$visibleWorkOrders = ($workOrders ?? collect())->whereIn('status', ['in_progress', 'overdue']);
 					@endphp
-					<!-- Work Orders Table -->
-					<div id="workOrderTable" class="w-full overflow-y-auto custom-scrollbar" style="max-height: 60vh;">
-						<table class="w-full border-collapse text-left text-xs text-white">
-							<thead class="bg-slate-800 text-slate-300 sticky top-0 z-10">
-								<tr class="table w-full table-fixed">
-									<th class="px-4 py-3 font-medium uppercase tracking-wider w-[15%]">Order #</th>
-									<th class="px-4 py-3 font-medium uppercase tracking-wider w-[20%]">Product</th>
-									<th class="px-4 py-3 font-medium uppercase tracking-wider w-[10%]">Qty</th>
-									<th class="px-4 py-3 font-medium uppercase tracking-wider w-[15%]">Assigned To</th>
-									<th class="px-4 py-3 font-medium uppercase tracking-wider w-[15%]">Due Date</th>
-									<th class="px-4 py-3 font-medium uppercase tracking-wider w-[15%]">Status</th>
-									<th class="px-4 py-3 font-medium uppercase tracking-wider w-[10%] text-center">Action</th>
-								</tr>
-							</thead>
-							<tbody class="divide-y divide-slate-600 block overflow-y-auto custom-scrollbar" style="max-height: 55vh;" id="workOrderTableBody">
-								@foreach($visibleWorkOrders as $workOrder)
-									@include('partials.work-order-row', ['workOrder' => $workOrder])
-								@endforeach
-								@if($visibleWorkOrders->count() === 0)
-									<tr class="table w-full table-fixed">
-										<td colspan="7" class="py-12 px-4 text-center text-slate-400">
-											No active production found
-										</td>
-									</tr>
-								@endif
-							</tbody>
-						</table>
+					<!-- Work Orders List -->
+					<div class="space-y-3 overflow-y-auto custom-scrollbar" style="max-height:60vh;" id="workOrderTableBody">
+						@foreach($visibleWorkOrders as $workOrder)
+							@include('partials.work-order-row', ['workOrder' => $workOrder])
+						@endforeach
+						<div id="workOrderEmptyState" class="py-12 px-4 text-center text-slate-400 {{ $visibleWorkOrders->count() > 0 ? 'hidden' : '' }}">
+							No active production found
+						</div>
 					</div>
 				</section>
 			</div>
