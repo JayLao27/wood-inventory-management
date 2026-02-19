@@ -142,7 +142,7 @@
 
         <!-- Add Work Order Modal -->
         <div id="workOrderModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="if(event.target === this) closeWorkOrderModal()">
-            <div class="modal-content bg-amber-50 rounded-2xl max-w-3xl w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
+            <div class="modal-content bg-amber-50 rounded-2xl max-w-2xl w-full shadow-2xl transform transition-all animate-fadeIn" onclick="event.stopPropagation()">
                 
                 <!-- Header -->
                 <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-300 px-6 py-5 rounded-t-2xl">
@@ -174,13 +174,21 @@
                     <div id="salesOrdersListSection" class="space-y-3">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Pending Sales Orders</h4>
-                            <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{{ count($pendingSalesOrders ?? []) }} Available</span>
+                            <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{{ $pendingItemsCount }} Products Pending</span>
                         </div>
                         
                         <div class="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
                             @forelse($pendingSalesOrders ?? [] as $salesOrder)
                                 @php
-                                    $itemsData = $salesOrder->items->map(fn($item) => ['id' => $item->product_id, 'name' => addslashes($item->product->product_name ?? 'Product'), 'quantity' => $item->quantity]);
+                                    $itemsData = $salesOrder->items->filter(function($item) use ($salesOrder) {
+                                        return !$salesOrder->workOrders->where('product_id', $item->product_id)
+                                                                      ->where('status', '!=', 'cancelled')
+                                                                      ->isNotEmpty();
+                                    })->map(fn($item) => [
+                                        'id' => $item->product_id, 
+                                        'name' => addslashes($item->product->product_name ?? 'Product'), 
+                                        'quantity' => $item->quantity
+                                    ])->values();
                                 @endphp
                                 <div onclick="selectSalesOrder({{ $salesOrder->id }}, '{{ addslashes($salesOrder->order_number) }}', '{{ addslashes($salesOrder->customer->name ?? '') }}', '{{ $salesOrder->delivery_date }}', {{ json_encode($itemsData) }})" 
                                      class="group relative p-5 border-2 border-gray-300 rounded-xl hover:border-blue-400 hover:shadow-lg cursor-pointer transition-all duration-300 bg-white hover:bg-blue-50">
@@ -273,50 +281,47 @@
                         <input type="hidden" name="priority" value="medium">
                         
                         <div class="space-y-6">
-                            <!-- Product line selector (when SO has multiple items) -->
-                            <div id="productLineSelector" class="hidden">
-                                <label class="block text-gray-800 text-sm font-semibold mb-2 uppercase tracking-wide">
-                                    Select Product Line 
-                                    <span class="text-red-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <select id="productLineSelect" class="w-full bg-white border-2 border-gray-300 rounded-lg px-4 py-3.5 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base appearance-none pr-10 transition-all">
-                                        <option value="">Choose product...</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                        </svg>
+                            <!-- Order Info -->
+                            <div class="bg-blue-50 rounded-xl border-2 border-blue-200 p-5 shadow-sm">
+                                <div class="flex flex-wrap gap-4 justify-between items-center mb-0">
+                                    <div>
+                                        <span class="text-xs text-gray-500 font-semibold uppercase block mb-1">Order #</span>
+                                        <span id="summaryOrderNumber" class="font-bold text-gray-800 text-lg block">-</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-gray-500 font-semibold uppercase block mb-1">Customer</span>
+                                        <span id="summaryCustomer" class="font-bold text-gray-800 text-base block">-</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs text-gray-500 font-semibold uppercase block mb-1">Delivery</span>
+                                        <span id="summaryDeliveryDate" class="font-bold text-gray-800 text-base block">-</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Order Summary -->
-                            <div class="bg-blue-50 rounded-xl border-2 border-blue-200 p-5 shadow-sm">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    <h3 class="font-bold text-gray-800 text-base">Order Summary</h3>
+                            <!-- Products to Produce -->
+                            <div>
+                                <label class="block text-gray-800 text-sm font-semibold mb-3 uppercase tracking-wide">
+                                    Select Products to Manufacture
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="bg-white border-2 border-gray-200 rounded-lg overflow-hidden">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
+                                                    <input type="checkbox" id="selectAllItems" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" checked onclick="toggleAllItems(this)">
+                                                </th>
+                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                                <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Qty</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="orderItemsTableBody" class="bg-white divide-y divide-gray-200">
+                                            <!-- Valid items will be injected here via JS -->
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                        <span class="text-xs text-gray-500 font-semibold uppercase block mb-1">Order #</span>
-                                        <span id="summaryOrderNumber" class="font-bold text-gray-800 text-sm block">-</span>
-                                    </div>
-                                    <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                        <span class="text-xs text-gray-500 font-semibold uppercase block mb-1">Customer</span>
-                                        <span id="summaryCustomer" class="font-bold text-gray-800 text-sm block truncate">-</span>
-                                    </div>
-                                    <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                        <span class="text-xs text-gray-500 font-semibold uppercase block mb-1">Product</span>
-                                        <span id="summaryProduct" class="font-bold text-gray-800 text-sm block truncate">-</span>
-                                    </div>
-                                    <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                        <span class="text-xs text-gray-500 font-semibold uppercase block mb-1">Quantity</span>
-                                        <span id="summaryQuantity" class="font-bold text-gray-800 text-sm block">-</span>
-                                    </div>
-                                </div>
+                                <p id="itemSelectionError" class="text-red-500 text-sm mt-2 hidden">Please select at least one product.</p>
                             </div>
 
                             <!-- Team Assignment -->
@@ -848,61 +853,71 @@
             function selectSalesOrder(salesOrderId, orderNumber, customerName, deliveryDate, items) {
                 const listSection = document.getElementById('salesOrdersListSection');
                 const formSection = document.getElementById('workOrderForm');
-                const productLineSelector = document.getElementById('productLineSelector');
-                const productLineSelect = document.getElementById('productLineSelect');
+                const tableBody = document.getElementById('orderItemsTableBody');
 
                 currentOrderItems = Array.isArray(items) ? items : JSON.parse(items);
                 document.getElementById('formSalesOrderId').value = salesOrderId;
                 document.getElementById('formDueDate').value = deliveryDate;
                 document.getElementById('summaryOrderNumber').textContent = orderNumber;
                 document.getElementById('summaryCustomer').textContent = customerName;
+                document.getElementById('summaryDeliveryDate').textContent = deliveryDate ? new Date(deliveryDate).toLocaleDateString() : '-';
 
-                productLineSelect.innerHTML = '<option value="">Choose product...</option>';
-                currentOrderItems.forEach((item, idx) => {
-                    const opt = document.createElement('option');
-                    opt.value = idx;
-                    opt.textContent = `${item.name} (Qty: ${item.quantity})`;
-                    productLineSelect.appendChild(opt);
-                });
-
-                if (currentOrderItems.length > 1) {
-                    productLineSelector.classList.remove('hidden');
-                    productLineSelect.required = true;
-                    document.getElementById('formProductId').value = '';
-                    document.getElementById('formQuantity').value = '';
-                    document.getElementById('summaryProduct').textContent = '-';
-                    document.getElementById('summaryQuantity').textContent = '-';
+                // Populate items table
+                tableBody.innerHTML = '';
+                if (currentOrderItems.length > 0) {
+                    currentOrderItems.forEach((item, idx) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <input type="checkbox" name="items[${idx}][selected]" value="1" class="item-checkbox rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" checked onchange="checkSelection()">
+                                <input type="hidden" name="items[${idx}][product_id]" value="${item.id}">
+                                <input type="hidden" name="items[${idx}][quantity]" value="${item.quantity}">
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 font-medium">
+                                ${item.name}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-right">
+                                ${item.quantity}
+                            </td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                    document.getElementById('selectAllItems').checked = true;
                 } else {
-                    productLineSelector.classList.add('hidden');
-                    productLineSelect.required = false;
-                    const first = currentOrderItems[0];
-                    document.getElementById('formProductId').value = first.id;
-                    document.getElementById('formQuantity').value = first.quantity;
-                    document.getElementById('summaryProduct').textContent = first.name;
-                    document.getElementById('summaryQuantity').textContent = first.quantity;
+                    tableBody.innerHTML = '<tr><td colspan="3" class="px-4 py-3 text-center text-sm text-gray-500">No pending products found.</td></tr>';
                 }
 
                 listSection.classList.add('hidden');
                 formSection.classList.remove('hidden');
+                checkSelection();
             }
 
-            document.getElementById('productLineSelect')?.addEventListener('change', function() {
-                const idx = this.value;
-                if (idx === '' || !currentOrderItems.length) return;
-                const item = currentOrderItems[parseInt(idx, 10)];
-                if (item) {
-                    document.getElementById('formProductId').value = item.id;
-                    document.getElementById('formQuantity').value = item.quantity;
-                    document.getElementById('summaryProduct').textContent = item.name;
-                    document.getElementById('summaryQuantity').textContent = item.quantity;
+            function toggleAllItems(source) {
+                const checkboxes = document.querySelectorAll('.item-checkbox');
+                checkboxes.forEach(cb => cb.checked = source.checked);
+                checkSelection();
+            }
+
+            function checkSelection() {
+                const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+                const submitBtn = document.querySelector('#workOrderForm button[type="submit"]');
+                const errorMsg = document.getElementById('itemSelectionError');
+                
+                if (checkboxes.length === 0) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    errorMsg.classList.remove('hidden');
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    errorMsg.classList.add('hidden');
                 }
-            });
+            }
             
             function resetWorkOrderForm() {
                 const listSection = document.getElementById('salesOrdersListSection');
                 const formSection = document.getElementById('workOrderForm');
                 document.getElementById('workOrderForm').reset();
-                document.getElementById('productLineSelector').classList.add('hidden');
                 listSection.classList.remove('hidden');
                 formSection.classList.add('hidden');
             }
