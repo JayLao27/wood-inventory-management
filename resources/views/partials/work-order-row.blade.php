@@ -1,10 +1,3 @@
-<div onclick="viewWorkOrder({{ $workOrder->id }})" class="p-4 border-2 border-slate-600 rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer work-order-row" data-order-number="{{ $workOrder->order_number }}" data-product-name="{{ $workOrder->product_name }}" data-assigned-to="{{ $workOrder->assigned_to }}" data-status="{{ $workOrder->status }}">
-    <div class="flex justify-between items-start">
-        <div class="flex-1">
-            <h3 class="font-bold text-white text-lg">{{ $workOrder->order_number }} • {{ $workOrder->product_name }}</h3>
-            <p class="text-base text-slate-300 font-medium mt-1">Due: {{ $workOrder->due_date->format('m/d/Y') }} • Assigned: {{ $workOrder->assigned_to }}</p>
-        </div>
-        <div class="flex items-center space-x-3">
             @php
                 $statusColors = [
                     'pending' => 'bg-yellow-500',
@@ -14,9 +7,28 @@
                     'overdue' => 'bg-red-500',
                     'cancelled' => 'bg-gray-500'
                 ];
+                
                 $statusColor = $statusColors[$workOrder->status] ?? 'bg-gray-500';
                 $statusLabel = ucwords(str_replace('_', ' ', $workOrder->status));
+                $borderClass = 'border-slate-600'; // Default border
+
+                // Dynamic Overdue Check
+                $today = \Illuminate\Support\Carbon::today();
+                $isOverdue = $workOrder->due_date && $workOrder->due_date->lt($today) && !in_array($workOrder->status, ['completed', 'cancelled', 'overdue']);
+
+                if ($isOverdue) {
+                    $statusColor = 'bg-red-500';
+                    $statusLabel = 'Overdue';
+                    $borderClass = 'border-red-500'; // Highlight border
+                }
             @endphp
+<div onclick="viewWorkOrder({{ $workOrder->id }})" class="p-4 border-2 {{ $borderClass }} rounded-xl hover:border-amber-500 hover:bg-slate-600/50 transition-all shadow-lg hover:shadow-xl backdrop-blur-sm cursor-pointer work-order-row" data-order-number="{{ $workOrder->order_number }}" data-product-name="{{ $workOrder->product_name }}" data-assigned-to="{{ $workOrder->assigned_to }}" data-status="{{ $workOrder->status }}">
+    <div class="flex justify-between items-start">
+        <div class="flex-1">
+            <h3 class="font-bold text-white text-lg">{{ $workOrder->order_number }} • {{ $workOrder->product_name }}</h3>
+            <p class="text-base text-slate-300 font-medium mt-1">Due: {{ $workOrder->due_date->format('m/d/Y') }} • Assigned: {{ $workOrder->assigned_to }}</p>
+        </div>
+        <div class="flex items-center space-x-3">
             <span class="px-4 py-2 {{ $statusColor }} text-white text-xs font-bold rounded-xl shadow-lg">
                 {{ $statusLabel }}
             </span>
