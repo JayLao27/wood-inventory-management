@@ -229,10 +229,24 @@
             </div>
         </div>
 
-        <div class="flex h-screen bg-gray-100">@include('layouts.sidebar')
+        <!-- Mobile Header -->
+        <div class="md:hidden flex items-center justify-between bg-[#1e293b] text-white p-4 border-b border-slate-700" x-data>
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('images/logo-white.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                <span class="font-bold text-lg">RM WOOD</span>
+            </div>
+            <button @click="$dispatch('toggle-sidebar')" class="p-2 rounded-lg hover:bg-slate-700 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex h-screen bg-gray-100 overflow-hidden">
+            @include('layouts.sidebar')
 
             <!-- Main Content -->
-            <div class="flex-1 flex flex-col overflow-hidden">
+            <div class="flex-1 flex flex-col overflow-hidden relative">
                 @yield('main-content')
             </div>
         </div>
