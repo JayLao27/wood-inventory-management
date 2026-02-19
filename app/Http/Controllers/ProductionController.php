@@ -25,10 +25,21 @@ class ProductionController extends Controller
         // Get status counts with COUNT queries, not loading all data
         $statusCounts = [
             'pending' => WorkOrder::where('status', 'pending')->count(),
-            'in_progress' => WorkOrder::where('status', 'in_progress')->count(),
+            'in_progress' => WorkOrder::where('status', 'in_progress')
+                ->where(function($q) {
+                    $q->whereNull('due_date')
+                      ->orWhere('due_date', '>=', now()->startOfDay());
+                })->count(),
             'quality_check' => WorkOrder::where('status', 'quality_check')->count(),
             'completed' => WorkOrder::where('status', 'completed')->count(),
-            'overdue' => WorkOrder::where('status', 'overdue')->count(),
+            'overdue' => WorkOrder::where(function($q) {
+                $q->where('status', 'overdue')
+                  ->orWhere(function($sub) {
+                      $sub->where('status', '!=', 'completed')
+                          ->where('status', '!=', 'cancelled')
+                          ->where('due_date', '<', now()->startOfDay());
+                  });
+            })->count(),
             'cancelled' => WorkOrder::where('status', 'cancelled')->count(),
         ];
 
@@ -309,29 +320,26 @@ class ProductionController extends Controller
             'completion_quantity' => $workOrder->quantity,
         ]);
 
-        $workOrder->loadMissing('product');
-        $laborCost = 0;
+        $workOrder->loadMissing(['product', 'salesOrder']);
+    
+        // Update product inventory (Stock In)
         if ($workOrder->product) {
-            $qty = $workOrder->completion_quantity > 0 ? $workOrder->completion_quantity : $workOrder->quantity;
-            $laborCost = (float) $workOrder->product->production_cost * (int) $qty;
-        }
+            $qtyCompleted = $workOrder->completion_quantity > 0 ? $workOrder->completion_quantity : $workOrder->quantity;
+            
+            // Record the inventory movement for the finished product
+            InventoryMovement::create([
+                'item_type' => 'product',
+                'item_id' => $workOrder->product_id,
+                'movement_type' => 'in',
+                'quantity' => $qtyCompleted,
+                'reference_type' => WorkOrder::class,
+                'reference_id' => $workOrder->id,
+                'notes' => sprintf('Production completed for WO-%s (Stock In: %s)', $workOrder->order_number, now()->toDateTimeString()),
+                'status' => 'completed',
+            ]);
 
-        if ($laborCost > 0) {
-            $laborRef = 'Labor - Work Order ' . $workOrder->order_number;
-            $alreadyRecorded = Accounting::where('transaction_type', 'Expense')
-                ->where('description', $laborRef)
-                ->exists();
-
-            if (!$alreadyRecorded) {
-                Accounting::create([
-                    'transaction_type' => 'Expense',
-                    'amount' => $laborCost,
-                    'date' => now()->toDateString(),
-                    'description' => $laborRef,
-                    'sales_order_id' => $workOrder->sales_order_id,
-                    'purchase_order_id' => null,
-                ]);
-            }
+            // Increment current stock of the product
+            $workOrder->product->increment('current_stock', $qtyCompleted);
         }
 
         // Check if all work orders for this sales order are completed
@@ -344,7 +352,7 @@ class ProductionController extends Controller
             }
         }
         
-        $message = 'Work order marked as completed.';
+        $message = 'Work order marked as completed and inventory updated.';
         
         if ($request->wantsJson()) {
             return response()->json([
