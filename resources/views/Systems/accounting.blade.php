@@ -159,7 +159,7 @@
 
 						<!-- Search and Filters -->
 						<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-							<div class="flex-1 max-w-md">
+							<div class="flex-1 max-w-md w-full">
 								<div class="relative">
 									<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 										<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,14 +169,14 @@
 									<input type="text" id="searchInput" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-slate-400">
 								</div>
 							</div>
-							<div class="flex gap-2">
-								<select id="statusFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+							<div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+								<select id="statusFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 w-full sm:w-auto">
 									<option value="all">All Status</option>
 									<option value="paid">Paid</option>
 									<option value="partial">Partial</option>
 									<option value="unpaid">Unpaid</option>
 								</select>
-								<select id="categoryFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+								<select id="categoryFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 w-full sm:w-auto">
 									<option value="all">All Categories</option>
 									<option value="Income">Income</option>
 									<option value="Expense">Expense</option>
