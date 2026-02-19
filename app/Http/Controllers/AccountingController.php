@@ -46,12 +46,33 @@ class AccountingController extends Controller
         $lastMonthNetProfitPercentage = $this->lastMonthNetprofit($netProfit);
         $lastMonthExpensesPercentage = $this->lastMonthTotalExpenses($totalExpenses);
 
-        $monthlyPerformance = [[
-            'month' => $startOfLastMonth->format('M'),
-            'revenue' => $lastMonthRevenue,
-            'expenses' => $lastMonthExpenses,
-            'net_profit' => $lastMonthNetProfit,
-        ]];
+        // Calculate current month data (Current Month is February if today is in Feb)
+        $startOfCurrentMonth = $now->copy()->startOfMonth();
+        $endOfCurrentMonth = $now->copy()->endOfMonth();
+        
+        $currentMonthData = Accounting::whereBetween('date', [$startOfCurrentMonth, $endOfCurrentMonth])
+            ->selectRaw('transaction_type, SUM(amount) as total')
+            ->groupBy('transaction_type')
+            ->get();
+            
+        $currentMonthRevenue = (float)($currentMonthData->where('transaction_type', 'Income')->first()->total ?? 0);
+        $currentMonthExpenses = (float)($currentMonthData->where('transaction_type', 'Expense')->first()->total ?? 0);
+        $currentMonthNetProfit = $currentMonthRevenue - $currentMonthExpenses;
+
+        $monthlyPerformance = [
+            [
+                'month' => $startOfCurrentMonth->format('M'),
+                'revenue' => $currentMonthRevenue,
+                'expenses' => $currentMonthExpenses,
+                'net_profit' => $currentMonthNetProfit,
+            ],
+            [
+                'month' => $startOfLastMonth->format('M'),
+                'revenue' => $lastMonthRevenue,
+                'expenses' => $lastMonthExpenses,
+                'net_profit' => $lastMonthNetProfit,
+            ]
+        ];
 
         // Use raw queries for calculations instead of loading all data
         $laborExpense = (float) Accounting::where('transaction_type', 'Expense')
