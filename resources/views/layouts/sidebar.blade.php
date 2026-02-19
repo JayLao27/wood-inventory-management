@@ -1,14 +1,48 @@
 <!-- Sidebar -->
 <div x-data="{ 
-    sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
+    sidebarOpen: window.innerWidth >= 768 ? (localStorage.getItem('sidebarOpen') !== 'false') : false,
     toggleSidebar() {
         this.sidebarOpen = !this.sidebarOpen;
-        localStorage.setItem('sidebarOpen', this.sidebarOpen);
+        if (window.innerWidth >= 768) {
+            localStorage.setItem('sidebarOpen', this.sidebarOpen);
+        }
+    },
+    closeSidebar() {
+        if (window.innerWidth < 768) {
+            this.sidebarOpen = false;
+        }
+    },
+    handleResize() {
+        if (window.innerWidth >= 768) {
+            this.sidebarOpen = localStorage.getItem('sidebarOpen') !== 'false';
+        } else {
+            this.sidebarOpen = false;
+        }
+    },
+    init() {
+        window.addEventListener('resize', () => this.handleResize());
     }
-}" class="relative z-50">
+}" 
+class="relative z-50"
+@keydown.window.escape="closeSidebar()"
+@toggle-sidebar.window="toggleSidebar()">
+
+    <!-- Mobile Backdrop -->
+    <div x-show="sidebarOpen" 
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="closeSidebar()"
+         class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-40 md:hidden"></div>
+
     <!-- Sidebar Container -->
-    <div :class="sidebarOpen ? 'w-72' : 'w-20'" 
-         class="bg-[#1e293b] text-white flex flex-col relative transition-all duration-300 ease-in-out shadow-2xl h-screen border-r border-slate-700/50">
+    <div :class="sidebarOpen ? 'translate-x-0 w-72' : '-translate-x-full md:translate-x-0 md:w-20'" 
+         class="fixed md:static inset-y-0 left-0 z-50 bg-[#1e293b] text-white flex flex-col transition-all duration-300 ease-in-out shadow-2xl h-screen border-r border-slate-700/50"
+         @touchstart.passive="touchStartX = $event.changedTouches[0].screenX"
+         @touchend.passive="touchEndX = $event.changedTouches[0].screenX; if(touchStartX - touchEndX > 50) closeSidebar()">
         
         <!-- Abstract Background Pattern (Subtle) -->
         <div class="absolute inset-0 opacity-5 pointer-events-none overflow-hidden">
@@ -19,7 +53,7 @@
 
         <!-- Toggle Button (Floating) -->
         <button @click="toggleSidebar()" 
-                class="absolute -right-4 top-8 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-full p-2 shadow-lg shadow-orange-900/20 hover:shadow-orange-500/30 hover:scale-110 transition-all duration-300 z-50 border-2 border-slate-800">
+                class="absolute -right-4 top-8 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-full p-2 shadow-lg shadow-orange-900/20 hover:shadow-orange-500/30 hover:scale-110 transition-all duration-300 z-50 border-2 border-slate-800 hidden md:block">
             <svg x-show="sidebarOpen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
