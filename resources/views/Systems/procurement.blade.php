@@ -194,7 +194,7 @@
 
 				<!-- Search and Filter Bar -->
 				<div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
-					<div class="flex-1 max-w-md">
+					<div class="flex-1 max-w-md w-full">
 						<div class="relative">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 								<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,8 +205,8 @@
 						</div>
 					</div>
 
-					<div class="flex items-center space-x-2">
-						<select id="statusFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+					<div class="flex items-center space-x-2 w-full md:w-auto">
+						<select id="statusFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 w-full md:w-auto">
 							<option value="all">All Status</option>
 							<option value="paid">Paid</option>
 							<option value="partial">Partial</option>
@@ -270,11 +270,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
 										</button>
-                                        <button onclick="event.stopPropagation(); openReceiveOrderModal({{ $order->id }}, '{{ $order->order_number }}')" class="p-1 hover:bg-slate-500 rounded text-slate-400 hover:text-green-400 transition-colors" title="Receive Stock">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </button>
+
 									</div>
 								</td>
 							</tr>
@@ -317,7 +313,7 @@
                                     </button>
                                     <button onclick="event.stopPropagation(); deleteSupplier({{ $supplier->id }})" class="p-1.5 hover:bg-slate-500 rounded text-slate-400 hover:text-red-400 transition-colors" title="Delete Supplier">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
                                 </div>
