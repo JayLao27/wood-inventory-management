@@ -153,8 +153,8 @@
 								<input type="search" id="searchInput" placeholder="Search items..." class="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-slate-400">
 							</div>
 						</div>
-						<div class="flex gap-2">
-							<select id="categoryFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+						<div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+							<select id="categoryFilter" class="bg-slate-700 border-slate-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 w-full sm:w-auto">
 								<option value="">All Categories</option>
 								@foreach($inventoryCategories as $category)
 									<option value="{{ $category }}">{{ $category }}</option>
@@ -188,7 +188,7 @@
                                 <span class="text-white font-bold text-lg">₱{{ number_format($material->unit_cost, 2) }}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-4 mt-2 text-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2 text-sm">
                             <div>
                                 <span class="text-slate-400 font-medium text-xs">Current Stock</span>
                                 <p class="text-white font-bold text-lg mt-1">{{ $material->current_stock }} {{ $material->unit }}</p>
@@ -230,7 +230,7 @@
                                 <span class="text-white font-bold text-lg">₱{{ number_format($product->selling_price, 2) }}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 mt-2 text-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2 text-sm">
                             <div>
                                 <span class="text-slate-400 font-medium text-xs">Production Cost</span>
                                 <p class="text-white font-bold text-lg mt-1">₱{{ number_format($product->production_cost, 2) }}</p>
@@ -1053,7 +1053,7 @@
                     })
                     .catch(error => {
                         console.error('Error loading product:', error);
-                        alert('Error loading product details');
+                        showErrorNotification('Error loading product details');
                     });
             }
 
@@ -1844,7 +1844,7 @@
                     const purchaseOrderId = purchaseOrderSelect ? purchaseOrderSelect.value : null;
 
                     if (!purchaseOrderId) {
-                        alert('Please select a purchase order first.');
+                        showErrorNotification('Please select a purchase order first.');
                         return;
                     }
 
@@ -1878,19 +1878,19 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                alert(data.message || 'Stock received successfully.');
+                                showSuccessNotification(data.message || 'Stock received successfully.');
                                 window.location.reload();
                             } else {
                                 // Exception 1.1: Invalid PO error display
                                 // Exception 2.1: Duplicate receipt error display
                                 // Exception 2.2: Database error display
-                                alert(data.message || 'Failed to receive stock.');
+                                showErrorNotification(data.message || 'Failed to receive stock.');
                             }
                         })
                         .catch(error => {
                             // Display exception error messages
                             const errorMessage = error.message || 'An error occurred while receiving stock.';
-                            alert(errorMessage);
+                            showErrorNotification(errorMessage);
                             console.error('Stock receive error:', error);
                         });
                 });
