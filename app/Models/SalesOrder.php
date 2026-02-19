@@ -37,5 +37,14 @@ class SalesOrder extends Model
     {
         return $this->workOrders()->exists();
     }
+
+    public function getRemainingBalanceAttribute()
+    {
+        $paid = $this->accountingTransactions()
+            ->where('transaction_type', 'Income')
+            ->sum('amount');
+            
+        return max($this->total_amount - $paid, 0);
+    }
 }
 
