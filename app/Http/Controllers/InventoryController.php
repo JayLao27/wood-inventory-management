@@ -202,6 +202,17 @@ class InventoryController extends Controller
     {
         if ($type === 'product') {
             $item = Product::findOrFail($id);
+            
+            // Check for active sales orders
+            $activeOrdersCount = \App\Models\SalesOrderItem::where('product_id', $id)
+                ->whereHas('salesOrder', function($query) {
+                    $query->whereNotIn('status', ['Cancelled', 'Delivered']);
+                })
+                ->count();
+
+            if ($activeOrdersCount > 0) {
+                return redirect()->back()->with('error', 'Cannot delete item associated with active orders');
+            }
         } else {
             $item = Material::findOrFail($id);
         }
