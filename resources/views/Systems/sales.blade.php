@@ -78,7 +78,7 @@ $paymentBg = [
 ];
 @endphp
 <!-- Main Content -->
-<div class="flex-1 flex flex-col overflow-hidden">
+<div class="flex-1 flex flex-col overflow-auto">
 	<!-- Success Notification -->
 	<div id="successNotification" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[999999] bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg text-lg font-semibold flex items-center gap-2 hidden transition-all duration-300">
 		<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@ $paymentBg = [
 	</div>
 
 	<!-- Dashboard Content -->
-	<div class="flex-1 p-5 bg-amber-50 overflow-y-auto min-h-0 custom-scrollbar">
+	<div class="flex-1 p-5 bg-amber-50 overflow-visible min-h-0 custom-scrollbar">
 		<!-- Summary Cards Row -->
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
 			<!-- Total Revenue Card -->
@@ -259,7 +259,7 @@ $paymentBg = [
 
 
 			<!-- Sales Orders Table -->
-			<div id="salesTable" class="overflow-y-auto overflow-x-auto custom-scrollbar" style="max-height: 60vh;">
+			<div id="salesTable" class="w-full overflow-y-auto custom-scrollbar" style="max-height: 65vh;">
 				<table class="w-full border-collapse text-left text-xs text-white">
 					<thead class="bg-slate-800 text-slate-300 sticky top-0">
 						<tr>
@@ -290,7 +290,7 @@ $paymentBg = [
 			</div>
 
 			<!-- Customers Table -->
-			<div id="customerTable" class="hidden overflow-y-auto overflow-x-auto custom-scrollbar" style="max-height: 60vh;">
+			<div id="customerTable" class="hidden w-full overflow-y-auto custom-scrollbar" style="max-height: 65vh;">
 				<table class="w-full border-collapse text-left text-xs text-white">
 					<thead class="bg-slate-800 text-slate-300 sticky top-0">
 						<tr>
@@ -355,7 +355,7 @@ $paymentBg = [
 									</button>
 									<button type="button" onclick="openDeleteCustomerModal({{ $customer->id }}, '{{ $customer->name }}')" class="p-1.5 hover:bg-slate-500 rounded text-slate-400 hover:text-red-400 transition-colors" title="Delete">
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
 									</button>
 								</div>
