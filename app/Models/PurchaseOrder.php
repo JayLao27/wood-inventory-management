@@ -48,4 +48,13 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(Accounting::class, 'purchase_order_id');
     }
+
+    public function getRemainingBalanceAttribute()
+    {
+        $paid = $this->accountingTransactions()
+            ->where('transaction_type', 'Expense')
+            ->sum('amount');
+            
+        return max($this->total_amount - $paid, 0);
+    }
 }
