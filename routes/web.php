@@ -102,6 +102,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/production', [ProductionController::class, 'store'])
         ->name('production.store')
         ->middleware('role:admin,workshop_staff');
+    Route::get('/production/{workOrder}', [ProductionController::class, 'show'])
+        ->name('production.show')
+        ->middleware('role:admin,workshop_staff');
     Route::put('/production/{workOrder}', [ProductionController::class, 'update'])
         ->name('production.update')
         ->middleware('role:admin,workshop_staff');
