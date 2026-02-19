@@ -4,18 +4,62 @@
 @section('main-content')
     <!-- Main Content -->
     <style>
-        /* New Dimmer Hover Effect */
-        .data-row {
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
+		.selected-row {
+			background-color: #1e40af !important;
+			color: white !important;
+			border-left: 4px solid #f59e0b !important;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+		}
 
-        .data-row:hover {
-            background-color: rgba(0, 0, 0, 0.2) !important;
-            /* Dims the row */
-            filter: brightness(1.1);
-            /* Slightly pops the text */
-        }
+		/* New Dimmer Hover Effect */
+		.data-row {
+			cursor: pointer;
+			transition: all 0.2s ease-in-out;
+		}
+
+		.data-row:hover {
+			background-color: rgba(0, 0, 0, 0.2) !important;
+			/* Dims the row */
+			filter: brightness(1.1);
+			/* Slightly pops the text */
+		}
+
+		.custom-scrollbar::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.custom-scrollbar::-webkit-scrollbar-track {
+			background: #475569;
+			border-radius: 4px;
+		}
+
+		.custom-scrollbar::-webkit-scrollbar-thumb {
+			background: #f59e0b;
+			border-radius: 4px;
+		}
+
+		.modal-overlay {
+			display: none;
+		}
+
+		.modal-overlay.flex {
+			display: flex;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: scale(0.95);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1);
+			}
+		}
+
+		.animate-fadeIn {
+			animation: fadeIn 0.2s ease-out;
+		}
     </style>
     <div class="flex-1 flex flex-col overflow-hidden">
 	<!-- Header Section -->
@@ -222,7 +266,7 @@
 				</div>
 
 				<!-- Purchase Orders Table -->
-				<div id="purchase-orders-table" class="overflow-x-auto rounded-xl border border-slate-600" style="max-height: 60vh;">
+				<div id="purchase-orders-table" class="overflow-x-auto rounded-xl border border-slate-600 custom-scrollbar" style="max-height: 60vh;">
 					<table class="w-full text-left border-collapse">
 						<thead class="bg-slate-700/50 text-slate-300 border-b border-slate-600 sticky top-0 z-10">
 							<tr>
@@ -284,7 +328,7 @@
 				</div>
 
             <!-- Suppliers Table -->
-            <div id="suppliers-table" class="overflow-y-auto hidden" style="max-height: 60vh;">
+            <div id="suppliers-table" class="overflow-y-auto hidden custom-scrollbar" style="max-height: 60vh;">
                 <table class="w-full border-collapse text-left text-xs text-white">
                     <thead class="bg-slate-800 text-slate-300 sticky top-0 z-10">
                         <tr>
@@ -298,7 +342,7 @@
                     </thead>
                     <tbody class="divide-y divide-slate-600">
                         @forelse($suppliers ?? [] as $supplier)
-                        <tr class="hover:bg-slate-600 transition cursor-pointer data-row">
+                        <tr class="hover:bg-slate-600 transition cursor-pointer data-row" onclick="selectRow(this)">
                             <td class="px-3 py-3 font-medium text-slate-300 border-l-4 border-amber-500">{{ $supplier->name }}</td>
                             <td class="px-3 py-3 text-slate-300">{{ $supplier->contact_person }}</td>
                             <td class="px-3 py-3 text-slate-300">{{ $supplier->phone }}</td>
@@ -2319,30 +2363,6 @@
     function openReceiveOrderModal(id, number) {
         document.getElementById('receiveOrderNumber').textContent = number;
         document.getElementById('receiveOrderForm').action = `/procurement/purchase-orders/${id}/receive-stock`; // Ensure this route exists or update logic
-        // Note: The controller might iterate on 'update' or have a dedicated 'receive' method. 
-        // Based on the user requests, we simply need a confirmation. 
-        // If there isn't a dedicated route, we might need to use a status update logic.
-        // For now, I'll assume a dedicated route or we can change it to use a hidden input for status='received'.
-        // Let's use the update route with a hidden status field if we were editing, but here we are posting.
-        // Actually, let's just make sure the form submits to the update endpoint with status=received if a specific receive endpoint doesn't exist.
-        // However, standard resource would be PUT/PATCH.
-        // Let's stick to the convention. If the user provided a `receiveStock` method in controller, we'd use it.
-        // Looking at ProcurementController, I saw `receiveStock` method? No, I saw `update` and `store`.
-        // Wait, I didn't check for `receiveStock` specifically in `ProcurementController`. 
-        // I will assume there isn't one and create it or use a route that I can add later.
-        // For now, I'll point it to `/procurement/purchase-orders/{id}/update-status` or similar if I create it.
-        // Or I can use the existing update route and inject status.
-        
-        // Let's double check if I can just use a form that submits to `procurement.purchase-order.update` with status 'received'.
-        // But that route expects a full request object.
-        
-        // I will use a specific route: `/procurement/purchase-orders/{id}/receive` and ensuring I add it to the routes if needed, 
-        // OR reuse the update Logic.
-        // Given I can't see routes file easily without looking, I'll assume I should use the update route with a hidden input.
-        
-        // Actually, looking at previous `sales-ajax.js`, `deliverOrderForm` submitted to `/sales-orders/${id}/deliver`.
-        // I'll assume a similar pattern `procurement/purchase-orders/${id}/receive` and will have to ensure that route exists or I create it.
-        // I'll check `ProcurementController` again in a moment, but for the UI part, let's set it.
         document.getElementById('receiveOrderForm').action = `/procurement/purchase-orders/${id}/receive`;
         
         const modal = document.getElementById('receiveOrderModal');
