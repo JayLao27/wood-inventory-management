@@ -79,7 +79,7 @@
     <div class="grain-overlay"></div>
 
     <!-- Main Container -->
-    <div class="relative z-10 w-full max-w-[1200px] px-6 py-12 flex items-center justify-between gap-16">
+    <div class="relative z-10 w-full max-w-[1200px] px-6 py-12 flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-10 lg:gap-16">
         
         <!-- Left Side: Brand Story (Visible on LG and up) -->
         <div class="hidden lg:flex flex-col flex-1 items-start space-y-10">
