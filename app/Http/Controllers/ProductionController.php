@@ -35,7 +35,7 @@ class ProductionController extends Controller
         // Get pending sales orders with better query filtering
         // Use DB subquery instead of map/filter in PHP
         $pendingSalesOrders = SalesOrder::with(['customer', 'items.product', 'workOrders'])
-            ->where('status', '!=', 'Delivered')
+            ->whereNotIn('status', ['Delivered', 'Cancelled'])
             ->whereHas('items', function($query) {
                 // Only get orders that have items without corresponding work orders (excluding cancelled)
                 $query->whereNotExists(function($subQuery) {
@@ -49,7 +49,7 @@ class ProductionController extends Controller
             ->paginate(15);
 
         $pendingItemsCount = (int) SalesOrderItem::whereHas('salesOrder', function($query) {
-            $query->where('status', '!=', 'Delivered');
+            $query->whereNotIn('status', ['Delivered', 'Cancelled']);
         })
         ->whereNotExists(function($subQuery) {
             $subQuery->select(DB::raw(1))
@@ -181,7 +181,7 @@ class ProductionController extends Controller
                     'quantity' => $qtyNeeded,
                     'reference_type' => WorkOrder::class,
                     'reference_id' => $workOrder->id,
-                    'notes' => sprintf('Production work order %s – %s x %s', $workOrder->order_number, $product->product_name, $validated['quantity']),
+                    'notes' => sprintf('Production work order %s – %s x %s (Stock Out: %s)', $workOrder->order_number, $product->product_name, $validated['quantity'], now()->toDateTimeString()),
                     'status' => 'completed',
                 ]);
 
@@ -356,6 +356,26 @@ class ProductionController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
+    public function show(WorkOrder $workOrder)
+    {
+        $workOrder->load(['product', 'salesOrder.customer']);
+
+        $data = [
+            'id' => $workOrder->id,
+            'order_number' => $workOrder->order_number,
+            'product_name' => $workOrder->product_name ?? $workOrder->product->product_name ?? 'Unknown',
+            'quantity' => $workOrder->quantity,
+            'completion_quantity' => $workOrder->completion_quantity,
+            'starting_date' => $workOrder->created_at ? $workOrder->created_at->toIso8601String() : null,
+            'due_date' => $workOrder->due_date ? $workOrder->due_date->toIso8601String() : null,
+            'assigned_to' => $workOrder->assigned_to,
+            'status' => $workOrder->status,
+            'notes' => $workOrder->notes ?? '', 
+        ];
+
+        return response()->json(['success' => true, 'workOrder' => $data]);
+    }
+
     public function cancel(WorkOrder $workOrder)
     {
         try {
@@ -390,13 +410,13 @@ class ProductionController extends Controller
 
                     // Record the inventory movement
                     InventoryMovement::create([
-                        'item_type' => 'App\Models\Material',
+                        'item_type' => 'material',
                         'item_id' => $material->id,
-                        'movement_type' => 'Return',
+                        'movement_type' => 'in',
                         'quantity' => $qtyToRelease,
-                        'reference_type' => 'App\Models\WorkOrder',
+                        'reference_type' => WorkOrder::class,
                         'reference_id' => $workOrder->id,
-                        'notes' => 'Materials released from cancelled work order ' . $workOrder->order_number,
+                        'notes' => 'Materials released from cancelled work order ' . $workOrder->order_number . ' (Stock In: ' . now()->toDateTimeString() . ')',
                     ]);
                 }
             }
