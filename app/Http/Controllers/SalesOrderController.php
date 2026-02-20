@@ -63,6 +63,7 @@ class SalesOrderController extends Controller
                     'paid_amount' => 0,
                     'payment_status' => 'Pending',
                     'note' => $validated['note'] ?? null,
+                    'user_id' => auth()->id(),
                 ]);
 
                 // If creation succeeds, break the loop
@@ -210,6 +211,7 @@ class SalesOrderController extends Controller
             'status' => $newStatus,
             'payment_status' => $validated['payment_status'] ?? $sales_order->payment_status,
             'note' => $validated['note'] ?? null,
+            'user_id' => auth()->id(),
         ]);
 
         if ($request->wantsJson()) {
