@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProcurementController;
 use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\AuditTrailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -161,6 +162,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/accounting/export/transactions', [AccountingController::class, 'exportTransactionHistory'])
         ->name('accounting.export.transactions')
         ->middleware('role:admin,accounting_staff');
+
+    // System Audit Trails
+    Route::get('/audit-trails', [AuditTrailController::class, 'index'])
+        ->name('audit-trails')
+        ->middleware('role:admin');
 
     // Profile
     Route::get('/profile', function () {
