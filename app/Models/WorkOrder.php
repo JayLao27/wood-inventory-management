@@ -21,7 +21,8 @@ class WorkOrder extends Model
         'starting_date',
         'assigned_to',
         'priority',
-        'notes'
+        'notes',
+        'user_id'
     ];
 
     protected $casts = [
@@ -38,6 +39,11 @@ class WorkOrder extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function inventoryMovements()
