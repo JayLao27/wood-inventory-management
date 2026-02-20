@@ -152,6 +152,7 @@ class ProcurementController extends Controller
             'status' => 'Pending',
             'payment_status' => 'Pending',
             'total_amount' => 0,
+            'user_id' => auth()->id(),
         ]);
 
         $totalAmount = 0;
@@ -209,6 +210,7 @@ class ProcurementController extends Controller
         if ($request->has('expected_delivery')) {
             $purchaseOrder->expected_delivery = $request->input('expected_delivery');
         }
+        $purchaseOrder->user_id = auth()->id();
         $purchaseOrder->save();
 
         Log::info('ProcurementController@updatePurchaseOrder - saved', ['id' => $id, 'status' => $purchaseOrder->status, 'payment_status' => $purchaseOrder->payment_status]);
@@ -399,6 +401,7 @@ class ProcurementController extends Controller
                     'notes' => 'Received from PO ' . $purchaseOrder->order_number 
                         . ' | Received by: ' . (auth()->user()->name ?? 'System')
                         . ' | Defect Qty: ' . number_format($defect, 2),
+                    'user_id' => auth()->id()
                     // created_at is automatically set by Laravel to NOW()
                     // This captures the exact timestamp when inventory clerk records receipt
                 ]);
@@ -499,7 +502,7 @@ class ProcurementController extends Controller
                 });
             }
 
-            $movements = $query->orderBy('created_at', 'desc')->get();
+            $movements = $query->with('user')->orderBy('created_at', 'desc')->get();
 
             // Format the data for the frontend
             $formattedMovements = $movements->map(function ($movement) {
@@ -522,6 +525,7 @@ class ProcurementController extends Controller
                     'supplier_name' => $purchaseOrder && $purchaseOrder->supplier ? $purchaseOrder->supplier->name : 'N/A',
                     'status' => $movement->status,
                     'notes' => $movement->notes,
+                    'user_name' => $movement->user->name ?? 'System',
                 ];
             });
 
@@ -588,6 +592,7 @@ class ProcurementController extends Controller
                         'reference_id' => $purchaseOrder->id,
                         'notes' => 'Bulk received from PO ' . $purchaseOrder->order_number 
                             . ' | Received by: ' . (auth()->user()->name ?? 'System'),
+                        'user_id' => auth()->id()
                     ]);
 
                     $material->increment('current_stock', $remaining);
