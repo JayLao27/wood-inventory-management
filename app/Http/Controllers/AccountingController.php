@@ -300,6 +300,7 @@ class AccountingController extends Controller
                 'description' => $request->input('description'),
                 'sales_order_id' => $request->order_id,
                 'purchase_order_id' => null,
+                'user_id' => auth()->id(),
             ]);
 
             // Update payment status for sales order
@@ -336,6 +337,7 @@ class AccountingController extends Controller
                 'description' => $request->input('description'),
                 'sales_order_id' => null,
                 'purchase_order_id' => $request->order_id,
+                'user_id' => auth()->id(),
             ]);
 
             // Update payment status for purchase order
