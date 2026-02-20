@@ -95,7 +95,8 @@ class InventoryController extends Controller
                 'movement_type' => 'in',
                 'quantity' => $request->current_stock,
                 'reference_type' => 'initial_stock',
-                'notes' => 'Initial stock entry'
+                'notes' => 'Initial stock entry',
+                'user_id' => auth()->id()
             ]);
         }
 
@@ -242,7 +243,7 @@ class InventoryController extends Controller
             })->values();
             $movements = [];
         } else {
-            $item = Material::with('inventoryMovements')->findOrFail($id);
+            $item = Material::with(['inventoryMovements.user'])->findOrFail($id);
             $cost = $item->unit_cost; // For materials, show unit cost
             $materials = [];
             $movements = $item->inventoryMovements
@@ -255,6 +256,7 @@ class InventoryController extends Controller
                         'reference_id' => $movement->reference_id,
                         'notes' => $movement->notes,
                         'created_at' => $movement->created_at,
+                        'user_name' => $movement->user->name ?? 'System',
                     ];
                 })
                 ->values();
@@ -298,7 +300,8 @@ class InventoryController extends Controller
                 'movement_type' => $request->movement_type,
                 'quantity' => $request->quantity,
                 'reference_type' => 'manual_adjustment',
-                'notes' => $request->notes
+                'notes' => $request->notes,
+                'user_id' => auth()->id()
             ]);
 
             // Update stock
@@ -320,7 +323,7 @@ class InventoryController extends Controller
     public function stockMovementsReport(Request $request)
     {
         $query = InventoryMovement::query()
-            ->with('item')
+            ->with(['item', 'user'])
             ->where('item_type', 'material') // Only get materials
             ->orderBy('created_at', 'desc');
 
@@ -415,6 +418,7 @@ class InventoryController extends Controller
                 'wo_id' => $woId,
                 'team_assigned' => $teamAssigned,
                 'notes' => $movement->notes,
+                'user_name' => $movement->user->name ?? 'System',
                 'status' => $movement->status ?? 'completed',
                 'created_at' => $movement->created_at
             ];
