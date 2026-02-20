@@ -50,18 +50,5 @@ class AccountingSeeder extends Seeder
                 ]);
             }
         }
-
-        // Additional random expenses (e.g. Utility, Rent)
-        $expenseTypes = ['Utility Bill', 'Rent', 'Maintenance', 'Office Supplies'];
-        for ($i = 0; $i < 10; $i++) {
-            Accounting::create([
-                'transaction_type' => 'Expense',
-                'amount' => rand(100, 5000),
-                'date' => now()->subDays(rand(1, 30)),
-                'description' => $expenseTypes[array_rand($expenseTypes)],
-                'sales_order_id' => null,
-                'purchase_order_id' => null,
-            ]);
-        }
     }
 }
