@@ -62,4 +62,29 @@ class User extends Authenticatable
     {
         return in_array($this->role, $roles);
     }
+
+    public function inventoryMovements(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
+    public function salesOrders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SalesOrder::class);
+    }
+
+    public function workOrders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WorkOrder::class);
+    }
+
+    public function purchaseOrders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
+    public function accountings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Accounting::class);
+    }
 }
