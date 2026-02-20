@@ -170,6 +170,7 @@ class ProductionController extends Controller
                         'reference_id' => 0, // Temporary, will update after WO creation
                         'notes' => sprintf('Production work order – %s x %s (Stock Out: %s)', $product->product_name, $quantity, now()->toDateTimeString()),
                         'status' => 'completed',
+                        'user_id' => auth()->id()
                     ]);
 
                     $material->decrement('current_stock', $qtyNeeded);
@@ -186,6 +187,7 @@ class ProductionController extends Controller
                     'assigned_to' => $validated['assigned_to'],
                     'priority' => $validated['priority'] ?? 'medium',
                     'status' => 'in_progress',
+                    'user_id' => auth()->id(),
                 ]);
 
                 // Update inventory movements with the correct reference_id
@@ -245,6 +247,7 @@ class ProductionController extends Controller
             if (isset($validated['notes'])) {
                 $updateData['notes'] = $validated['notes'];
             }
+            $updateData['user_id'] = auth()->id();
 
             if (!empty($updateData)) {
                 $workOrder->update($updateData);
@@ -330,6 +333,7 @@ class ProductionController extends Controller
                 'reference_id' => $workOrder->id,
                 'notes' => sprintf('Production completed for WO-%s (Stock In: %s)', $workOrder->order_number, now()->toDateTimeString()),
                 'status' => 'completed',
+                'user_id' => auth()->id()
             ]);
 
             // Increment current stock of the product
@@ -419,6 +423,7 @@ class ProductionController extends Controller
                         'reference_type' => WorkOrder::class,
                         'reference_id' => $workOrder->id,
                         'notes' => 'Materials released from cancelled work order ' . $workOrder->order_number . ' (Stock In: ' . now()->toDateTimeString() . ')',
+                        'user_id' => auth()->id()
                     ]);
                 }
             }
