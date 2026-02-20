@@ -1,4 +1,3 @@
-
 @extends('layouts.system')
 
 @section('main-content')
@@ -268,8 +267,8 @@
 				<!-- Purchase Orders Table -->
 				<div id="purchase-orders-table" class="overflow-x-auto rounded-xl border border-slate-600 custom-scrollbar" style="max-height: 60vh;">
 					<table class="w-full text-left border-collapse">
-						<thead class="bg-slate-700/50 text-slate-300 border-b border-slate-600 sticky top-0 z-10">
-							<tr>
+						<thead >
+							<tr class="bg-slate-700/50 text-slate-300 border-b border-slate-600 sticky top-0 z-10">
 								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Order #</th>
 								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Supplier</th>
 								<th class="px-4 py-3 font-semibold text-xs uppercase tracking-wider">Order Date</th>
@@ -818,7 +817,9 @@
                     <p class="text-slate-300 text-xs mt-0.5" id="viewOrderHeaderSupplier">-</p>
                 </div>
                 <button class="text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 rounded-lg p-2 transition-all" onclick="closeViewOrderItemsModal()">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                 </button>
             </div>
 
@@ -1779,7 +1780,7 @@
                     return;
                 }
                 modal.classList.remove('hidden');
-                modal.style.display = 'flex';
+                modal.classList.add('flex');
             } catch (err) {
                 console.error('Error in editOrder:', err);
                 alert('Unable to open edit modal. Check console for details.');
