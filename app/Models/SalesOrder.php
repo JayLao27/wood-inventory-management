@@ -10,7 +10,7 @@ class SalesOrder extends Model
     protected $fillable = [
         'order_number', 'customer_id', 'order_date',
         'delivery_date', 'due_date', 'total_amount', 'status',
-        'paid_amount', 'payment_status', 'note'
+        'paid_amount', 'payment_status', 'note', 'user_id'
     ];
 
     public function customer()
@@ -21,6 +21,11 @@ class SalesOrder extends Model
     public function items()
     {
         return $this->hasMany(SalesOrderItem::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function workOrders()
