@@ -15,7 +15,8 @@ class InventoryMovement extends Model
         'reference_type',
         'reference_id',
         'notes',
-        'status'
+        'status',
+        'user_id'
     ];
 
     protected $casts = [
@@ -30,5 +31,10 @@ class InventoryMovement extends Model
     public function reference(): MorphTo
     {
         return $this->morphTo('reference', 'reference_type', 'reference_id');
+    }
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
