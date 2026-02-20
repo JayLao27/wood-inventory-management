@@ -23,6 +23,7 @@ class PurchaseOrder extends Model
         'approval_date',
         'updated_date',
         'payment_status',
+        'user_id',
     ];
 
     protected $casts = [
@@ -42,6 +43,11 @@ class PurchaseOrder extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function accountingTransactions(): HasMany
