@@ -709,7 +709,7 @@
                                                     <th class="px-4 py-3">Material</th>
                                                     <th class="px-4 py-3 text-center">Quantity</th>
                                                     <th class="px-4 py-3">PO ID</th>
-                                                    <th class="px-4 py-3">From Supplier</th>
+                                                    <th class="px-4 py-3">User</th>
                                                     <th class="px-4 py-3">Notes</th>
                                                 </tr>
                                             </thead>
@@ -734,7 +734,7 @@
                                                     <th class="px-4 py-3">Material</th>
                                                     <th class="px-4 py-3 text-center">Quantity Out</th>
                                                     <th class="px-4 py-3">Work Order</th>
-                                                    <th class="px-4 py-3">Team Assigned</th>
+                                                    <th class="px-4 py-3">User</th>
                                                     <th class="px-4 py-3">Notes</th>
                                                 </tr>
                                             </thead>
@@ -1481,7 +1481,7 @@
                 } else {
                     stockInBody.innerHTML = stockInRecords.map(movement => {
                         const poId = movement.po_number || '-';
-                        const supplierName = movement.supplier_name || '-';
+                        const userName = movement.user_name || 'System';
                         const quantity = `${Number(movement.quantity).toFixed(2)} ${movement.unit || ''}`.trim();
                         const dateTime = movement.date ? `${movement.date} ${movement.time || ''}`.trim() : '-';
 
@@ -1493,7 +1493,14 @@
                                     <span class="inline-block px-3 py-1 font-semibold text-green-700 bg-green-100 rounded-full">+${quantity}</span>
                                 </td>
                                 <td class="px-4 py-3 text-gray-700 font-semibold">${poId}</td>
-                                <td class="px-4 py-3 text-gray-600 text-sm">${supplierName}</td>
+                                <td class="px-4 py-3 text-gray-900 font-medium text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-600 border border-slate-200">
+                                            ${userName.substring(0, 2).toUpperCase()}
+                                        </div>
+                                        ${userName}
+                                    </div>
+                                </td>
                                 <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
                             </tr>
                         `;
@@ -1506,7 +1513,7 @@
                     stockOutBody.innerHTML = stockOut.map(movement => {
                         const quantity = `${Number(movement.quantity).toFixed(2)} ${movement.unit || ''}`;
                         const woId = movement.wo_id || '-';
-                        const teamAssigned = movement.team_assigned || '-';
+                        const userName = movement.user_name || 'System';
 
                         return `
                             <tr class="hover:bg-red-50 transition-all duration-200">
@@ -1516,7 +1523,14 @@
                                     <span class="inline-block px-3 py-1 font-semibold text-red-700 bg-red-100 rounded-full">-${quantity}</span>
                                 </td>
                                 <td class="px-4 py-3 text-gray-700 font-semibold">${woId}</td>
-                                <td class="px-4 py-3 text-gray-600 text-sm">${teamAssigned}</td>
+                                <td class="px-4 py-3 text-gray-900 font-medium text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-600 border border-slate-200">
+                                            ${userName.substring(0, 2).toUpperCase()}
+                                        </div>
+                                        ${userName}
+                                    </div>
+                                </td>
                                 <td class="px-4 py-3 text-xs text-gray-500 max-w-xs truncate" title="${movement.notes || '-'}">${movement.notes || '-'}</td>
                             </tr>
                         `;
