@@ -15,6 +15,8 @@ Route::get('/', function () {
 });
 
 // Auth
+Route::get('/altcha-challenge', [App\Http\Captcha\CaptchaController::class, 'challenge'])
+    ->name('altcha.challenge');
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login');
 Route::post('/login', [AuthController::class, 'login'])

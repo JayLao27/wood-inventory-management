@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | RM Wood Works</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script async defer src="/altcha.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
@@ -60,6 +61,29 @@
         .input-group:focus-within svg {
             color: var(--accent);
             transform: scale(1.1);
+        }
+
+        /* Altcha Widget Styling */
+        altcha-widget {
+            --altcha-max-width: 100%;
+            --altcha-border-radius: 0.75rem;
+            --altcha-color-base: #ffffff;
+            --altcha-color-border: #333333;
+            --altcha-color-bg: #181a1b;
+            margin-bottom: 0.5rem;
+        }
+
+        .altcha-footer {
+            font-size: 10px;
+            color: #8B735B;
+            text-align: right;
+            margin-top: 4px;
+            padding-right: 4px;
+        }
+
+        .altcha-footer u {
+            text-decoration: underline;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -183,13 +207,45 @@
                         </div>
                     </div>
 
-                    <!-- Remember & Action -->
-                    <div class="flex items-center justify-between pt-2">
-                        <label class="inline-flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#D2691E] text-[#D2691E] focus:ring-[#D2691E]/50 transition-colors">
-                            <span class="text-sm text-[#6D5D54] group-hover:text-[#8B4513] transition-colors">Remember me</span>
-                        </label>
+                    <!-- Altcha Captcha -->
+                    <div class="pt-2 relative">
+                        <div class="border border-[#333333] bg-[#181a1b] rounded-xl overflow-hidden transition-all hover:border-[#D2691E]/30">
+                            <altcha-widget 
+                                challengeurl="{{ route('altcha.challenge') }}" 
+                                name="altcha_payload"
+                                theme="dark"
+                                auto="off"
+                                overlay
+                                debug
+                                hidefooter
+                                hidelogo
+                                strings="{{ json_encode(['label' => "Verification Required"]) }}"
+                                style="border: none; margin-bottom: 0;"
+                            ></altcha-widget>
+                            <div class="text-right pr-3 pb-2 -mt-1 relative z-10 pointer-events-none">
+                                <span class="text-[10px] text-[#fff]">Protected by <u class="pointer-events-auto"> ALTCHA</u></span>
+                            </div>
+                        </div>
                     </div>
+
+                    <script>
+                        // Log Altcha events to help debug
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const widget = document.querySelector('altcha-widget');
+                            if (widget) {
+                                widget.addEventListener('statechange', (ev) => {
+                                    console.log('Altcha State:', ev.detail.state);
+                                });
+                                widget.addEventListener('serverjson', (ev) => {
+                                    console.log('Altcha Challenge JSON:', ev.detail.json);
+                                });
+                                widget.addEventListener('error', (ev) => {
+                                    console.error('Altcha Error:', ev.detail.error);
+                                });
+                            }
+                        });
+                    </script>
+
 
                     <!-- Submit Button -->
                     <button type="submit" 
@@ -211,5 +267,12 @@
         </div>
     </div>
 
+    <!-- Simple Reference Form (Requested) -->
+    <div class="hidden">
+        <form>
+            <altcha-widget challengeurl="/altcha-challenge"></altcha-widget>
+        </form>
+    </div>
 </body>
 </html>
+```
