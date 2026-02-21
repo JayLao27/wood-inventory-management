@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -62,6 +64,7 @@
             transform: scale(1.1);
         }
     </style>
+    <x-turnstile.scripts />
 </head>
 <body class="min-h-screen bg-[#FDFBF7] relative overflow-hidden flex items-center justify-center">
 
@@ -72,7 +75,7 @@
         <div class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-gradient-to-tr from-[#DEB887]/30 to-[#F4A460]/20 rounded-full blur-[80px]"></div>
         
         <!-- Subtle Grid -->
-        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(139, 69, 19, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 69, 19, 0.03) 1px, transparent 1px); background-size: 50px 50px;"></div>
+        <div class="absolute inset-0"    style="background-image: linear-gradient(rgba(139, 69, 19, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 69, 19, 0.03) 1px, transparent 1px); background-size: 50px 50px;"></div>
     </div>
 
     <!-- Grain Overlay for texture -->
@@ -161,7 +164,7 @@
                             </div>
                             <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
                                 class="custom-input w-full bg-white/60 border border-[#DEB887]/50 rounded-xl px-4 py-3.5 pl-11 text-[#4A3728] placeholder-[#8B735B]/50 font-medium focus:outline-none focus:bg-white"
-                                placeholder="name@rmwoodworks.com">
+                                placeholder="role@rmwoodworks.com">
                         </div>
                     </div>
 
@@ -183,14 +186,19 @@
                         </div>
                     </div>
 
-                    <!-- Remember & Action -->
-                    <div class="flex items-center justify-between pt-2">
-                        <label class="inline-flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#D2691E] text-[#D2691E] focus:ring-[#D2691E]/50 transition-colors">
-                            <span class="text-sm text-[#6D5D54] group-hover:text-[#8B4513] transition-colors">Remember me</span>
-                        </label>
-                    </div>
-
+            <div class="mt-4 flex flex-col items-center justify-center">
+            <div class="min-h-[65px] flex items-center justify-center">
+                <x-turnstile
+                    data-action="login"
+                    data-theme="light"
+                />
+            </div>
+            @error('cf-turnstile-response')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+        </div>            
+              
+                                            
                     <!-- Submit Button -->
                     <button type="submit" 
                         class="w-full bg-gradient-to-r from-[#8B4513] via-[#A0522D] to-[#8B4513] bg-[length:200%_auto] hover:bg-right transition-all duration-500 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-[#8B4513]/30 active:scale-[0.98] flex items-center justify-center gap-2 group">
