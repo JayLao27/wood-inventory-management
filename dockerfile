@@ -24,7 +24,7 @@ RUN echo '<Directory /var/www/html/public>\n\
     Options Indexes FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
-</Directory>' >> /etc/apache2/sites-available/000-default.conf
+    </Directory>' >> /etc/apache2/sites-available/000-default.conf
 
 #set working dir
 WORKDIR /var/www/html
