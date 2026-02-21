@@ -20,10 +20,19 @@ class AuthController extends Controller
 	public function login(Request $request)
 	{
 		try {
-			$request->validate([
+			$rules = [
 				'email' => 'required|email',
 				'password' => 'required|string',
-				'cf-turnstile-response' => ['required', new Turnstile]	
+			];
+
+			if (app()->isProduction()) {
+				$rules['cf-turnstile-response'] = ['required', new Turnstile];
+			}
+
+			$request->validate($rules, [
+				'cf-turnstile-response.required' => 'Please complete the CAPTCHA verification.',
+			], [
+				'cf-turnstile-response' => 'CAPTCHA',
 			]);
 		} catch (\Illuminate\Http\Client\RequestException $e) {
 			return back()->withErrors(['turnstile' => 'Unable to verify captcha. Please try again.'])->withInput();
